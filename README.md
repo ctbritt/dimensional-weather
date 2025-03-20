@@ -1,90 +1,64 @@
 # Dimensional Weather for Dark Sun
 
-A dynamic weather system for the Dark Sun setting, based on five dimensions: temperature, wind, precipitation, humidity, and variability.
+A dynamic weather system for the Dark Sun setting in Foundry VTT, providing harsh and unforgiving Athasian weather conditions.
 
 ## Description
 
-Dimensional Weather is a FoundryVTT module that provides a comprehensive Athasian weather system for your Dark Sun campaigns. The weather is generated based on five dimensions:
-
-1. **Temperature** - How hot or cold it is (usually very hot in Athas)
-2. **Wind** - How strong the wind is blowing
-3. **Precipitation** - How much precipitation is falling (rare in Athas)
-4. **Humidity** - How dry the air is (typically very dry)
-5. **Variability** - How quickly the weather changes
+This module adds a comprehensive Athasian weather system to your Dark Sun campaign, featuring:
+- Terrain-specific weather patterns
+- Survival rules based on conditions
+- Private GM commands for weather management
+- Thematic chat display with Dark Sun styling
 
 ## Features
 
-- **Authentic Dark Sun Weather**: Weather conditions that reflect the harsh, unforgiving environment of Athas
-- **Terrain-Specific Climate Presets**: Different terrain types like Sandy Wastes, Glass Plateau, Sea of Silt, etc.
-- **Automatic Integration with Simple Calendar**: Time and season are automatically retrieved from Simple Calendar
-- **Customizable Weather Display**: Clean, thematic chat cards with terrain information and survival considerations
-- **Easy-to-Use Commands**: Simple chat commands for checking and updating weather
+### Weather System
+- Temperature (extreme heat effects)
+- Wind (from dead still to hurricane force)
+- Humidity (typically very dry)
+- Precipitation (rare in Athas)
+
+### Terrain Types
+- Boulder Fields
+- Dust Sinks
+- Mountains
+- Mudflats
+- Rocky Badlands
+- Salt Flats
+- Salt Marshes
+- Sandy Wastes
+- Scrub Plains
+- Stony Barrens
+- Verdant Belt
+- Sea of Silt
+- Ringing Mountains
+- Forest Ridge
+
+### Commands
+- `/weather` - Display current weather (available to all)
+- `/weather terrain [type]` - Change terrain type (GM only)
+- `/weather update` - Force weather update (GM only)
+- `/weather stats` - Display weather statistics (GM only)
+- `/weather forecast` - Show weather forecast (GM only)
+- `/weather random [0-10]` - Set weather variability (GM only)
+- `/date` - Show calendar information
 
 ## Installation
 
-### Method 1: From FoundryVTT
-
-1. In your FoundryVTT setup screen, go to the "Add-on Modules" tab
-2. Click "Install Module"
-3. Search for "Dimensional Weather for Dark Sun"
-4. Click "Install"
-
-### Method 2: Manual Installation
-
-1. Download the latest release from the [Releases page](https://github.com/ctbritt/dimensional-weather/releases)
-2. Extract the zip file
-3. Copy the extracted folder to your FoundryVTT modules directory
-4. Restart FoundryVTT
-5. Enable the module in your world's module settings
+1. Copy this URL: `[your manifest URL]`
+2. In Foundry VTT, go to Add-on Modules
+3. Click "Install Module"
+4. Paste the manifest URL and click Install
 
 ## Usage
 
-### Chat Commands
-
-- `/weather` - Display current weather report
-- `/weather update` - Force a weather update
-- `/forecast` - Show weather forecast
-- `/terrain` - Display current terrain and available options
-- `/terrain [type]` - Change terrain type (e.g., `/terrain sandyWastes`)
-- `/date` - Display current date and time
-
-You can also access these commands through the weather button in the chat control bar.
+1. Enable the module in your world's module settings
+2. Use `/weather` to check current conditions
+3. GMs can use additional commands to manage the weather system
 
 ## Dependencies
 
-- [Simple Calendar](https://foundryvtt.com/packages/foundryvtt-simple-calendar) (Required) - Provides date and time information
-
-## Recent Changes
-
-- Improved thematic styling for Dark Sun setting
-- Removed season and time display from the weather report for a cleaner interface
-- Enhanced terrain-specific atmospheric descriptions and survival considerations
-- Improved command handling and registration
-- Added UI button in chat for easy access to weather commands
-
-## Development and Distribution
-
-### Versioning
-
-This module uses semantic versioning (MAJOR.MINOR.PATCH):
-- MAJOR version for incompatible changes
-- MINOR version for new functionality that is backwards-compatible
-- PATCH version for backwards-compatible bug fixes
-
-### Release Workflow
-
-To create a new release:
-
-1. Update code and commit changes
-2. Create and push a new tag with the version number:
-   ```
-   git tag v1.0.1
-   git push origin v1.0.1
-   ```
-3. The GitHub Actions workflow will automatically:
-   - Update the version in module.json
-   - Create a zip file with all module files
-   - Create a new GitHub release with the zip and module.json files
+- Simple Calendar (for date/time integration)
 
 ## License
 
