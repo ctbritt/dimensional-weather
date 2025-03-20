@@ -1,0 +1,106 @@
+{
+    "dimensional-weather": {
+        "settings": {
+            "worldType": {
+                "name": "Тип Світу",
+                "hint": "Виберіть між Традиційною Фентезі або Темним Сонцем (Атас)."
+            },
+            "climateType": {
+                "name": "Тип Клімату",
+                "hint": "Виберіть переважаючий клімат регіону."
+            },
+            "season": {
+                "name": "Пора Року",
+                "hint": "Виберіть поточну пору року."
+            },
+            "timeOfDay": {
+                "name": "Час Доби",
+                "hint": "Виберіть поточний час доби."
+            },
+            "updateInterval": {
+                "name": "Інтервал Оновлення Погоди",
+                "hint": "Встановіть, скільки ігрових годин має пройти між автоматичними оновленнями погоди."
+            },
+            "useSimpleCalendar": {
+                "name": "Використовувати Інтеграцію з Simple Calendar",
+                "hint": "Автоматично синхронізувати пори року та час доби з модулем Simple Calendar."
+            },
+            "useHexMap": {
+                "name": "Використовувати Погоду Гексагональної Карти",
+                "hint": "Увімкнути систему погоди гексагональної карти для кампаній Темного Сонця."
+            }
+        },
+        "dimensions": {
+            "temperature": "Температура",
+            "wind": "Вітер",
+            "precipitation": "Опади",
+            "humidity": "Вологість",
+            "variability": "Мінливість"
+        },
+        "climates": {
+            "traditional": {
+                "temperate": "Помірний",
+                "desert": "Пустеля",
+                "tundra": "Тундра",
+                "tropical": "Тропічний",
+                "coastal": "Прибережний",
+                "mountain": "Гірський",
+                "swamp": "Болотистий"
+            },
+            "darkSun": {
+                "boulderFields": "Кам'яні Поля",
+                "dustSinks": "Пилкові Западини",
+                "forestRidge": "Лісовий Хребет",
+                "mountains": "Гори",
+                "mudflats": "Мулові Рівнини",
+                "ringingMountains": "Дзвінкі Гори",
+                "rockyBadlands": "Кам'янисті Бескиди",
+                "saltFlats": "Солоні Рівнини",
+                "saltMarshes": "Солоні Болота",
+                "sandyWastes": "Піщані Пустелі",
+                "scrubPlains": "Чагарникові Рівнини",
+                "seaOfSilt": "Море Мулу",
+                "stonyBarrens": "Кам'янисті Пустирі",
+                "verdantBelt": "Зелене Кільце"
+            }
+        },
+        "seasons": {
+            "traditional": {
+                "spring": "Весна",
+                "summer": "Літо",
+                "fall": "Осінь",
+                "winter": "Зима"
+            },
+            "darkSun": {
+                "highSun": "Високе Сонце",
+                "sunDescending": "Сонце, що Спускається",
+                "sunAscending": "Сонце, що Піднімається"
+            }
+        },
+        "timeOfDay": {
+            "earlyMorning": "Ранній Ранок",
+            "midMorning": "Середина Ранку",
+            "noon": "Полудень",
+            "afternoon": "Післяобідній Час",
+            "evening": "Вечір",
+            "night": "Ніч",
+            "lateNight": "Пізня Ніч"
+        },
+        "ui": {
+            "checkWeather": "Перевірити Погоду",
+            "updateWeather": "Оновити Погоду",
+            "currentWeather": "Поточна Погода",
+            "effects": "Ефекти",
+            "hexMapControls": "Елементи Керування Гексагональною Картою"
+        },
+        "commands": {
+            "weather": "Показати поточну погоду",
+            "weatherUpdate": "Примусово оновити погоду",
+            "weatherSet": "Встановити конкретний вимір погоди",
+            "weatherClimate": "Встановити клімат",
+            "weatherSeason": "Встановити пору року",
+            "weatherTime": "Встановити час доби",
+            "weatherHex": "Перемістити погоду на гексагональній карті"
+        }
+    }
+}

@@ -1,0 +1,106 @@
+{
+    "dimensional-weather": {
+        "settings": {
+            "worldType": {
+                "name": "World Type",
+                "hint": "Choose between Traditional Fantasy or Dark Sun (Athas) settings."
+            },
+            "climateType": {
+                "name": "Climate Type",
+                "hint": "Select the predominant climate of the region."
+            },
+            "season": {
+                "name": "Season",
+                "hint": "Select the current season."
+            },
+            "timeOfDay": {
+                "name": "Time of Day",
+                "hint": "Select the current time of day."
+            },
+            "updateInterval": {
+                "name": "Weather Update Interval",
+                "hint": "Set how many in-game hours should pass between automatic weather updates."
+            },
+            "useSimpleCalendar": {
+                "name": "Use Simple Calendar Integration",
+                "hint": "Automatically sync seasons and time of day with the Simple Calendar module."
+            },
+            "useHexMap": {
+                "name": "Use Hex Map Weather",
+                "hint": "Enable the hex map weather system for Dark Sun campaigns."
+            }
+        },
+        "dimensions": {
+            "temperature": "Temperature",
+            "wind": "Wind",
+            "precipitation": "Precipitation",
+            "humidity": "Humidity",
+            "variability": "Variability"
+        },
+        "climates": {
+            "traditional": {
+                "temperate": "Temperate",
+                "desert": "Desert",
+                "tundra": "Tundra",
+                "tropical": "Tropical",
+                "coastal": "Coastal",
+                "mountain": "Mountain",
+                "swamp": "Swamp"
+            },
+            "darkSun": {
+                "boulderFields": "Boulder Fields",
+                "dustSinks": "Dust Sinks",
+                "forestRidge": "Forest Ridge",
+                "mountains": "Mountains",
+                "mudflats": "Mudflats",
+                "ringingMountains": "Ringing Mountains",
+                "rockyBadlands": "Rocky Badlands",
+                "saltFlats": "Salt Flats",
+                "saltMarshes": "Salt Marshes",
+                "sandyWastes": "Sandy Wastes",
+                "scrubPlains": "Scrub Plains",
+                "seaOfSilt": "Sea of Silt",
+                "stonyBarrens": "Stony Barrens",
+                "verdantBelt": "Verdant Belt"
+            }
+        },
+        "seasons": {
+            "traditional": {
+                "spring": "Spring",
+                "summer": "Summer",
+                "fall": "Fall/Autumn",
+                "winter": "Winter"
+            },
+            "darkSun": {
+                "highSun": "High Sun",
+                "sunDescending": "Sun Descending",
+                "sunAscending": "Sun Ascending"
+            }
+        },
+        "timeOfDay": {
+            "earlyMorning": "Early Morning",
+            "midMorning": "Mid Morning",
+            "noon": "Noon",
+            "afternoon": "Afternoon",
+            "evening": "Evening",
+            "night": "Night",
+            "lateNight": "Late Night"
+        },
+        "ui": {
+            "checkWeather": "Check Weather",
+            "updateWeather": "Update Weather",
+            "currentWeather": "Current Weather",
+            "effects": "Effects",
+            "hexMapControls": "Hex Map Controls"
+        },
+        "commands": {
+            "weather": "Display current weather",
+            "weatherUpdate": "Force weather update",
+            "weatherSet": "Set a specific weather dimension",
+            "weatherClimate": "Set climate",
+            "weatherSeason": "Set season",
+            "weatherTime": "Set time of day",
+            "weatherHex": "Move hex map weather"
+        }
+    }
+}

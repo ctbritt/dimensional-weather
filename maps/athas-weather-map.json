@@ -1,0 +1,132 @@
+{
+    "metadata": {
+        "name": "Custom Weather Map",
+        "description": "A custom hex-based weather map",
+        "author": "Your Name"
+    },
+    "weatherTypes": {
+        "normal": {
+            "name": "Normal",
+            "color": "#7f8c8d",
+            "description": "Typical weather conditions for the region.",
+            "effects": "No special effects.",
+            "gameEffects": {
+                "temperature": 7,
+                "wind": 3,
+                "humidity": -5
+            }
+        },
+        "hot": {
+            "name": "Hot",
+            "color": "#f9e076",
+            "description": "The scorching sun beats down relentlessly.",
+            "effects": "Double water consumption during the day.",
+            "gameEffects": {
+                "waterConsumption": 2,
+                "temperature": 7
+            }
+        },
+        "windy": {
+            "name": "Windy",
+            "color": "#b3b3b3",
+            "description": "Strong winds whip across the barren landscape.",
+            "effects": "Penalty to ranged attacks.",
+            "gameEffects": {
+                "rangedAttacks": -5,
+                "wind": 7
+            }
+        },
+        "sandstorm": {
+            "name": "Sandstorm",
+            "color": "#e67e22",
+            "description": "A wall of sand obscures vision and scours exposed skin.",
+            "effects": "Cannot see past 5 feet.",
+            "gameEffects": {
+                "visibility": "heavily obscured",
+                "perceptionChecks": -10,
+                "wind": 9,
+                "humidity": -8
+            }
+        },
+        "deadlyHot": {
+            "name": "Deadly Hot",
+            "color": "#e74c3c",
+            "description": "The heat is unbearable, threatening to cook anyone exposed to it.",
+            "effects": "Quintuple water consumption during the day.",
+            "gameEffects": {
+                "waterConsumption": 5,
+                "exhaustion": true,
+                "temperature": 10
+            }
+        },
+        "overcast": {
+            "name": "Overcast",
+            "color": "#2a9d8f",
+            "description": "Rare clouds provide some relief from the sun.",
+            "effects": "Bonus to hiding in shadows.",
+            "gameEffects": {
+                "stealthBonus": 2,
+                "temperature": 5
+            }
+        },
+        "dryThunder": {
+            "name": "Dry Thunder",
+            "color": "#8e44ad",
+            "description": "Lightning crackles across the sky without rain.",
+            "effects": "Lightning strikes on critical misses.",
+            "gameEffects": {
+                "temperature": 6,
+                "wind": 5
+            }
+        },
+        "cool": {
+            "name": "Cool",
+            "color": "#3498db",
+            "description": "A rare respite from the heat.",
+            "effects": "Normal water consumption.",
+            "gameEffects": {
+                "temperature": 4,
+                "wind": 2
+            }
+        }
+    },
+    "hexMap": {
+        "0,0": "normal",
+        "1,0": "hot",
+        "2,0": "hot",
+        "3,0": "deadlyHot",
+        "-1,0": "overcast",
+        "-2,0": "overcast",
+        "-3,0": "sandstorm",
+        "0,-1": "windy",
+        "1,-1": "hot",
+        "2,-1": "deadlyHot",
+        "3,-1": "deadlyHot",
+        "-1,-1": "overcast",
+        "-2,-1": "overcast",
+        "-3,-1": "sandstorm",
+        "0,1": "cool",
+        "1,1": "hot",
+        "2,1": "dryThunder",
+        "3,1": "deadlyHot",
+        "-1,1": "windy",
+        "-2,1": "sandstorm",
+        "-3,1": "sandstorm",
+        "0,-2": "windy",
+        "1,-2": "windy",
+        "2,-2": "hot",
+        "-1,-2": "overcast",
+        "-2,-2": "overcast",
+        "0,2": "dryThunder",
+        "1,2": "dryThunder",
+        "2,2": "dryThunder",
+        "-1,2": "windy",
+        "-2,2": "sandstorm",
+        "0,-3": "overcast",
+        "1,-3": "windy",
+        "-1,-3": "overcast",
+        "0,3": "dryThunder",
+        "1,3": "deadlyHot",
+        "-1,3": "windy"
+    }
+}

@@ -1,0 +1,69 @@
+{
+  "id": "dimensional-weather",
+  "title": "Dark Sun Weather",
+  "description": "A module for Dark Sun that adds weather effects to the game.",
+  "esmodules": [
+    "scripts/dimensional-weather.js"
+  ],
+  "styles": [
+    "styles/dimensional-weather.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "version": "1.0.0",
+  "compatibility": {
+    "minimum": "12",
+    "verified": "13"
+  },
+  "relationships": {
+    "systems": [
+      {
+        "id": "dnd5e",
+        "type": "system",
+        "compatibility": {}
+      }
+    ],
+    "requires": [
+      {
+        "id": "chat-commander",
+        "type": "module",
+        "manifest": "https://gitlab.com/woodentavern/foundryvtt-chat-command-lib/-/raw/master/module.json",
+        "compatibility": {
+          "verified": "2.0.1"
+        }
+      },
+      {
+        "id": "about-time",
+        "type": "module",
+        "compatibility": {}
+      },
+      {
+        "id": "foundryvtt-simple-calendar",
+        "type": "module",
+        "compatibility": {}
+      },
+      {
+        "id": "lib-wrapper",
+        "type": "module",
+        "manifest": "https://github.com/ruipin/fvtt-lib-wrapper/releases/download/v1.12.11.0/module.json",
+        "compatibility": {
+          "verified": "1.12.11.0"
+        }
+      }
+    ]
+  },
+  "authors": [
+    {
+      "name": "Christopher Allbritton",
+      "email": "ctbritt@gmail.com",
+      "url": "https://christopherallbritton.com",
+      "discord": "callbritton",
+      "flags": {}
+    }
+  ]
+}

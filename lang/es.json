@@ -1,0 +1,106 @@
+{
+    "dimensional-weather": {
+        "settings": {
+            "worldType": {
+                "name": "Tipo de Mundo",
+                "hint": "Elija entre Fantasía Tradicional o Sol Oscuro (Athas)."
+            },
+            "climateType": {
+                "name": "Tipo de Clima",
+                "hint": "Seleccione el clima predominante de la región."
+            },
+            "season": {
+                "name": "Estación",
+                "hint": "Seleccione la estación actual."
+            },
+            "timeOfDay": {
+                "name": "Hora del Día",
+                "hint": "Seleccione la hora actual del día."
+            },
+            "updateInterval": {
+                "name": "Intervalo de Actualización del Clima",
+                "hint": "Establezca cuántas horas de juego deben pasar entre actualizaciones automáticas del clima."
+            },
+            "useSimpleCalendar": {
+                "name": "Usar Integración con Simple Calendar",
+                "hint": "Sincronice automáticamente las estaciones y la hora del día con el módulo Simple Calendar."
+            },
+            "useHexMap": {
+                "name": "Usar Clima de Mapa Hexagonal",
+                "hint": "Habilite el sistema de clima hexagonal para campañas de Sol Oscuro."
+            }
+        },
+        "dimensions": {
+            "temperature": "Temperatura",
+            "wind": "Viento",
+            "precipitation": "Precipitación",
+            "humidity": "Humedad",
+            "variability": "Variabilidad"
+        },
+        "climates": {
+            "traditional": {
+                "temperate": "Templado",
+                "desert": "Desierto",
+                "tundra": "Tundra",
+                "tropical": "Tropical",
+                "coastal": "Costero",
+                "mountain": "Montaña",
+                "swamp": "Pantano"
+            },
+            "darkSun": {
+                "boulderFields": "Campos de Rocas",
+                "dustSinks": "Sumideros de Polvo",
+                "forestRidge": "Cresta Forestal",
+                "mountains": "Montañas",
+                "mudflats": "Llanuras Fangosas",
+                "ringingMountains": "Montañas Resonantes",
+                "rockyBadlands": "Tierras Baldías Rocosas",
+                "saltFlats": "Llanuras Salinas",
+                "saltMarshes": "Marismas Salinas",
+                "sandyWastes": "Desiertos Arenosos",
+                "scrubPlains": "Llanuras de Matorral",
+                "seaOfSilt": "Mar de Limo",
+                "stonyBarrens": "Tierras Baldías Pedregosas",
+                "verdantBelt": "Cinturón Verdeante"
+            }
+        },
+        "seasons": {
+            "traditional": {
+                "spring": "Primavera",
+                "summer": "Verano",
+                "fall": "Otoño",
+                "winter": "Invierno"
+            },
+            "darkSun": {
+                "highSun": "Sol Alto",
+                "sunDescending": "Sol Descendente",
+                "sunAscending": "Sol Ascendente"
+            }
+        },
+        "timeOfDay": {
+            "earlyMorning": "Madrugada",
+            "midMorning": "Media Mañana",
+            "noon": "Mediodía",
+            "afternoon": "Tarde",
+            "evening": "Atardecer",
+            "night": "Noche",
+            "lateNight": "Noche Cerrada"
+        },
+        "ui": {
+            "checkWeather": "Verificar Clima",
+            "updateWeather": "Actualizar Clima",
+            "currentWeather": "Clima Actual",
+            "effects": "Efectos",
+            "hexMapControls": "Controles de Mapa Hexagonal"
+        },
+        "commands": {
+            "weather": "Mostrar clima actual",
+            "weatherUpdate": "Forzar actualización del clima",
+            "weatherSet": "Establecer una dimensión específica del clima",
+            "weatherClimate": "Establecer clima",
+            "weatherSeason": "Establecer estación",
+            "weatherTime": "Establecer hora del día",
+            "weatherHex": "Mover clima en mapa hexagonal"
+        }
+    }
+}
