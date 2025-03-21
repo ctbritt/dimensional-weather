@@ -1,7 +1,41 @@
 {
     "name": "Athas",
     "description": "Dark Sun campaign setting weather system",
-    "version": "TEST-1.0",
+    "seasons": {
+        "highSun": {
+            "name": "High Sun",
+            "description": "",
+            "modifiers": {
+                "temperature": 2,
+                "wind": 1,
+                "precipitation": -1,
+                "humidity": -1,
+                "variability": 1
+            }
+        },
+        "sunDescending": {
+            "name": "Sun Descending",
+            "description": "",
+            "modifiers": {
+                "temperature": -1,
+                "wind": 0,
+                "precipitation": 1,
+                "humidity": 1,
+                "variability": 1
+            }
+        },
+        "sunAscending": {
+            "name": "Sun Ascending",
+            "description": "",
+            "modifiers": {
+                "temperature": 1,
+                "wind": 0,
+                "precipitation": 0,
+                "humidity": 0,
+                "variability": 1
+            }
+        }
+    },
     "weatherDimensions": {
         "temperature": {
             "descriptions": {
@@ -75,10 +109,10 @@
                 "-10": "Extremely Dry — The air is parched, painfully devoid of moisture, cracking lips and drying skin instantly.",
                 "-5": "Very Dry — The atmosphere is intensely dry, each breath feeling like sandpaper in the throat.",
                 "-1": "Dry — Air is characteristically arid, typical for Athas, harsh yet expected.",
-                "0": "Normal — Standard Athasian dryness; oppressive compared to other worlds but routine here.",
+                "0": "Normal — Standard Athasian dryness.",
                 "1": "Slightly Humid — An uncommon hint of moisture lingers briefly, providing surprising relief to weary travelers.",
-                "5": "Moderately Humid — The air carries a comforting touch of humidity, almost reminiscent of gentler lands.",
-                "10": "Very Humid — Moisture thickens the air, heavy and stifling, causing sweat to pour and sapping strength rapidly."
+                "5": "Moderately Humid — You can feel the hint of moisture in the air; a promise or a tease?",
+                "10": "Very Humid — Moisture thickens the air, heavy and stifling, causing sweat to pour down your neck and sap your strength rapidly."
             }
         }
     },

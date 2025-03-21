@@ -1,42 +1,119 @@
 {
-    "name": "Your Setting Name",
-    "description": "Brief description of your setting's weather system",
-    "version": "1.0",
+    "name": "Template Climate System",
+    "description": "A template for creating custom climate systems",
+    "seasons": {
+        "spring": {
+            "name": "Spring",
+            "description": "A season of renewal and moderate weather.",
+            "modifiers": {
+                "temperature": 1,
+                "wind": 1,
+                "precipitation": 2,
+                "humidity": 1,
+                "variability": 2
+            }
+        },
+        "summer": {
+            "name": "Summer",
+            "description": "The hottest season with increased humidity and potential for storms.",
+            "modifiers": {
+                "temperature": 3,
+                "wind": 0,
+                "precipitation": 1,
+                "humidity": 2,
+                "variability": 1
+            }
+        },
+        "autumn": {
+            "name": "Autumn",
+            "description": "Cooling temperatures and increased wind bring changing weather patterns.",
+            "modifiers": {
+                "temperature": -1,
+                "wind": 2,
+                "precipitation": 1,
+                "humidity": 0,
+                "variability": 3
+            }
+        },
+        "winter": {
+            "name": "Winter",
+            "description": "Cold temperatures and potential for snow and ice.",
+            "modifiers": {
+                "temperature": -3,
+                "wind": 1,
+                "precipitation": 0,
+                "humidity": -1,
+                "variability": 2
+            }
+        }
+    },
     "weatherDimensions": {
         "temperature": {
             "descriptions": {
-                "-10": "Freezing (0° F) - Extreme cold, survival checks required",
-                "-5": "Cold (30° F) - The air is bitter cold",
-                "0": "Mild (60° F) - Comfortable temperature",
-                "5": "Hot (90° F) - A very warm day",
-                "10": "Scorching (120° F) - Dangerously hot conditions"
+                "-10": "Extreme cold (0°F or lower)",
+                "-5": "Very cold (20°F)",
+                "-2": "Cold (35°F)",
+                "0": "Cool (50°F)",
+                "2": "Warm (70°F)",
+                "5": "Hot (85°F)",
+                "8": "Very hot (95°F)",
+                "10": "Extreme heat (100°F or higher)"
+            },
+            "rules": {
+                "-10": {
+                    "description": "Extreme Cold",
+                    "effect": "DC 10 Constitution save each hour or gain 1 Exhaustion level",
+                    "immunity": "Creatures with Cold Resistance/Immunity automatically succeed"
+                },
+                "10": {
+                    "description": "Extreme Heat",
+                    "effect": "DC 5 Constitution save each hour (increases by 1 per hour) or gain 1 Exhaustion level",
+                    "disadvantage": "Creatures wearing Medium/Heavy armor have Disadvantage",
+                    "immunity": "Creatures with Fire Resistance/Immunity automatically succeed"
+                }
             }
         },
         "wind": {
             "descriptions": {
-                "-10": "Dead Still - No wind at all, the air is completely stagnant",
-                "-5": "Light Breeze - Gentle movement of air, leaves rustle softly",
-                "0": "Moderate - Normal wind conditions",
-                "5": "Strong Wind - Powerful gusts that can impede movement",
-                "10": "Gale Force - Extremely dangerous winds, difficult to stand"
+                "-10": "Dead calm",
+                "-5": "Very light breeze",
+                "-2": "Light breeze",
+                "0": "Moderate breeze",
+                "2": "Strong breeze",
+                "5": "Strong wind",
+                "8": "Gale force winds",
+                "10": "Hurricane force winds"
             }
         },
         "precipitation": {
             "descriptions": {
-                "-10": "None - Clear skies without a cloud in sight",
-                "-5": "None - Some clouds but no rain",
-                "0": "Light - Brief scattered showers",
-                "5": "Moderate - Steady rainfall",
-                "10": "Heavy - Intense downpour"
+                "-10": "Clear skies",
+                "-5": "Partly cloudy",
+                "-2": "Mostly cloudy",
+                "0": "Light rain/snow",
+                "2": "Moderate rain/snow",
+                "5": "Heavy rain/snow",
+                "8": "Torrential downpour",
+                "10": "Severe storm"
+            },
+            "rules": {
+                "5": {
+                    "description": "Heavy Precipitation",
+                    "effect": "Area is Lightly Obscured",
+                    "disadvantage": "Disadvantage on Wisdom (Perception) checks"
+                }
             }
         },
         "humidity": {
             "descriptions": {
-                "-10": "Extremely Dry - Parched air that cracks lips and skin",
-                "-5": "Dry - Below average humidity",
-                "0": "Normal - Comfortable humidity level",
-                "5": "Humid - Noticeable moisture in the air",
-                "10": "Very Humid - Air feels thick and oppressive"
+                "-10": "Extremely dry",
+                "-5": "Very dry",
+                "-2": "Dry",
+                "0": "Normal humidity",
+                "2": "Humid",
+                "5": "Very humid",
+                "8": "Oppressively humid",
+                "10": "Saturated air"
             }
         }
     },
@@ -48,49 +125,27 @@
             "temperature": 2
         },
         "Afternoon": {
-            "temperature": 3
+            "temperature": 1
         },
         "Night": {
-            "temperature": -3
+            "temperature": -1
         },
         "Late Night": {
-            "temperature": -4
+            "temperature": -2
         }
     },
     "terrains": {
-        "plains": {
-            "name": "Plains",
-            "description": "Open grasslands with rolling hills",
+        "template_terrain": {
+            "name": "Template Terrain",
+            "description": "A template for creating custom terrain types",
             "temperature": 0,
-            "wind": 2,
+            "wind": 0,
             "precipitation": 0,
             "humidity": 0,
-            "variability": 3,
-            "rules": []
-        },
-        "forest": {
-            "name": "Forest",
-            "description": "Dense woodland with tall trees providing shade",
-            "temperature": -1,
-            "wind": -2,
-            "precipitation": 2,
-            "humidity": 3,
-            "variability": 2,
-            "rules": [
-                "Movement is Difficult terrain unless on a path"
-            ]
-        },
-        "mountains": {
-            "name": "Mountains",
-            "description": "High altitude peaks and rocky terrain",
-            "temperature": -3,
-            "wind": 4,
-            "precipitation": 1,
-            "humidity": -2,
             "variability": 5,
             "rules": [
-                "Movement is Difficult terrain",
-                "Altitude effects above 10,000 feet"
+                "Example rule: Movement is Difficult terrain",
+                "Example rule: Creatures without eye protection have Disadvantage on Perception checks"
             ]
         }
     }

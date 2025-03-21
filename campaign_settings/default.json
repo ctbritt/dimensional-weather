@@ -2,6 +2,52 @@
     "name": "Default Climate System",
     "description": "A comprehensive weather system simulating Earth-like climates, from arctic to tropical regions.",
     "version": "1.0",
+    "seasons": {
+        "spring": {
+            "name": "Spring",
+            "description": "A season of renewal and moderate weather.",
+            "modifiers": {
+                "temperature": 1,
+                "wind": 1,
+                "precipitation": 2,
+                "humidity": 1,
+                "variability": 2
+            }
+        },
+        "summer": {
+            "name": "Summer",
+            "description": "The hottest season with increased humidity and potential for storms.",
+            "modifiers": {
+                "temperature": 3,
+                "wind": 0,
+                "precipitation": 1,
+                "humidity": 2,
+                "variability": 1
+            }
+        },
+        "autumn": {
+            "name": "Autumn",
+            "description": "Cooling temperatures and increased wind bring changing weather patterns.",
+            "modifiers": {
+                "temperature": -1,
+                "wind": 2,
+                "precipitation": 1,
+                "humidity": 0,
+                "variability": 3
+            }
+        },
+        "winter": {
+            "name": "Winter",
+            "description": "Cold temperatures and potential for snow and ice.",
+            "modifiers": {
+                "temperature": -3,
+                "wind": 1,
+                "precipitation": 0,
+                "humidity": -1,
+                "variability": 2
+            }
+        }
+    },
     "weatherDimensions": {
         "temperature": {
             "descriptions": {
@@ -17,27 +63,37 @@
             "rules": {
                 "-10": {
                     "description": "Extreme Cold",
-                    "effect": "DC 10 Constitution save each hour or gain 1 Exhaustion level",
-                    "immunity": "Creatures with Cold Resistance/Immunity automatically succeed"
+                    "effect": "DC 10 Constitution save each hour or gain 1 Exhaustion level. Creatures with Cold Resistance/Immunity automatically succeed."
                 },
                 "10": {
                     "description": "Extreme Heat",
-                    "effect": "DC 5 Constitution save each hour (increases by 1 per hour) or gain 1 Exhaustion level",
-                    "disadvantage": "Creatures wearing Medium/Heavy armor have Disadvantage",
-                    "immunity": "Creatures with Fire Resistance/Immunity automatically succeed"
+                    "effect": "DC 5 Constitution save each hour (increases by 1 per hour) or gain 1 Exhaustion level. Creatures wearing Medium/Heavy armor have Disadvantage. Creatures with Fire Resistance/Immunity automatically succeed."
                 }
             }
         },
         "wind": {
             "descriptions": {
-                "-10": "Dead calm",
-                "-5": "Very light breeze",
-                "-2": "Light breeze",
-                "0": "Moderate breeze",
-                "2": "Strong breeze",
-                "5": "Strong wind",
-                "8": "Gale force winds",
-                "10": "Hurricane force winds"
+                "-10": "Dead Calm",
+                "-5": "Very Light Breeze",
+                "-1": "Light Breeze",
+                "0": "Moderate Breeze",
+                "1": "Strong Breeze",
+                "2": "Strong Wind",
+                "5": "Very Strong Wind",
+                "8": "Gale Force Wind",
+                "10": "Hurricane Force"
+            },
+            "rules": {
+                "2": {
+                    "description": "Strong Wind",
+                    "effect": [
+                        "Disadvantage on ranged attack rolls with weapons",
+                        "Extinguishes open flames",
+                        "Disperses fog",
+                        "Flying creatures must land at the end of their turn or fall",
+                        "In desert terrain: Could create sandstorm that imposes Disadvantage on Wisdom (Perception) checks"
+                    ]
+                }
             }
         },
         "precipitation": {
@@ -45,8 +101,8 @@
                 "-10": "Clear skies",
                 "-5": "Partly cloudy",
                 "-2": "Mostly cloudy",
-                "0": "Light rain/snow",
-                "2": "Moderate rain/snow",
+                "0": "Clear skies",
+                "2": "Light rain/snow",
                 "5": "Heavy rain/snow",
                 "8": "Torrential downpour",
                 "10": "Severe storm"
@@ -54,8 +110,13 @@
             "rules": {
                 "5": {
                     "description": "Heavy Precipitation",
-                    "effect": "Area is Lightly Obscured",
-                    "disadvantage": "Disadvantage on Wisdom (Perception) checks"
+                    "effect": [
+                        "Area is Lightly Obscured",
+                        "Disadvantage on Wisdom (Perception) checks",
+                        "Extinguishes open flames",
+                        "Disperses fog",
+                        "Flying creatures must land at the end of their turn or fall"
+                    ]
                 }
             }
         },
@@ -105,7 +166,7 @@
         "subarctic": {
             "name": "Subarctic Taiga",
             "description": "Cold forest region with long winters and short summers. Dense coniferous forests dominate.",
-            "temperature": -5,
+            "temperature": -8,
             "wind": 2,
             "precipitation": -2,
             "humidity": 0,
