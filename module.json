@@ -1,12 +1,16 @@
 {
   "id": "dimensional-weather",
-  "title": "Dark Sun Weather",
-  "description": "A module for Dark Sun that adds weather effects to the game.",
+  "title": "DimensionalWeather",
+  "description": "A module that adds weather effects to the game in a modular and dimensional manner.",
   "esmodules": [
     "scripts/dimensional-weather.js"
   ],
   "styles": [
-    "styles/dimensional-weather.css"
+    "styles/dimensional-weather.css",
+    "styles/weather-map.css"
+  ],
+  "templates": [
+    "templates/weather-map.html"
   ],
   "languages": [
     {
@@ -67,5 +71,8 @@
       "discord": "callbritton",
       "flags": {}
     }
+  ],
+  "scripts": [
+    "scripts/dimensional-weather.js"
   ]
 }

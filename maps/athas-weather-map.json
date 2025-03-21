@@ -1,15 +1,15 @@
 {
     "metadata": {
-        "name": "Custom Weather Map",
-        "description": "A custom hex-based weather map",
-        "author": "Your Name"
+        "name": "Athas Weather Map",
+        "description": "A hex-based weather map for Dark Sun settings",
+        "author": "Christopher Allbritton"
     },
     "weatherTypes": {
         "normal": {
             "name": "Normal",
             "color": "#7f8c8d",
-            "description": "Typical weather conditions for the region.",
-            "effects": "No special effects.",
+            "description": "Standard Athasian weather conditions",
+            "effects": "No special effects",
             "gameEffects": {
                 "temperature": 7,
                 "wind": 3,
@@ -19,31 +19,38 @@
         "hot": {
             "name": "Hot",
             "color": "#f9e076",
-            "description": "The scorching sun beats down relentlessly.",
-            "effects": "Double water consumption during the day.",
+            "description": "The scorching sun beats down relentlessly",
+            "effects": ">38C, 2x water usage",
             "gameEffects": {
                 "waterConsumption": 2,
-                "temperature": 7
+                "temperature": 8,
+                "survivalEffects": [
+                    "Double water consumption"
+                ]
             }
         },
         "windy": {
             "name": "Windy",
             "color": "#b3b3b3",
-            "description": "Strong winds whip across the barren landscape.",
-            "effects": "Penalty to ranged attacks.",
+            "description": "Strong winds whip across the barren landscape",
+            "effects": "Disadv ranged weapon atks & tracking, 5% tornado",
             "gameEffects": {
-                "rangedAttacks": -5,
+                "rangedAttacks": "disadvantage",
+                "tracking": "disadvantage",
+                "tornadoChance": 5,
                 "wind": 7
             }
         },
         "sandstorm": {
             "name": "Sandstorm",
             "color": "#e67e22",
-            "description": "A wall of sand obscures vision and scours exposed skin.",
-            "effects": "Cannot see past 5 feet.",
+            "description": "A wall of sand obscures vision and scours exposed skin",
+            "effects": "5' visibility, magical tracking only, disadv route finding, no foraging",
             "gameEffects": {
-                "visibility": "heavily obscured",
-                "perceptionChecks": -10,
+                "visibility": 5,
+                "tracking": "magical only",
+                "routeFinding": "disadvantage",
+                "foraging": "disabled",
                 "wind": 9,
                 "humidity": -8
             }
@@ -51,30 +58,33 @@
         "deadlyHot": {
             "name": "Deadly Hot",
             "color": "#e74c3c",
-            "description": "The heat is unbearable, threatening to cook anyone exposed to it.",
-            "effects": "Quintuple water consumption during the day.",
+            "description": "The heat is unbearable, threatening to cook anyone exposed",
+            "effects": ">55C, 4x water usage",
             "gameEffects": {
-                "waterConsumption": 5,
-                "exhaustion": true,
-                "temperature": 10
+                "waterConsumption": 4,
+                "temperature": 10,
+                "survivalEffects": [
+                    "Quadruple water consumption"
+                ]
             }
         },
         "overcast": {
             "name": "Overcast",
             "color": "#2a9d8f",
-            "description": "Rare clouds provide some relief from the sun.",
-            "effects": "Bonus to hiding in shadows.",
+            "description": "Rare clouds provide some relief from the sun",
+            "effects": "Adv on hiding",
             "gameEffects": {
-                "stealthBonus": 2,
+                "stealth": "advantage",
                 "temperature": 5
             }
         },
         "dryThunder": {
             "name": "Dry Thunder",
             "color": "#8e44ad",
-            "description": "Lightning crackles across the sky without rain.",
-            "effects": "Lightning strikes on critical misses.",
+            "description": "Lightning crackles across the sky without rain",
+            "effects": "Lightning strike on crit miss",
             "gameEffects": {
+                "criticalMiss": "lightning strike",
                 "temperature": 6,
                 "wind": 5
             }
@@ -82,16 +92,45 @@
         "cool": {
             "name": "Cool",
             "color": "#3498db",
-            "description": "A rare respite from the heat.",
-            "effects": "Normal water consumption.",
+            "description": "A rare respite from the heat",
+            "effects": "No changes",
             "gameEffects": {
                 "temperature": 4,
                 "wind": 2
             }
+        },
+        "rain": {
+            "name": "Rain",
+            "color": "#0000ff",
+            "description": "An extremely rare occurrence of actual rainfall",
+            "effects": "Flash floods, plant blooms, magical tracking only, -1 lvl exh.",
+            "gameEffects": {
+                "flashFloods": true,
+                "plantBlooms": true,
+                "tracking": "magical only",
+                "exhaustion": -1,
+                "humidity": 8,
+                "precipitation": 8
+            }
+        }
+    },
+    "movementRules": {
+        "directions": {
+            "1": "Northeast",
+            "2": "East",
+            "3": "Southeast",
+            "4": "Southwest",
+            "5": "West",
+            "6": "Northwest"
+        },
+        "edgeRule": "If you reach the edge and would have to take a move off the map, instead move in the closest possible valid direction",
+        "cornerRule": "If you are in a corner you do not move",
+        "barrierRules": {
+            "magenta": "one-way only, move left or right in directional trend instead"
         }
     },
     "hexMap": {
-        "0,0": "normal",
+        "0,0": "rain",
         "1,0": "hot",
         "2,0": "hot",
         "3,0": "deadlyHot",

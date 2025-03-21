@@ -1,0 +1,23 @@
+{{!-- weather-map.html --}}
+<div class="weather-map-container">
+  <canvas id="weather-map-canvas"></canvas>
+  <div class="weather-legend">
+    <h3>Weather Types</h3>
+    <div id="legend-entries">
+      {{#each weatherTypes}}
+      <div class="legend-entry" data-type="{{type}}">
+        <div class="color-box" style="background-color: {{color}}"></div>
+        <span class="legend-label">{{label}}</span>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+  <div class="weather-effects">
+    <h3>Weather Effects</h3>
+    <ul>
+      {{#each weatherEffects}}
+      <li>{{effect}}</li>
+      {{/each}}
+    </ul>
+  </div>
+</div>
