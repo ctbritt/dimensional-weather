@@ -1,7 +1,6 @@
 /**
  * Dimensional Weather Module
  * A clean, rearchitected weather system for FoundryVTT
- * for Athasian settings.
  *
  * Features:
  *  - Climate presets (e.g. Scrub Plains, Rocky Badlands)
@@ -44,9 +43,9 @@ class DimensionalWeather {
       },
       mudflats: {
         temperature: 8,
-        wind: 3,
+        wind: 2,
         precipitation: -5,
-        humidity: 5,
+        humidity: 8,
         variability: 7,
       },
       rockyBadlands: {
@@ -65,9 +64,9 @@ class DimensionalWeather {
       },
       saltMarshes: {
         temperature: 8,
-        wind: 2,
+        wind: 3,
         precipitation: -5,
-        humidity: 5,
+        humidity: 7,
         variability: 5,
       },
       sandyWastes: {
@@ -93,7 +92,7 @@ class DimensionalWeather {
       },
       verdantBelt: {
         temperature: 7,
-        wind: 2,
+        wind: 1,
         precipitation: -5,
         humidity: 5,
         variability: 6,
@@ -201,32 +200,6 @@ class DimensionalWeather {
    */
   static registerSettings() {
     console.log("Dimensional Weather | Registering settings");
-
-    // Register chat commands settings
-    game.settings.register("dimensional-weather", "chatCommands", {
-      name: "Chat Commands",
-      hint: "Register weather chat commands",
-      scope: "world",
-      config: false,
-      type: Object,
-      default: {
-        weather: {
-          command: "weather",
-          description: "Display or modify weather conditions",
-          usage: "/weather [terrain|update|stats|random|help]",
-        },
-        forecast: {
-          command: "forecast",
-          description: "Display weather forecast",
-          usage: "/forecast",
-        },
-        date: {
-          command: "date",
-          description: "Display calendar information",
-          usage: "/date",
-        },
-      },
-    });
 
     // Terrain type setting
     game.settings.register("dimensional-weather", "terrain", {
@@ -1013,7 +986,6 @@ Hooks.on("chatCommandsReady", (commands) => {
   commands.register({
     name: "/weather",
     module: "dimensional-weather",
-    aliases: ["/w"],
     description: "Display current weather conditions",
     icon: "<i class='fas fa-cloud-sun'></i>",
     requiredRole: "NONE",
@@ -1205,7 +1177,6 @@ Hooks.on("chatCommandsReady", (commands) => {
   commands.register({
     name: "/date",
     module: "dimensional-weather",
-    aliases: ["/d"],
     description: "Display calendar information (GM only)",
     icon: "<i class='fas fa-calendar'></i>",
     requiredRole: "GAMEMASTER",
