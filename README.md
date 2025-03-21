@@ -1,4 +1,4 @@
-# Dimensional Weather for Dark Sun
+# Dimensional Weather for FoundryVTT
 
 A dynamic weather system for Foundry VTT, providing a modular system for developing your own climes, terrains, and atmospheric phenomenon.
 
