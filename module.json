@@ -15,14 +15,14 @@
       "path": "lang/en.json"
     }
   ],
-  "version": "1.0.0",
+  "version": "0.0.1",
   "compatibility": {
     "minimum": "12",
     "verified": "13"
   },
   "url": "https://github.com/ctbritt/dimensional-weather",
   "manifest": "https://github.com/ctbritt/dimensional-weather/releases/latest/download/module.json",
-  "download": "https://github.com/ctbritt/dimensional-weather/releases/download/v1.0.0/dimensional-weather.zip",
+  "download": "https://github.com/ctbritt/dimensional-weather/releases/download/0.0.1/dimensional-weather.zip",
   "license": "MIT",
   "relationships": {
     "systems": [
@@ -34,9 +34,9 @@
     ],
     "requires": [
       {
-        "id": "chat-commander",
+        "id": "_chatcommands",
         "type": "module",
-        "manifest": "https://gitlab.com/woodentavern/foundryvtt-chat-command-lib/-/raw/master/module.json",
+        "manifest": "https://gitlab.com/woodentavern/foundryvtt-chat-command-lib/-/raw/master/src/module.json",
         "compatibility": {
           "verified": "2.0.1"
         }
