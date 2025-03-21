@@ -24,10 +24,6 @@
             "useSimpleCalendar": {
                 "name": "Use Simple Calendar Integration",
                 "hint": "Automatically sync seasons and time of day with the Simple Calendar module."
-            },
-            "useHexMap": {
-                "name": "Use Hex Map Weather",
-                "hint": "Enable the hex map weather system for Dark Sun campaigns."
             }
         },
         "dimensions": {
@@ -99,8 +95,7 @@
             "weatherSet": "Set a specific weather dimension",
             "weatherClimate": "Set climate",
             "weatherSeason": "Set season",
-            "weatherTime": "Set time of day",
-            "weatherHex": "Move hex map weather"
+            "weatherTime": "Set time of day"
         }
     }
 }

@@ -90,8 +90,7 @@
             "checkWeather": "Verificar Clima",
             "updateWeather": "Actualizar Clima",
             "currentWeather": "Clima Actual",
-            "effects": "Efectos",
-            "hexMapControls": "Controles de Mapa Hexagonal"
+            "effects": "Efectos"
         },
         "commands": {
             "weather": "Mostrar clima actual",
@@ -99,8 +98,7 @@
             "weatherSet": "Establecer una dimensión específica del clima",
             "weatherClimate": "Establecer clima",
             "weatherSeason": "Establecer estación",
-            "weatherTime": "Establecer hora del día",
-            "weatherHex": "Mover clima en mapa hexagonal"
+            "weatherTime": "Establecer hora del día"
         }
     }
 }

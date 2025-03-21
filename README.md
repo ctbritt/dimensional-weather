@@ -1,24 +1,24 @@
 # Dimensional Weather for Dark Sun
 
-A dynamic weather system for the Dark Sun setting in Foundry VTT, providing harsh and unforgiving Athasian weather conditions.
+A dynamic weather system for Foundry VTT, providing a modular system for developing your own climes, terrains, and atmospheric phenomenon.
 
 ## Description
 
-This module adds a comprehensive Athasian weather system to your Dark Sun campaign, featuring:
+This module adds a comprehensive weather system to your campaign, featuring:
 - Terrain-specific weather patterns
 - Survival rules based on conditions
 - Private GM commands for weather management
-- Thematic chat display with Dark Sun styling
 
 ## Features
 
-### Weather System
-- Temperature (extreme heat effects)
-- Wind (from dead still to hurricane force)
-- Humidity (typically very dry)
-- Precipitation (rare in Athas)
+### Weather Dimensions
+- Temperature
+- Wind
+- Humidity
+- Precipitation
 
 ### Terrain Types
+Your terrain types can be specific to your campaign. For example, if using the Dark Sun campaign, you would have:
 - Boulder Fields
 - Dust Sinks
 - Mountains
@@ -57,8 +57,11 @@ This module adds a comprehensive Athasian weather system to your Dark Sun campai
 3. GMs can use additional commands to manage the weather system
 
 ## Dependencies
+- [Chat Commands Library](https://gitlab.com/woodentavern/foundryvtt-chat-command-lib)
+- [About Time](https://github.com/LeafWulf/about-time)
+- [Simple Calendar](https://github.com/vigoren/foundryvtt-simple-calendar)
+- [libWrapper](https://github.com/ruipin/fvtt-lib-wrapper)
 
-- Simple Calendar (for date/time integration)
 
 ## License
 

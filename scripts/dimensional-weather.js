@@ -10,269 +10,6 @@
  *  - Chat commands for weather updates, forecasts, and calendar info
  */
 
-class WeatherMapApplication extends Application {
-  constructor(options = {}) {
-    super({
-      ...options,
-      title: "Athas Weather Map",
-      id: "athas-weather-map",
-      template: "modules/dimensional-weather/templates/weather-map.html",
-      width: Math.min(800, window.innerWidth * 0.8),
-      height: Math.min(800, window.innerHeight * 0.8),
-      minimizable: true,
-      resizable: true,
-      classes: ["weather-map-app"],
-    });
-
-    this.weatherData = game.settings.get("dimensional-weather", "weatherMap");
-    this.hexSize = 35; // Reduced hex size for better layout
-    this.colors = {
-      hot: "#f9e076",
-      windy: "#b3b3b3",
-      sandstorm: "#e67e22",
-      deadlyHot: "#e74c3c",
-      overcast: "#2a9d8f",
-      dryThunder: "#8e44ad",
-      cool: "#3498db",
-      rain: "#0000ff",
-    };
-  }
-
-  /** @override */
-  static get defaultOptions() {
-    return mergeObject(super.defaultOptions, {
-      width: Math.min(800, window.innerWidth * 0.8),
-      height: Math.min(800, window.innerHeight * 0.8),
-      minimizable: true,
-      resizable: true,
-      classes: ["weather-map-app"],
-      template: "modules/dimensional-weather/templates/weather-map.html",
-    });
-  }
-
-  /** @override */
-  getData(options = {}) {
-    return {
-      weatherTypes: Object.keys(this.colors).map((type) => ({
-        type,
-        color: this.colors[type],
-        label: type
-          .replace(/([A-Z])/g, " $1")
-          .toLowerCase()
-          .replace(/^./, (str) => str.toUpperCase()),
-      })),
-      weatherEffects: [
-        { effect: "Cool: No changes" },
-        { effect: "Overcast: Adv on hiding" },
-        { effect: "Hot: >38C, 2x water usage" },
-        { effect: "Deadly Hot: >55C, 4x water usage" },
-        { effect: "Dry Thunder: Lightning strike on crit miss" },
-        { effect: "Windy: Disadv ranged weapon atks & tracking, 5% tornado" },
-        {
-          effect:
-            "Rain: Flash floods, plant blooms, magical tracking only, -1 lvl exh.",
-        },
-        {
-          effect:
-            "Sandstorm: 5' visibility, magical tracking only, disadv route finding, no foraging",
-        },
-      ],
-    };
-  }
-
-  /** @override */
-  activateListeners(html) {
-    super.activateListeners(html);
-
-    // Get the canvas and set its size
-    const canvas = html.find("#weather-map-canvas")[0];
-    this.resizeCanvas(canvas);
-
-    // Make legend entries interactive
-    html.find(".legend-entry").on("click", (event) => {
-      const type = event.currentTarget.dataset.type;
-      if (type) {
-        this.highlightWeatherType(type);
-      }
-    });
-
-    // Handle window resize
-    this._onResize = () => {
-      this.resizeCanvas(canvas);
-      this.drawMap();
-    };
-    window.addEventListener("resize", this._onResize);
-
-    this.drawMap();
-  }
-
-  /** @override */
-  async close(options = {}) {
-    window.removeEventListener("resize", this._onResize);
-    return super.close(options);
-  }
-
-  resizeCanvas(canvas) {
-    const container = canvas.parentElement;
-    const rect = container.getBoundingClientRect();
-    canvas.width = rect.width - 40; // Account for padding
-    canvas.height = rect.height - 40;
-  }
-
-  drawMap() {
-    const canvas = this.element.find("#weather-map-canvas")[0];
-    const ctx = canvas.getContext("2d");
-
-    // Enable antialiasing
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = "high";
-
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Calculate scale based on canvas size
-    const scale = Math.min(
-      canvas.width / (this.hexSize * 20),
-      canvas.height / (this.hexSize * 20)
-    );
-
-    // Save the context state
-    ctx.save();
-
-    // Center the map
-    ctx.translate(canvas.width / 2, canvas.height / 2);
-    ctx.scale(scale, scale);
-
-    // Draw hexagons
-    for (let [coords, type] of Object.entries(this.weatherData.hexMap)) {
-      const [q, r] = coords.split(",").map(Number);
-      this.drawHex(ctx, q, r, type);
-    }
-
-    // Draw direction indicator
-    this.drawDirectionIndicator(ctx);
-
-    // Restore the context state
-    ctx.restore();
-  }
-
-  drawHex(ctx, q, r, type) {
-    // Use axial coordinates for better hex grid layout
-    const x = this.hexSize * (Math.sqrt(3) * q + (Math.sqrt(3) / 2) * r);
-    const y = this.hexSize * ((3 / 2) * r);
-
-    // Calculate hex corners
-    const corners = [];
-    for (let i = 0; i < 6; i++) {
-      const angle = ((2 * Math.PI) / 6) * i;
-      corners.push({
-        x: x + this.hexSize * Math.cos(angle),
-        y: y + this.hexSize * Math.sin(angle),
-      });
-    }
-
-    // Draw hex
-    ctx.beginPath();
-    ctx.moveTo(corners[0].x, corners[0].y);
-    for (let i = 1; i < corners.length; i++) {
-      ctx.lineTo(corners[i].x, corners[i].y);
-    }
-    ctx.closePath();
-
-    // Fill hex
-    ctx.fillStyle = this.colors[type];
-    ctx.fill();
-
-    // Draw border
-    ctx.strokeStyle = "#000000";
-    ctx.lineWidth = 1;
-    ctx.stroke();
-  }
-
-  drawDirectionIndicator(ctx) {
-    // Draw direction indicator in the bottom right
-    const indicatorSize = this.hexSize * 1.2;
-    const x = this.hexSize * 8; // Position to the right
-    const y = this.hexSize * 6; // Position to the bottom
-
-    // Draw the hex
-    ctx.beginPath();
-    for (let i = 0; i < 6; i++) {
-      const angle = ((2 * Math.PI) / 6) * i;
-      const px = x + indicatorSize * Math.cos(angle);
-      const py = y + indicatorSize * Math.sin(angle);
-      if (i === 0) ctx.moveTo(px, py);
-      else ctx.lineTo(px, py);
-    }
-    ctx.closePath();
-    ctx.strokeStyle = "#000000";
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    // Add numbers 1-6 around the hex
-    ctx.font = `${this.hexSize / 2}px Arial`;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillStyle = "#000000";
-
-    for (let i = 1; i <= 6; i++) {
-      const angle = ((2 * Math.PI) / 6) * (i - 1) - Math.PI / 6;
-      const textX = x + indicatorSize * 1.3 * Math.cos(angle);
-      const textY = y + indicatorSize * 1.3 * Math.sin(angle);
-      ctx.fillText(i.toString(), textX, textY);
-    }
-  }
-
-  drawHexOutline(ctx, q, r) {
-    const x = this.hexSize * (Math.sqrt(3) * q + (Math.sqrt(3) / 2) * r);
-    const y = this.hexSize * ((3 / 2) * r);
-
-    ctx.beginPath();
-    for (let i = 0; i < 6; i++) {
-      const angle = ((2 * Math.PI) / 6) * i;
-      const px = x + this.hexSize * Math.cos(angle);
-      const py = y + this.hexSize * Math.sin(angle);
-      if (i === 0) ctx.moveTo(px, py);
-      else ctx.lineTo(px, py);
-    }
-    ctx.closePath();
-    ctx.stroke();
-  }
-
-  highlightWeatherType(type) {
-    const canvas = this.element.find("#weather-map-canvas")[0];
-    const ctx = canvas.getContext("2d");
-
-    // Redraw the map
-    this.drawMap();
-
-    // Add highlight effect for matching hexes
-    ctx.save();
-    ctx.strokeStyle = "#ffffff";
-    ctx.lineWidth = 4;
-    ctx.shadowColor = "#000000";
-    ctx.shadowBlur = 10;
-
-    for (let [coords, hexType] of Object.entries(this.weatherData.hexMap)) {
-      if (hexType === type) {
-        const [q, r] = coords.split(",").map(Number);
-        this.drawHexOutline(ctx, q, r);
-      }
-    }
-    ctx.restore();
-  }
-
-  /** @override */
-  _onResize(event) {
-    super._onResize(event);
-    const canvas = this.element.find("#weather-map-canvas")[0];
-    if (canvas) {
-      this.resizeCanvas(canvas);
-      this.drawMap();
-    }
-  }
-}
-
 class DimensionalWeather {
   constructor(options = {}) {
     // Initialize weather dimensions with default values or provided options
@@ -281,12 +18,6 @@ class DimensionalWeather {
     this.precipitation = options.precipitation ?? 0;
     this.humidity = options.humidity ?? 0;
     this.variability = options.variability ?? 5; // How rapidly weather can change
-
-    // Optionally use hex map mode (not fully implemented in this example)
-    this.useHexMap =
-      game.settings.get("dimensional-weather", "useHexMap") || false;
-    this.currentHexPosition = { q: 0, r: 0 };
-    this.currentWeatherType = "normal";
 
     // Define Dark Sun terrain presets
     this.terrains = {
@@ -388,7 +119,6 @@ class DimensionalWeather {
         humidity: 10,
         variability: 7,
       },
-      // ... add additional terrains here if needed ...
     };
 
     // Descriptions for weather dimensions (expanded for more granularity)
@@ -498,23 +228,6 @@ class DimensionalWeather {
       },
     });
 
-    // Register hex map settings
-    game.settings.register("dimensional-weather", "currentHexPosition", {
-      name: "Current Hex Position",
-      scope: "world",
-      config: false,
-      type: Object,
-      default: { q: 0, r: 0 },
-    });
-
-    game.settings.register("dimensional-weather", "currentWeatherType", {
-      name: "Current Weather Type",
-      scope: "world",
-      config: false,
-      type: String,
-      default: "normal",
-    });
-
     // Terrain type setting
     game.settings.register("dimensional-weather", "terrain", {
       name: "Terrain Type",
@@ -545,16 +258,6 @@ class DimensionalWeather {
           game.dimWeather.setTerrain(value);
         }
       },
-    });
-
-    // Toggle hex map mode (if used)
-    game.settings.register("dimensional-weather", "useHexMap", {
-      name: "Use Hex Map",
-      hint: "Enable hex-based weather generation.",
-      scope: "world",
-      config: true,
-      type: Boolean,
-      default: false,
     });
 
     // Variability control
@@ -600,49 +303,6 @@ class DimensionalWeather {
       config: true,
       type: String,
       default: "",
-    });
-
-    game.settings.register("dimensional-weather", "weatherMap", {
-      name: "Weather Map Data",
-      scope: "world",
-      config: false,
-      type: Object,
-      default: {
-        hexMap: {
-          // Top row
-          "-1,-2": "overcast",
-          "0,-2": "overcast",
-          "1,-2": "overcast",
-
-          // Second row
-          "-2,-1": "sandstorm",
-          "-1,-1": "overcast",
-          "0,-1": "overcast",
-          "1,-1": "hot",
-          "2,-1": "hot",
-
-          // Middle row
-          "-3,0": "sandstorm",
-          "-2,0": "sandstorm",
-          "-1,0": "windy",
-          "0,0": "rain",
-          "1,0": "hot",
-          "2,0": "deadlyHot",
-          "3,0": "deadlyHot",
-
-          // Fourth row
-          "-2,1": "sandstorm",
-          "-1,1": "windy",
-          "0,1": "cool",
-          "1,1": "hot",
-          "2,1": "deadlyHot",
-
-          // Bottom row
-          "-1,2": "sandstorm",
-          "0,2": "dryThunder",
-          "1,2": "dryThunder",
-        },
-      },
     });
   }
 
@@ -1446,22 +1106,6 @@ Hooks.on("chatCommandsReady", (commands) => {
               terrain: game.settings.get("dimensional-weather", "terrain"),
             };
 
-            // Add hex map information if enabled
-            if (game.dimWeather.useHexMap) {
-              const hexPosition = game.settings.get(
-                "dimensional-weather",
-                "currentHexPosition"
-              );
-              const weatherType = game.settings.get(
-                "dimensional-weather",
-                "currentWeatherType"
-              );
-              stats.hexMap = {
-                position: hexPosition,
-                weatherType: weatherType,
-              };
-            }
-
             return {
               content: `Weather Statistics (GM Only):\n${JSON.stringify(
                 stats,
@@ -1479,10 +1123,6 @@ Hooks.on("chatCommandsReady", (commands) => {
               speaker: { alias: "Dimensional Weather" },
               whisper: [game.user.id],
             };
-
-          case "hex":
-            new WeatherMapApplication().render(true);
-            break;
 
           case "help":
             showWeatherHelp();
@@ -1503,7 +1143,7 @@ Hooks.on("chatCommandsReady", (commands) => {
         if (!parameters) {
           return [
             game.chatCommands.createInfoElement(
-              "Display current weather conditions or use subcommands: terrain, update, stats, forecast, hex, help"
+              "Display current weather conditions or use subcommands: terrain, update, stats, forecast, help"
             ),
           ];
         }
@@ -1542,7 +1182,6 @@ Hooks.on("chatCommandsReady", (commands) => {
           { cmd: "random", desc: "Set weather variability (0-10)" },
           { cmd: "stats", desc: "Display weather statistics" },
           { cmd: "forecast", desc: "Show weather forecast" },
-          { cmd: "hex", desc: "Show the weather hex map" },
           { cmd: "help", desc: "Show weather command help" },
         ];
 
@@ -1619,7 +1258,6 @@ function showWeatherHelp() {
                   <li><code>/weather stats</code> - Display weather statistics (GM only)</li>
                   <li><code>/weather forecast</code> - Show weather forecast (GM only)</li>
                   <li><code>/weather random [0-10]</code> - Set weather variability (GM only)</li>
-                  <li><code>/weather hex</code> - Show the weather hex map</li>
                   <li><code>/date</code> - Show calendar information</li>
                 </ul>
                 <h4>Available Terrains:</h4>
