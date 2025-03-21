@@ -1,0 +1,14 @@
+{
+    "campaignSettings": [
+        {
+            "id": "default",
+            "name": "Default D&D 5e",
+            "path": "default.json"
+        },
+        {
+            "id": "athas",
+            "name": "Dark Sun: Athas",
+            "path": "athas.json"
+        }
+    ]
+}

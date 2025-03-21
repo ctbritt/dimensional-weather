@@ -1,0 +1,208 @@
+{
+    "name": "Default Climate System",
+    "description": "A comprehensive weather system simulating Earth-like climates, from arctic to tropical regions.",
+    "version": "1.0",
+    "weatherDimensions": {
+        "temperature": {
+            "descriptions": {
+                "-10": "Extreme cold (0°F or lower)",
+                "-5": "Very cold (20°F)",
+                "-2": "Cold (35°F)",
+                "0": "Cool (50°F)",
+                "2": "Warm (70°F)",
+                "5": "Hot (85°F)",
+                "8": "Very hot (95°F)",
+                "10": "Extreme heat (100°F or higher)"
+            },
+            "rules": {
+                "-10": {
+                    "description": "Extreme Cold",
+                    "effect": "DC 10 Constitution save each hour or gain 1 Exhaustion level",
+                    "immunity": "Creatures with Cold Resistance/Immunity automatically succeed"
+                },
+                "10": {
+                    "description": "Extreme Heat",
+                    "effect": "DC 5 Constitution save each hour (increases by 1 per hour) or gain 1 Exhaustion level",
+                    "disadvantage": "Creatures wearing Medium/Heavy armor have Disadvantage",
+                    "immunity": "Creatures with Fire Resistance/Immunity automatically succeed"
+                }
+            }
+        },
+        "wind": {
+            "descriptions": {
+                "-10": "Dead calm",
+                "-5": "Very light breeze",
+                "-2": "Light breeze",
+                "0": "Moderate breeze",
+                "2": "Strong breeze",
+                "5": "Strong wind",
+                "8": "Gale force winds",
+                "10": "Hurricane force winds"
+            }
+        },
+        "precipitation": {
+            "descriptions": {
+                "-10": "Clear skies",
+                "-5": "Partly cloudy",
+                "-2": "Mostly cloudy",
+                "0": "Light rain/snow",
+                "2": "Moderate rain/snow",
+                "5": "Heavy rain/snow",
+                "8": "Torrential downpour",
+                "10": "Severe storm"
+            },
+            "rules": {
+                "5": {
+                    "description": "Heavy Precipitation",
+                    "effect": "Area is Lightly Obscured",
+                    "disadvantage": "Disadvantage on Wisdom (Perception) checks"
+                }
+            }
+        },
+        "humidity": {
+            "descriptions": {
+                "-10": "Extremely dry",
+                "-5": "Very dry",
+                "-2": "Dry",
+                "0": "Normal humidity",
+                "2": "Humid",
+                "5": "Very humid",
+                "8": "Oppressively humid",
+                "10": "Saturated air"
+            }
+        }
+    },
+    "timeModifiers": {
+        "Early Morning": {
+            "temperature": -2
+        },
+        "Noon": {
+            "temperature": 2
+        },
+        "Afternoon": {
+            "temperature": 1
+        },
+        "Night": {
+            "temperature": -1
+        },
+        "Late Night": {
+            "temperature": -2
+        }
+    },
+    "terrains": {
+        "arctic": {
+            "name": "Arctic Tundra",
+            "description": "Frozen wasteland with permafrost and sparse vegetation. Extreme cold and strong winds are common.",
+            "temperature": -8,
+            "wind": 3,
+            "precipitation": -5,
+            "humidity": -2,
+            "variability": 2,
+            "rules": [
+                "Movement is Difficult terrain in deep snow"
+            ]
+        },
+        "subarctic": {
+            "name": "Subarctic Taiga",
+            "description": "Cold forest region with long winters and short summers. Dense coniferous forests dominate.",
+            "temperature": -5,
+            "wind": 2,
+            "precipitation": -2,
+            "humidity": 0,
+            "variability": 3,
+            "rules": [
+                "Movement is Difficult terrain in deep snow"
+            ]
+        },
+        "temperate": {
+            "name": "Temperate Forest",
+            "description": "Mild climate with distinct seasons. Deciduous forests with moderate rainfall.",
+            "temperature": 0,
+            "wind": 0,
+            "precipitation": 0,
+            "humidity": 0,
+            "variability": 4,
+            "rules": []
+        },
+        "mediterranean": {
+            "name": "Mediterranean",
+            "description": "Hot, dry summers and mild, wet winters. Coastal climate with scrub vegetation.",
+            "temperature": 2,
+            "wind": 1,
+            "precipitation": -2,
+            "humidity": -1,
+            "variability": 3,
+            "rules": []
+        },
+        "desert": {
+            "name": "Desert",
+            "description": "Arid region with extreme temperature variations between day and night.",
+            "temperature": 5,
+            "wind": 2,
+            "precipitation": -8,
+            "humidity": -5,
+            "variability": 4,
+            "rules": [
+                "Creatures without eye protection have Disadvantage on Perception checks during the day"
+            ]
+        },
+        "savanna": {
+            "name": "Savanna",
+            "description": "Tropical grassland with distinct wet and dry seasons.",
+            "temperature": 3,
+            "wind": 1,
+            "precipitation": -2,
+            "humidity": 1,
+            "variability": 4,
+            "rules": []
+        },
+        "tropical": {
+            "name": "Tropical Rainforest",
+            "description": "Hot, humid climate with heavy rainfall and dense vegetation.",
+            "temperature": 2,
+            "wind": -1,
+            "precipitation": 3,
+            "humidity": 5,
+            "variability": 3,
+            "rules": [
+                "Movement is Difficult terrain"
+            ]
+        },
+        "mountain": {
+            "name": "Mountain",
+            "description": "High elevation terrain with variable weather based on altitude.",
+            "temperature": -2,
+            "wind": 3,
+            "precipitation": 0,
+            "humidity": -1,
+            "variability": 4,
+            "rules": [
+                "Movement is Difficult terrain",
+                "High Altitude: Each hour counts as 2 hours for travel purposes",
+                "Creatures can become acclimated after 30 days at this elevation"
+            ]
+        },
+        "coastal": {
+            "name": "Coastal",
+            "description": "Ocean-adjacent terrain with moderate temperatures and high humidity.",
+            "temperature": 1,
+            "wind": 2,
+            "precipitation": 0,
+            "humidity": 2,
+            "variability": 3,
+            "rules": []
+        },
+        "swamp": {
+            "name": "Swamp",
+            "description": "Wetland with standing water, high humidity, and dense vegetation.",
+            "temperature": 1,
+            "wind": -1,
+            "precipitation": 1,
+            "humidity": 4,
+            "variability": 3,
+            "rules": [
+                "Movement is Difficult terrain"
+            ]
+        }
+    }
+}

@@ -1,0 +1,97 @@
+{
+    "name": "Your Setting Name",
+    "description": "Brief description of your setting's weather system",
+    "version": "1.0",
+    "weatherDimensions": {
+        "temperature": {
+            "descriptions": {
+                "-10": "Freezing (0° F) - Extreme cold, survival checks required",
+                "-5": "Cold (30° F) - The air is bitter cold",
+                "0": "Mild (60° F) - Comfortable temperature",
+                "5": "Hot (90° F) - A very warm day",
+                "10": "Scorching (120° F) - Dangerously hot conditions"
+            }
+        },
+        "wind": {
+            "descriptions": {
+                "-10": "Dead Still - No wind at all, the air is completely stagnant",
+                "-5": "Light Breeze - Gentle movement of air, leaves rustle softly",
+                "0": "Moderate - Normal wind conditions",
+                "5": "Strong Wind - Powerful gusts that can impede movement",
+                "10": "Gale Force - Extremely dangerous winds, difficult to stand"
+            }
+        },
+        "precipitation": {
+            "descriptions": {
+                "-10": "None - Clear skies without a cloud in sight",
+                "-5": "None - Some clouds but no rain",
+                "0": "Light - Brief scattered showers",
+                "5": "Moderate - Steady rainfall",
+                "10": "Heavy - Intense downpour"
+            }
+        },
+        "humidity": {
+            "descriptions": {
+                "-10": "Extremely Dry - Parched air that cracks lips and skin",
+                "-5": "Dry - Below average humidity",
+                "0": "Normal - Comfortable humidity level",
+                "5": "Humid - Noticeable moisture in the air",
+                "10": "Very Humid - Air feels thick and oppressive"
+            }
+        }
+    },
+    "timeModifiers": {
+        "Early Morning": {
+            "temperature": -2
+        },
+        "Noon": {
+            "temperature": 2
+        },
+        "Afternoon": {
+            "temperature": 3
+        },
+        "Night": {
+            "temperature": -3
+        },
+        "Late Night": {
+            "temperature": -4
+        }
+    },
+    "terrains": {
+        "plains": {
+            "name": "Plains",
+            "description": "Open grasslands with rolling hills",
+            "temperature": 0,
+            "wind": 2,
+            "precipitation": 0,
+            "humidity": 0,
+            "variability": 3,
+            "rules": []
+        },
+        "forest": {
+            "name": "Forest",
+            "description": "Dense woodland with tall trees providing shade",
+            "temperature": -1,
+            "wind": -2,
+            "precipitation": 2,
+            "humidity": 3,
+            "variability": 2,
+            "rules": [
+                "Movement is Difficult terrain unless on a path"
+            ]
+        },
+        "mountains": {
+            "name": "Mountains",
+            "description": "High altitude peaks and rocky terrain",
+            "temperature": -3,
+            "wind": 4,
+            "precipitation": 1,
+            "humidity": -2,
+            "variability": 5,
+            "rules": [
+                "Movement is Difficult terrain",
+                "Altitude effects above 10,000 feet"
+            ]
+        }
+    }
+}

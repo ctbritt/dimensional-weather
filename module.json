@@ -1,16 +1,12 @@
 {
   "id": "dimensional-weather",
-  "title": "DimensionalWeather",
+  "title": "Dimensional Weather",
   "description": "A module that adds weather effects to the game in a modular and dimensional manner.",
   "esmodules": [
     "scripts/dimensional-weather.js"
   ],
   "styles": [
-    "styles/dimensional-weather.css",
-    "styles/weather-map.css"
-  ],
-  "templates": [
-    "templates/weather-map.html"
+    "styles/dimensional-weather.css"
   ],
   "languages": [
     {
@@ -71,8 +67,5 @@
       "discord": "callbritton",
       "flags": {}
     }
-  ],
-  "scripts": [
-    "scripts/dimensional-weather.js"
   ]
 }

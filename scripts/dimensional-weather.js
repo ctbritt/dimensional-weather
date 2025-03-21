@@ -10,657 +10,330 @@
  *  - Chat commands for weather updates, forecasts, and calendar info
  */
 
-class WeatherMapApplication extends Application {
-  constructor(options = {}) {
-    super({
-      ...options,
-      title: "Athas Weather Map",
-      id: "athas-weather-map",
-      template: "modules/dimensional-weather/templates/weather-map.html",
-      width: Math.min(800, window.innerWidth * 0.8),
-      height: Math.min(800, window.innerHeight * 0.8),
-      minimizable: true,
-      resizable: true,
-      classes: ["weather-map-app"],
-    });
-
-    this.weatherData = game.settings.get("dimensional-weather", "weatherMap");
-    this.hexSize = 35; // Reduced hex size for better layout
-    this.colors = {
-      hot: "#f9e076",
-      windy: "#b3b3b3",
-      sandstorm: "#e67e22",
-      deadlyHot: "#e74c3c",
-      overcast: "#2a9d8f",
-      dryThunder: "#8e44ad",
-      cool: "#3498db",
-      rain: "#0000ff",
-    };
-  }
-
-  /** @override */
-  static get defaultOptions() {
-    return mergeObject(super.defaultOptions, {
-      width: Math.min(800, window.innerWidth * 0.8),
-      height: Math.min(800, window.innerHeight * 0.8),
-      minimizable: true,
-      resizable: true,
-      classes: ["weather-map-app"],
-      template: "modules/dimensional-weather/templates/weather-map.html",
-    });
-  }
-
-  /** @override */
-  getData(options = {}) {
-    return {
-      weatherTypes: Object.keys(this.colors).map((type) => ({
-        type,
-        color: this.colors[type],
-        label: type
-          .replace(/([A-Z])/g, " $1")
-          .toLowerCase()
-          .replace(/^./, (str) => str.toUpperCase()),
-      })),
-      weatherEffects: [
-        { effect: "Cool: No changes" },
-        { effect: "Overcast: Adv on hiding" },
-        { effect: "Hot: >38C, 2x water usage" },
-        { effect: "Deadly Hot: >55C, 4x water usage" },
-        { effect: "Dry Thunder: Lightning strike on crit miss" },
-        { effect: "Windy: Disadv ranged weapon atks & tracking, 5% tornado" },
-        {
-          effect:
-            "Rain: Flash floods, plant blooms, magical tracking only, -1 lvl exh.",
-        },
-        {
-          effect:
-            "Sandstorm: 5' visibility, magical tracking only, disadv route finding, no foraging",
-        },
-      ],
-    };
-  }
-
-  /** @override */
-  activateListeners(html) {
-    super.activateListeners(html);
-
-    // Get the canvas and set its size
-    const canvas = html.find("#weather-map-canvas")[0];
-    this.resizeCanvas(canvas);
-
-    // Make legend entries interactive
-    html.find(".legend-entry").on("click", (event) => {
-      const type = event.currentTarget.dataset.type;
-      if (type) {
-        this.highlightWeatherType(type);
-      }
-    });
-
-    // Handle window resize
-    this._onResize = () => {
-      this.resizeCanvas(canvas);
-      this.drawMap();
-    };
-    window.addEventListener("resize", this._onResize);
-
-    this.drawMap();
-  }
-
-  /** @override */
-  async close(options = {}) {
-    window.removeEventListener("resize", this._onResize);
-    return super.close(options);
-  }
-
-  resizeCanvas(canvas) {
-    const container = canvas.parentElement;
-    const rect = container.getBoundingClientRect();
-    canvas.width = rect.width - 40; // Account for padding
-    canvas.height = rect.height - 40;
-  }
-
-  drawMap() {
-    const canvas = this.element.find("#weather-map-canvas")[0];
-    const ctx = canvas.getContext("2d");
-
-    // Enable antialiasing
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = "high";
-
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Calculate scale based on canvas size
-    const scale = Math.min(
-      canvas.width / (this.hexSize * 20),
-      canvas.height / (this.hexSize * 20)
-    );
-
-    // Save the context state
-    ctx.save();
-
-    // Center the map
-    ctx.translate(canvas.width / 2, canvas.height / 2);
-    ctx.scale(scale, scale);
-
-    // Draw hexagons
-    for (let [coords, type] of Object.entries(this.weatherData.hexMap)) {
-      const [q, r] = coords.split(",").map(Number);
-      this.drawHex(ctx, q, r, type);
-    }
-
-    // Draw direction indicator
-    this.drawDirectionIndicator(ctx);
-
-    // Restore the context state
-    ctx.restore();
-  }
-
-  drawHex(ctx, q, r, type) {
-    // Use axial coordinates for better hex grid layout
-    const x = this.hexSize * (Math.sqrt(3) * q + (Math.sqrt(3) / 2) * r);
-    const y = this.hexSize * ((3 / 2) * r);
-
-    // Calculate hex corners
-    const corners = [];
-    for (let i = 0; i < 6; i++) {
-      const angle = ((2 * Math.PI) / 6) * i;
-      corners.push({
-        x: x + this.hexSize * Math.cos(angle),
-        y: y + this.hexSize * Math.sin(angle),
-      });
-    }
-
-    // Draw hex
-    ctx.beginPath();
-    ctx.moveTo(corners[0].x, corners[0].y);
-    for (let i = 1; i < corners.length; i++) {
-      ctx.lineTo(corners[i].x, corners[i].y);
-    }
-    ctx.closePath();
-
-    // Fill hex
-    ctx.fillStyle = this.colors[type];
-    ctx.fill();
-
-    // Draw border
-    ctx.strokeStyle = "#000000";
-    ctx.lineWidth = 1;
-    ctx.stroke();
-  }
-
-  drawDirectionIndicator(ctx) {
-    // Draw direction indicator in the bottom right
-    const indicatorSize = this.hexSize * 1.2;
-    const x = this.hexSize * 8; // Position to the right
-    const y = this.hexSize * 6; // Position to the bottom
-
-    // Draw the hex
-    ctx.beginPath();
-    for (let i = 0; i < 6; i++) {
-      const angle = ((2 * Math.PI) / 6) * i;
-      const px = x + indicatorSize * Math.cos(angle);
-      const py = y + indicatorSize * Math.sin(angle);
-      if (i === 0) ctx.moveTo(px, py);
-      else ctx.lineTo(px, py);
-    }
-    ctx.closePath();
-    ctx.strokeStyle = "#000000";
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    // Add numbers 1-6 around the hex
-    ctx.font = `${this.hexSize / 2}px Arial`;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillStyle = "#000000";
-
-    for (let i = 1; i <= 6; i++) {
-      const angle = ((2 * Math.PI) / 6) * (i - 1) - Math.PI / 6;
-      const textX = x + indicatorSize * 1.3 * Math.cos(angle);
-      const textY = y + indicatorSize * 1.3 * Math.sin(angle);
-      ctx.fillText(i.toString(), textX, textY);
-    }
-  }
-
-  drawHexOutline(ctx, q, r) {
-    const x = this.hexSize * (Math.sqrt(3) * q + (Math.sqrt(3) / 2) * r);
-    const y = this.hexSize * ((3 / 2) * r);
-
-    ctx.beginPath();
-    for (let i = 0; i < 6; i++) {
-      const angle = ((2 * Math.PI) / 6) * i;
-      const px = x + this.hexSize * Math.cos(angle);
-      const py = y + this.hexSize * Math.sin(angle);
-      if (i === 0) ctx.moveTo(px, py);
-      else ctx.lineTo(px, py);
-    }
-    ctx.closePath();
-    ctx.stroke();
-  }
-
-  highlightWeatherType(type) {
-    const canvas = this.element.find("#weather-map-canvas")[0];
-    const ctx = canvas.getContext("2d");
-
-    // Redraw the map
-    this.drawMap();
-
-    // Add highlight effect for matching hexes
-    ctx.save();
-    ctx.strokeStyle = "#ffffff";
-    ctx.lineWidth = 4;
-    ctx.shadowColor = "#000000";
-    ctx.shadowBlur = 10;
-
-    for (let [coords, hexType] of Object.entries(this.weatherData.hexMap)) {
-      if (hexType === type) {
-        const [q, r] = coords.split(",").map(Number);
-        this.drawHexOutline(ctx, q, r);
-      }
-    }
-    ctx.restore();
-  }
-
-  /** @override */
-  _onResize(event) {
-    super._onResize(event);
-    const canvas = this.element.find("#weather-map-canvas")[0];
-    if (canvas) {
-      this.resizeCanvas(canvas);
-      this.drawMap();
-    }
-  }
-}
-
 class DimensionalWeather {
   constructor(options = {}) {
-    // Initialize weather dimensions with default values or provided options
-    this.temperature = options.temperature ?? 0; // scale: -10 to 10
-    this.wind = options.wind ?? 0;
-    this.precipitation = options.precipitation ?? 0;
-    this.humidity = options.humidity ?? 0;
-    this.variability = options.variability ?? 5; // How rapidly weather can change
-
-    // Optionally use hex map mode (not fully implemented in this example)
-    this.useHexMap =
-      game.settings.get("dimensional-weather", "useHexMap") || false;
-    this.currentHexPosition = { q: 0, r: 0 };
-    this.currentWeatherType = "normal";
-
-    // Define Dark Sun terrain presets
-    this.terrains = {
-      boulderFields: {
-        temperature: 9,
-        wind: 6,
-        precipitation: -10,
-        humidity: -10,
-        variability: 6,
-      },
-      dustSinks: {
-        temperature: 10,
-        wind: 7,
-        precipitation: -10,
-        humidity: -5,
-        variability: 8,
-      },
-      mountains: {
-        temperature: 4,
-        wind: 8,
-        precipitation: -10,
-        humidity: -5,
-        variability: 9,
-      },
-      mudflats: {
-        temperature: 8,
-        wind: 3,
-        precipitation: -5,
-        humidity: 5,
-        variability: 7,
-      },
-      rockyBadlands: {
-        temperature: 9,
-        wind: 6,
-        precipitation: -10,
-        humidity: -10,
-        variability: 6,
-      },
-      saltFlats: {
-        temperature: 10,
-        wind: 4,
-        precipitation: -10,
-        humidity: -10,
-        variability: 3,
-      },
-      saltMarshes: {
-        temperature: 8,
-        wind: 2,
-        precipitation: -5,
-        humidity: 5,
-        variability: 5,
-      },
-      sandyWastes: {
-        temperature: 10,
-        wind: 8,
-        precipitation: -10,
-        humidity: -10,
-        variability: 10,
-      },
-      scrubPlains: {
-        temperature: 8,
-        wind: 3,
-        precipitation: -10,
-        humidity: -5,
-        variability: 4,
-      },
-      stonyBarrens: {
-        temperature: 9,
-        wind: 5,
-        precipitation: -10,
-        humidity: -10,
-        variability: 5,
-      },
-      verdantBelt: {
-        temperature: 7,
-        wind: 2,
-        precipitation: -5,
-        humidity: 5,
-        variability: 6,
-      },
-      seaOfSilt: {
-        temperature: 10,
-        wind: 7,
-        precipitation: -10,
-        humidity: -5,
-        variability: 9,
-      },
-      ringingMountains: {
-        temperature: 4,
-        wind: 8,
-        precipitation: -10,
-        humidity: -5,
-        variability: 9,
-      },
-      forestRidge: {
-        temperature: 3,
-        wind: -2,
-        precipitation: 5,
-        humidity: 10,
-        variability: 7,
-      },
-      // ... add additional terrains here if needed ...
-    };
-
-    // Descriptions for weather dimensions (expanded for more granularity)
-    this.temperatureDescriptions = {
-      "-10":
-        "Freezing (40° F) - The night air bites at exposed skin, a rare respite from the day's heat",
-      "-9":
-        "Very Cold (45° F) - The air is crisp and cold, a welcome relief from the usual heat",
-      "-8":
-        "Cold (50° F) - A cool breeze offers temporary relief from the desert's usual heat",
-      "-7": "Cool (55° F) - The temperature is surprisingly mild for Athas",
-      "-6":
-        "Mildly Cool (60° F) - A pleasant temperature by Athasian standards",
-      "-5": "Cold (65° F) - The air feels refreshingly cool",
-      "-4": "Cool (70° F) - A comfortable temperature for travel",
-      "-3": "Mildly Cool (75° F) - The heat is bearable",
-      "-2": "Cool (80° F) - The temperature is moderate for Athas",
-      "-1": "Mild (85° F) - The heat begins to intensify",
-      "0": "Mild (90° F) - The sun's heat becomes noticeable",
-      "1": "Warm (95° F) - The heat starts to become oppressive",
-      "2": "Hot (100° F) - The sun's rays burn exposed skin",
-      "3": "Very Hot (105° F) - The heat is intense and dangerous",
-      "4": "Extremely Hot (110° F) - The air shimmers with heat",
-      "5": "Hot (115° F) - The heat is nearly unbearable",
-      "6": "Very Hot (120° F) - The air feels like a furnace",
-      "7": "Extremely Hot (125° F) - The heat threatens to overwhelm",
-      "8": "Scorching (130° F) - The heat is deadly to the unprepared",
-      "9": "Deadly Hot (135° F) - The heat is life-threatening",
-      "10":
-        "Unbearable (140° F+) - The heat is lethal without immediate shelter",
-    };
-    this.windDescriptions = {
-      "-10": "Dead Still - The air is eerily motionless",
-      "-8": "Calm - A rare moment of stillness",
-      "-6": "Light Air - Barely perceptible movement",
-      "-4": "Light Breeze - A gentle wind",
-      "-2": "Moderate Breeze - The wind begins to stir",
-      "0": "Fresh Breeze - A soothing, gentle breeze",
-      "2": "Strong Breeze - The wind carries stinging sand",
-      "4": "Strong Wind - The wind howls around you",
-      "6": "Gale Force - The wind is dangerous to travel in",
-      "8": "Storm Force - This wind is dangerous to travel in",
-      "10": "Hurricane Force - The deadly winds of Athas rage",
-    };
-    this.precipitationDescriptions = {
-      "-10":
-        "None - The sky is utterly devoid of clouds, as is typical for Athas",
-      "-5": "None - A few wisps of cloud, an extremely rare sight on Athas",
-      "-1": "None - Some clouds dot the sky, almost unheard of in this world",
-      "0": "None - A few large clouds float along the horizon",
-      "1": "Light - A miraculous light mist fills the air",
-      "5": "Medium - A light rain falls from the sky, a rare event on Athas",
-      "10":
-        "Heavy - A miraculous rainstorm falls from the sky, a once-in-a-lifetime event",
-    };
-    this.humidityDescriptions = {
-      "-10": "Extremely Dry - The air is almost completely devoid of moisture",
-      "-5": "Very Dry - The air is extremely dry",
-      "-1": "Dry - The air is very dry, normal for this world",
-      "0": "Normal - Typical Athasian dryness, harsh by any other standard",
-      "1": "Slightly Humid - A rare hint of moisture, almost refreshing",
-      "5": "A little Humid - The air is feels almost like home",
-      "10":
-        "Very Humid - The air is thick with moisture, sapping strength and making sweat drip down your face",
-    };
-
-    // Time-of-day temperature modifiers (further adjustments can be added)
-    this.timeModifiers = {
-      "Early Morning": { temperature: -2 },
-      Noon: { temperature: +3 },
-      Afternoon: { temperature: +4 },
-      Night: { temperature: -1 },
-      "Late Night": { temperature: -3 },
-    };
+    this.settingsData = null;
+    this.settingsIndex = null;
+    this.temperature = 0;
+    this.wind = 0;
+    this.precipitation = 0;
+    this.humidity = 0;
+    this.variability = 5;
+    this.initialized = false;
   }
 
   /**
-   * Register Foundry module settings. This includes terrain selection,
-   * hex map toggle, and variability.
+   * Updates the index.json file by scanning the campaign_settings directory
+   * @private
    */
-  static registerSettings() {
-    console.log("Dimensional Weather | Registering settings");
+  async _updateSettingsIndex() {
+    try {
+      // Get all JSON files in the campaign_settings directory
+      const settingsFiles = await FilePicker.browse(
+        "data",
+        "modules/dimensional-weather/campaign_settings",
+        { extensions: [".json"] }
+      );
 
-    // Register chat commands settings
-    game.settings.register("dimensional-weather", "chatCommands", {
-      name: "Chat Commands",
-      hint: "Register weather chat commands",
-      scope: "world",
-      config: false,
-      type: Object,
-      default: {
-        weather: {
-          command: "weather",
-          description: "Display or modify weather conditions",
-          usage: "/weather [terrain|update|stats|random|help]",
-        },
-        forecast: {
-          command: "forecast",
-          description: "Display weather forecast",
-          usage: "/forecast",
-        },
-        date: {
-          command: "date",
-          description: "Display calendar information",
-          usage: "/date",
-        },
-      },
-    });
+      // Filter out index.json itself and build the settings array
+      const campaignSettings = [];
+      for (const file of settingsFiles.files) {
+        if (file.endsWith("index.json")) continue;
 
-    // Register hex map settings
-    game.settings.register("dimensional-weather", "currentHexPosition", {
-      name: "Current Hex Position",
-      scope: "world",
-      config: false,
-      type: Object,
-      default: { q: 0, r: 0 },
-    });
+        try {
+          // Load each settings file to get its metadata
+          const response = await fetch(file);
+          if (!response.ok) continue;
 
-    game.settings.register("dimensional-weather", "currentWeatherType", {
-      name: "Current Weather Type",
-      scope: "world",
-      config: false,
-      type: String,
-      default: "normal",
-    });
+          const settingsData = await response.json();
+          const filename = file.split("/").pop();
 
-    // Terrain type setting
-    game.settings.register("dimensional-weather", "terrain", {
-      name: "Terrain Type",
-      hint:
-        "The type of terrain in Athas for weather generation. Note: Time and season information is automatically retrieved from Simple Calendar.",
-      scope: "world",
-      config: true,
-      type: String,
-      choices: {
-        boulderFields: "Boulder Fields",
-        dustSinks: "Dust Sinks",
-        forestRidge: "Forest Ridge",
-        mountains: "Mountains",
-        mudflats: "Mudflats",
-        ringingMountains: "Ringing Mountains",
-        rockyBadlands: "Rocky Badlands",
-        saltFlats: "Salt Flats",
-        saltMarshes: "Salt Marshes",
-        sandyWastes: "Sandy Wastes",
-        scrubPlains: "Scrub Plains",
-        seaOfSilt: "Sea Of Silt",
-        stonyBarrens: "Stony Barrens",
-        verdantBelt: "Verdant Belt",
-      },
-      default: "scrubPlains",
-      onChange: (value) => {
-        if (game.dimWeather) {
-          game.dimWeather.setTerrain(value);
+          // Add to the campaign settings array
+          campaignSettings.push({
+            id: filename.replace(".json", ""),
+            name: settingsData.name || filename.replace(".json", ""),
+            path: filename,
+          });
+        } catch (error) {
+          console.warn(`Failed to process settings file ${file}:`, error);
         }
-      },
-    });
+      }
 
-    // Toggle hex map mode (if used)
-    game.settings.register("dimensional-weather", "useHexMap", {
-      name: "Use Hex Map",
-      hint: "Enable hex-based weather generation.",
-      scope: "world",
-      config: true,
-      type: Boolean,
-      default: false,
-    });
-
-    // Variability control
-    game.settings.register("dimensional-weather", "variability", {
-      name: "Weather Variability",
-      hint: "Higher values mean more rapid weather changes.",
-      scope: "world",
-      config: true,
-      type: Number,
-      default: 5,
-      range: { min: 0, max: 10, step: 1 },
-    });
-
-    // LLM Settings
-    game.settings.register("dimensional-weather", "useLLM", {
-      name: "Use AI for Descriptions",
-      hint:
-        "Use an AI language model to generate more dynamic weather descriptions.",
-      scope: "world",
-      config: true,
-      type: Boolean,
-      default: false,
-    });
-
-    game.settings.register("dimensional-weather", "llmProvider", {
-      name: "AI Provider",
-      hint: "Choose which AI service to use for descriptions.",
-      scope: "world",
-      config: true,
-      type: String,
-      choices: {
-        openai: "OpenAI (ChatGPT)",
-        anthropic: "Anthropic (Claude)",
-        google: "Google (Gemini)",
-      },
-      default: "openai",
-    });
-
-    game.settings.register("dimensional-weather", "llmApiKey", {
-      name: "AI API Key",
-      hint: "Your API key for the chosen AI service.",
-      scope: "world",
-      config: true,
-      type: String,
-      default: "",
-    });
-
-    game.settings.register("dimensional-weather", "weatherMap", {
-      name: "Weather Map Data",
-      scope: "world",
-      config: false,
-      type: Object,
-      default: {
-        hexMap: {
-          // Top row
-          "-1,-2": "overcast",
-          "0,-2": "overcast",
-          "1,-2": "overcast",
-
-          // Second row
-          "-2,-1": "sandstorm",
-          "-1,-1": "overcast",
-          "0,-1": "overcast",
-          "1,-1": "hot",
-          "2,-1": "hot",
-
-          // Middle row
-          "-3,0": "sandstorm",
-          "-2,0": "sandstorm",
-          "-1,0": "windy",
-          "0,0": "rain",
-          "1,0": "hot",
-          "2,0": "deadlyHot",
-          "3,0": "deadlyHot",
-
-          // Fourth row
-          "-2,1": "sandstorm",
-          "-1,1": "windy",
-          "0,1": "cool",
-          "1,1": "hot",
-          "2,1": "deadlyHot",
-
-          // Bottom row
-          "-1,2": "sandstorm",
-          "0,2": "dryThunder",
-          "1,2": "dryThunder",
-        },
-      },
-    });
+      // Just return the index content without trying to save it
+      return { campaignSettings };
+    } catch (error) {
+      console.error(
+        "Dimensional Weather | Failed to scan settings directory:",
+        error
+      );
+      throw error;
+    }
   }
 
-  /**
-   * Initialize the weather system state from settings.
-   * Sets the base weather dimensions from the chosen terrain.
-   */
-  initWeather() {
+  async loadSettings() {
+    try {
+      // First try to update the settings index
+      try {
+        // Get the current index of available settings
+        this.settingsIndex = await this._updateSettingsIndex();
+      } catch (error) {
+        console.warn(
+          "Dimensional Weather | Failed to scan settings directory, falling back to existing index:",
+          error
+        );
+        // If scanning fails, try to load existing index
+        const indexResponse = await fetch(
+          "/modules/dimensional-weather/campaign_settings/index.json"
+        );
+        if (!indexResponse.ok) {
+          throw new Error(
+            `Failed to load settings index: ${indexResponse.status} ${indexResponse.statusText}`
+          );
+        }
+        this.settingsIndex = await indexResponse.json();
+      }
+
+      // Get the selected campaign setting
+      const selectedSetting =
+        game.settings.get("dimensional-weather", "campaignSetting") ||
+        "default";
+      const settingInfo = this.settingsIndex.campaignSettings.find(
+        (s) => s.id === selectedSetting
+      );
+
+      if (!settingInfo) {
+        throw new Error(`Invalid campaign setting: ${selectedSetting}`);
+      }
+
+      // Load the selected campaign setting
+      const response = await fetch(
+        `/modules/dimensional-weather/campaign_settings/${settingInfo.path}`
+      );
+      if (!response.ok) {
+        throw new Error(
+          `Failed to load settings: ${response.status} ${response.statusText}`
+        );
+      }
+      this.settingsData = await response.json();
+      console.log("Dimensional Weather | Loaded settings:", this.settingsData);
+
+      // Initialize weather after settings are loaded
+      if (!this.initialized) {
+        await this.initWeather();
+        this.initialized = true;
+      }
+    } catch (error) {
+      console.error("Dimensional Weather | Failed to load settings:", error);
+      ui.notifications.error(
+        "Failed to load weather settings. Check the console for details."
+      );
+      // Load default fallback values
+      this.settingsData = {
+        name: "Default Fallback",
+        description: "Basic fallback weather system",
+        weatherDimensions: {
+          temperature: { descriptions: { "0": "Normal temperature" } },
+          wind: { descriptions: { "0": "Normal wind" } },
+          precipitation: { descriptions: { "0": "Clear skies" } },
+          humidity: { descriptions: { "0": "Normal humidity" } },
+        },
+        terrains: {
+          default: {
+            name: "Default",
+            description: "Default terrain",
+            temperature: 0,
+            wind: 0,
+            precipitation: 0,
+            humidity: 0,
+            variability: 5,
+            rules: [],
+          },
+        },
+      };
+    }
+  }
+
+  async initWeather() {
+    if (!this.settingsData) {
+      console.warn(
+        "Dimensional Weather | Waiting for settings to load before initializing weather"
+      );
+      await this.loadSettings();
+      return;
+    }
+
     const terrainKey = game.settings.get("dimensional-weather", "terrain");
-    const terrain = this.terrains[terrainKey] || this.terrains["scrubPlains"];
+    const terrain =
+      this.settingsData.terrains[terrainKey] ||
+      Object.values(this.settingsData.terrains)[0];
+
+    if (!terrain) {
+      console.error("Dimensional Weather | No valid terrain found");
+      return;
+    }
 
     this.temperature = terrain.temperature;
     this.wind = terrain.wind;
     this.precipitation = terrain.precipitation;
     this.humidity = terrain.humidity;
-    this.variability = game.settings.get("dimensional-weather", "variability");
+    this.variability =
+      game.settings.get("dimensional-weather", "variability") ?? 5;
 
     console.log("Dimensional Weather | Initialized with terrain:", terrainKey);
+  }
+
+  static async registerSettings() {
+    console.log("Dimensional Weather | Registering settings");
+
+    try {
+      // Load the settings index first to populate the campaign setting choices
+      const response = await fetch(
+        "/modules/dimensional-weather/campaign_settings/index.json"
+      );
+      if (!response.ok) {
+        throw new Error(
+          `Failed to load settings index: ${response.status} ${response.statusText}`
+        );
+      }
+      const settingsIndex = await response.json();
+
+      // Create choices object for the campaign setting dropdown
+      const choices = {};
+      settingsIndex.campaignSettings.forEach((setting) => {
+        choices[setting.id] = setting.name;
+      });
+
+      // Register campaign setting choice
+      game.settings.register("dimensional-weather", "campaignSetting", {
+        name: "Campaign Setting",
+        hint: "Choose which campaign setting to use for weather generation",
+        scope: "world",
+        config: true,
+        type: String,
+        choices: choices,
+        default: "default",
+        onChange: async (value) => {
+          if (game.dimWeather) {
+            await game.dimWeather.loadSettings();
+            game.dimWeather.initWeather();
+            ui.notifications.info(
+              `Weather system changed to ${choices[value]}`
+            );
+          }
+        },
+      });
+
+      // Register chat commands settings
+      game.settings.register("dimensional-weather", "chatCommands", {
+        name: "Chat Commands",
+        hint: "Register weather chat commands",
+        scope: "world",
+        config: false,
+        type: Object,
+        default: {
+          weather: {
+            command: "weather",
+            description: "Display or modify weather conditions",
+            usage: "/weather [terrain|update|stats|random|help]",
+          },
+          forecast: {
+            command: "forecast",
+            description: "Display weather forecast",
+            usage: "/forecast",
+          },
+          date: {
+            command: "date",
+            description: "Display calendar information",
+            usage: "/date",
+          },
+        },
+      });
+
+      // Terrain type setting
+      game.settings.register("dimensional-weather", "terrain", {
+        name: "Terrain Type",
+        hint:
+          "The type of terrain in Athas for weather generation. Note: Time and season information is automatically retrieved from Simple Calendar.",
+        scope: "world",
+        config: true,
+        type: String,
+        choices: {
+          boulderFields: "Boulder Fields",
+          dustSinks: "Dust Sinks",
+          forestRidge: "Forest Ridge",
+          mountains: "Mountains",
+          mudflats: "Mudflats",
+          ringingMountains: "Ringing Mountains",
+          rockyBadlands: "Rocky Badlands",
+          saltFlats: "Salt Flats",
+          saltMarshes: "Salt Marshes",
+          sandyWastes: "Sandy Wastes",
+          scrubPlains: "Scrub Plains",
+          seaOfSilt: "Sea Of Silt",
+          stonyBarrens: "Stony Barrens",
+          verdantBelt: "Verdant Belt",
+        },
+        default: "scrubPlains",
+        onChange: (value) => {
+          if (game.dimWeather) {
+            game.dimWeather.setTerrain(value);
+          }
+        },
+      });
+
+      // Variability control
+      game.settings.register("dimensional-weather", "variability", {
+        name: "Weather Variability",
+        hint: "Higher values mean more rapid weather changes.",
+        scope: "world",
+        config: true,
+        type: Number,
+        default: 5,
+        range: { min: 0, max: 10, step: 1 },
+      });
+
+      // LLM Settings
+      game.settings.register("dimensional-weather", "useLLM", {
+        name: "Use AI for Descriptions",
+        hint:
+          "Use an AI language model to generate more dynamic weather descriptions.",
+        scope: "world",
+        config: true,
+        type: Boolean,
+        default: false,
+      });
+
+      game.settings.register("dimensional-weather", "llmProvider", {
+        name: "AI Provider",
+        hint: "Choose which AI service to use for descriptions.",
+        scope: "world",
+        config: true,
+        type: String,
+        choices: {
+          openai: "OpenAI (ChatGPT)",
+          anthropic: "Anthropic (Claude)",
+          google: "Google (Gemini)",
+        },
+        default: "openai",
+      });
+
+      game.settings.register("dimensional-weather", "llmApiKey", {
+        name: "AI API Key",
+        hint: "Your API key for the chosen AI service.",
+        scope: "world",
+        config: true,
+        type: String,
+        default: "",
+      });
+    } catch (error) {
+      console.error(
+        "Dimensional Weather | Failed to register settings:",
+        error
+      );
+      ui.notifications.error(
+        "Failed to register weather settings. Check the console for details."
+      );
+    }
   }
 
   /**
@@ -668,18 +341,41 @@ class DimensionalWeather {
    * @param {string} terrainKey - The key of the terrain to set
    */
   setTerrain(terrainKey) {
-    if (!this.terrains[terrainKey]) {
-      console.warn(`Dimensional Weather | Invalid terrain key: ${terrainKey}`);
+    if (!this.settingsData?.terrains) {
+      console.error(
+        "Dimensional Weather | Settings data or terrains not loaded"
+      );
+      ui.notifications.error(
+        "Weather system settings not loaded. Please try reloading the page."
+      );
       return;
     }
 
-    console.log(`Dimensional Weather | Setting terrain to: ${terrainKey}`);
-    const terrain = this.terrains[terrainKey];
+    if (!this.settingsData.terrains[terrainKey]) {
+      console.warn(
+        `Dimensional Weather | Invalid terrain key: ${terrainKey}, falling back to scrubPlains`
+      );
+      terrainKey = "scrubPlains";
+    }
 
-    this.temperature = terrain.temperature;
-    this.wind = terrain.wind;
-    this.precipitation = terrain.precipitation;
-    this.humidity = terrain.humidity;
+    console.log(`Dimensional Weather | Setting terrain to: ${terrainKey}`);
+    const terrain = this.settingsData.terrains[terrainKey];
+
+    if (!terrain) {
+      console.error(
+        "Dimensional Weather | No valid terrain found, using default values"
+      );
+      this.temperature = 0;
+      this.wind = 0;
+      this.precipitation = 0;
+      this.humidity = 0;
+      return;
+    }
+
+    this.temperature = terrain.temperature ?? 0;
+    this.wind = terrain.wind ?? 0;
+    this.precipitation = terrain.precipitation ?? 0;
+    this.humidity = terrain.humidity ?? 0;
 
     this.updateWeather(true);
   }
@@ -689,32 +385,64 @@ class DimensionalWeather {
    * current values and the terrain baseline. Optionally applies time-of-day modifiers.
    */
   updateWeather(forced = false) {
+    if (!this.settingsData?.terrains) {
+      console.error(
+        "Dimensional Weather | Settings data or terrains not loaded"
+      );
+      ui.notifications.error(
+        "Weather system settings not loaded. Please try reloading the page."
+      );
+      return;
+    }
+
     const terrainKey = game.settings.get("dimensional-weather", "terrain");
-    const terrain = this.terrains[terrainKey] || this.terrains["scrubPlains"];
+    let terrain = this.settingsData.terrains[terrainKey];
+
+    // Fallback to scrubPlains if the terrain doesn't exist
+    if (!terrain) {
+      console.warn(
+        `Dimensional Weather | Invalid terrain: ${terrainKey}, falling back to scrubPlains`
+      );
+      terrain = this.settingsData.terrains["scrubPlains"];
+    }
+
+    // If still no valid terrain, use default values
+    if (!terrain) {
+      console.error(
+        "Dimensional Weather | No valid terrain found, using default values"
+      );
+      terrain = {
+        temperature: 0,
+        wind: 0,
+        precipitation: 0,
+        humidity: 0,
+      };
+    }
 
     // Basic interpolation with a random factor based on variability.
     this.temperature = Math.round(
-      (this.temperature + terrain.temperature) / 2 +
+      (this.temperature + (terrain.temperature ?? 0)) / 2 +
         ((Math.random() * 2 - 1) * this.variability) / 2
     );
     this.wind = Math.round(
-      (this.wind + terrain.wind) / 2 +
+      (this.wind + (terrain.wind ?? 0)) / 2 +
         ((Math.random() * 2 - 1) * this.variability) / 2
     );
     this.precipitation = Math.round(
-      (this.precipitation + terrain.precipitation) / 2 +
+      (this.precipitation + (terrain.precipitation ?? 0)) / 2 +
         ((Math.random() * 2 - 1) * this.variability) / 2
     );
     this.humidity = Math.round(
-      (this.humidity + terrain.humidity) / 2 +
+      (this.humidity + (terrain.humidity ?? 0)) / 2 +
         ((Math.random() * 2 - 1) * this.variability) / 2
     );
 
     // Apply time-of-day modifier (if available via Simple Calendar)
     const timePeriod = this.getTimePeriod();
-    const modifiers = this.timeModifiers[timePeriod] || {};
-    if (typeof modifiers.temperature !== "undefined")
+    const modifiers = this.settingsData?.timeModifiers?.[timePeriod] || {};
+    if (typeof modifiers.temperature !== "undefined") {
       this.temperature += modifiers.temperature;
+    }
 
     // Clamp values within -10 and 10.
     this.temperature = Math.max(-10, Math.min(10, this.temperature));
@@ -732,7 +460,9 @@ class DimensionalWeather {
       modifiers: modifiers,
     });
 
-    if (forced) this.displayWeatherReport();
+    if (forced) {
+      this.displayWeatherReport();
+    }
   }
 
   /**
@@ -758,10 +488,27 @@ class DimensionalWeather {
     let survivalRules = "<h4>Survival Rules:</h4><ul>";
 
     // Temperature-based rules
-    if (this.temperature >= 2) {
-      survivalRules += `<li>Water consumption is doubled</li>
-                       <li>Make Constitution saving throw every 4 hours or gain a level of exhaustion. The DC is 5 for the first hour and increases by 1 for each additional hour.</li>
-                       <li>Creatures wearing medium or heavy armor, or who are clad in heavy clothing, have disadvantage on the saving throw. Creatures with resistance or immunity to fire damage automatically succeed on the saving throw, as do creatures naturally adapted to hot climates.</li>`;
+    if (this.settingsData?.weatherDimensions?.temperature?.rules) {
+      const tempRules = this.settingsData.weatherDimensions.temperature.rules;
+      // Check for extreme cold
+      if (this.temperature <= -10 && tempRules["-10"]) {
+        const rule = tempRules["-10"];
+        survivalRules += `<li>${rule.effect}</li>`;
+        if (rule.immunity) {
+          survivalRules += `<li>${rule.immunity}</li>`;
+        }
+      }
+      // Check for extreme heat
+      if (this.temperature >= 2 && tempRules["2"]) {
+        const rule = tempRules["2"];
+        survivalRules += `<li>${rule.effect}</li>`;
+        if (rule.disadvantage) {
+          survivalRules += `<li>${rule.disadvantage}</li>`;
+        }
+        if (rule.immunity) {
+          survivalRules += `<li>${rule.immunity}</li>`;
+        }
+      }
     }
 
     // Wind-based rules
@@ -773,44 +520,25 @@ class DimensionalWeather {
     }
 
     // Precipitation-based rules
-    if (this.precipitation >= 3) {
-      survivalRules += `<li>Area is lightly obscured</li>
-                       <li>Disadvantage on Wisdom (Perception) checks that rely on sight</li>
-                       <li>Open flames are extinguished</li>`;
+    if (this.settingsData?.weatherDimensions?.precipitation?.rules) {
+      const precipRules = this.settingsData.weatherDimensions.precipitation
+        .rules;
+      if (this.precipitation >= 5 && precipRules["5"]) {
+        const rule = precipRules["5"];
+        survivalRules += `<li>${rule.effect}</li>`;
+        if (rule.disadvantage) {
+          survivalRules += `<li>${rule.disadvantage}</li>`;
+        }
+      }
     }
 
     // Add terrain-specific rules
     const currentTerrain = game.settings.get("dimensional-weather", "terrain");
-    switch (currentTerrain) {
-      case "boulderFields":
-        survivalRules += `<li>Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)</li>`;
-        break;
-      case "dustSinks":
-        survivalRules += `<li>Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)</li>
-                         <li>Creatures can become trapped in deep dust (DC 15 Strength check to escape)</li>`;
-        break;
-      case "mountains":
-      case "ringingMountains":
-        survivalRules += `<li>Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)</li>
-                         <li>If above 10,000 feet, each hour of travel counts as 2 hours due to high altitude effects</li>
-                         <li>Creatures can become acclimated after 30 days at this elevation</li>`;
-        break;
-      case "saltFlats":
-        survivalRules += `<li>During the day, creatures without eye protection have disadvantage on Perception checks</li>`;
-        break;
-      case "sandyWastes":
-        survivalRules += `<li>During the day, creatures without eye protection have disadvantage on Perception checks</li>`;
-        break;
-      case "mudflats":
-      case "rockyBadlands":
-        survivalRules += `<li>Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)</li>`;
-        break;
-      case "stonyBarrens":
-      case "scrubPlains":
-      case "forestRidge":
-      case "seaOfSilt":
-        survivalRules += `<li>Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)</li>`;
-        break;
+    const terrain = this.settingsData?.terrains?.[currentTerrain];
+    if (terrain?.rules) {
+      terrain.rules.forEach((rule) => {
+        survivalRules += `<li>${rule}</li>`;
+      });
     }
 
     survivalRules += "</ul>";
@@ -833,14 +561,27 @@ class DimensionalWeather {
    * Returns a narrative description of the current weather conditions.
    */
   async getWeatherDescription() {
-    const tempDesc = this.temperatureDescriptions[this.temperature.toString()];
-    const windDesc = this.windDescriptions[
-      this._roundToEvenForDescription(this.wind)
-    ];
-    const precipDesc = this.precipitationDescriptions[
-      this.precipitation.toString()
-    ];
-    const humidDesc = this.humidityDescriptions[this.humidity.toString()];
+    if (!this.settingsData?.weatherDimensions) {
+      console.warn("Dimensional Weather | Weather dimensions not loaded");
+      return "Weather system is still initializing...";
+    }
+
+    const tempDesc =
+      this.settingsData.weatherDimensions.temperature.descriptions[
+        this.temperature.toString()
+      ] || "Normal temperature";
+    const windDesc =
+      this.settingsData.weatherDimensions.wind.descriptions[
+        this._roundToEvenForDescription(this.wind)
+      ] || "Normal wind";
+    const precipDesc =
+      this.settingsData.weatherDimensions.precipitation.descriptions[
+        this.precipitation.toString()
+      ] || "Clear skies";
+    const humidDesc =
+      this.settingsData.weatherDimensions.humidity.descriptions[
+        this.humidity.toString()
+      ] || "Normal humidity";
     const currentTerrain = game.settings.get("dimensional-weather", "terrain");
     const timePeriod = this.getTimePeriod();
 
@@ -959,24 +700,40 @@ class DimensionalWeather {
   ) {
     // Humidity-based descriptions
     if (this.humidity < -8) {
-      humidDesc = this.humidityDescriptions["-10"];
+      humidDesc =
+        this.settingsData.weatherDimensions.humidity.descriptions["-10"] ||
+        "Very low humidity";
     } else if (this.humidity < -5) {
-      humidDesc = this.humidityDescriptions["-5"];
+      humidDesc =
+        this.settingsData.weatherDimensions.humidity.descriptions["-5"] ||
+        "Low humidity";
     } else if (this.humidity < -1) {
-      humidDesc = this.humidityDescriptions["-1"];
+      humidDesc =
+        this.settingsData.weatherDimensions.humidity.descriptions["-1"] ||
+        "Slightly low humidity";
     } else {
-      humidDesc = this.humidityDescriptions["0"];
+      humidDesc =
+        this.settingsData.weatherDimensions.humidity.descriptions["0"] ||
+        "Normal humidity";
     }
 
     // Precipitation-based descriptions
     if (this.precipitation > 3) {
-      precipDesc = this.precipitationDescriptions["10"];
+      precipDesc =
+        this.settingsData.weatherDimensions.precipitation.descriptions["10"] ||
+        "Very high precipitation";
     } else if (this.precipitation > 0) {
-      precipDesc = this.precipitationDescriptions["5"];
+      precipDesc =
+        this.settingsData.weatherDimensions.precipitation.descriptions["5"] ||
+        "High precipitation";
     } else if (this.precipitation > -5) {
-      precipDesc = this.precipitationDescriptions["-5"];
+      precipDesc =
+        this.settingsData.weatherDimensions.precipitation.descriptions["-5"] ||
+        "Moderate precipitation";
     } else {
-      precipDesc = this.precipitationDescriptions["-10"];
+      precipDesc =
+        this.settingsData.weatherDimensions.precipitation.descriptions["-10"] ||
+        "Very low precipitation";
     }
 
     // Format the weather conditions with bold text
@@ -1231,7 +988,8 @@ class DimensionalWeather {
   async displayForecast() {
     const currentTerrain = game.settings.get("dimensional-weather", "terrain");
     const terrain =
-      this.terrains[currentTerrain] || this.terrains["scrubPlains"];
+      this.settingsData.terrains[currentTerrain] ||
+      this.settingsData.terrains["scrubPlains"];
 
     // Generate 5 days of weather
     const forecast = [];
@@ -1340,9 +1098,13 @@ ${forecastHtml}`;
 // ===== Foundry Hook Registrations =====
 
 // Register module settings during initialization.
-Hooks.once("init", () => {
+Hooks.once("init", async () => {
   console.log("Dimensional Weather | Init hook called");
-  DimensionalWeather.registerSettings();
+  console.log(
+    "Dimensional Weather | Module directory:",
+    game.modules.get("dimensional-weather")?.path
+  );
+  await DimensionalWeather.registerSettings();
 });
 
 // Register chat commands
@@ -1370,15 +1132,98 @@ Hooks.on("chatCommandsReady", (commands) => {
           return;
         }
 
-        // Only allow GMs to use subcommands
+        const args = parameters.split(" ");
+        const subcommand = args[0]?.toLowerCase();
+
+        // Handle version command first since it's available to all users
+        if (subcommand === "version" || subcommand === "v") {
+          if (!game.dimWeather?.settingsData) {
+            return {
+              content: "Weather system not initialized or settings not loaded.",
+              speaker: { alias: "Dimensional Weather" },
+            };
+          }
+          return {
+            content: `Weather System Info:<br>
+                     Name: ${game.dimWeather.settingsData.name}<br>
+                     Version: ${game.dimWeather.settingsData.version}<br>
+                     Description: ${game.dimWeather.settingsData.description}`,
+            speaker: { alias: "Dimensional Weather" },
+          };
+        }
+
+        // Handle setting command - available to GMs only
+        if (subcommand === "setting") {
+          if (!game.user.isGM) {
+            ui.notifications.warn("Only the GM can change campaign settings.");
+            return;
+          }
+
+          if (args.length < 2) {
+            ui.notifications.warn(
+              "Please specify a campaign setting. Use /weather help for available options."
+            );
+            return;
+          }
+
+          const settingId = args[1].toLowerCase();
+          const setting = game.dimWeather.settingsIndex.campaignSettings.find(
+            (s) => s.id.toLowerCase() === settingId
+          );
+
+          if (!setting) {
+            ui.notifications.warn(
+              `Invalid campaign setting: ${settingId}. Use /weather help for available options.`
+            );
+            return;
+          }
+
+          await game.settings.set(
+            "dimensional-weather",
+            "campaignSetting",
+            setting.id
+          );
+
+          // Load the new settings to get the default terrain
+          await game.dimWeather.loadSettings();
+
+          // Set the terrain to the first terrain in the settings file
+          const defaultTerrain = Object.keys(
+            game.dimWeather.settingsData.terrains
+          )[0];
+          if (defaultTerrain) {
+            await game.settings.set(
+              "dimensional-weather",
+              "terrain",
+              defaultTerrain
+            );
+            await game.dimWeather.initWeather();
+          }
+
+          // Format the terrain name with all words capitalized
+          const formattedTerrain = defaultTerrain
+            .replace(/([A-Z])/g, " $1")
+            .trim()
+            .split(" ")
+            .map(
+              (word) =>
+                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+            )
+            .join(" ");
+
+          return {
+            content: `Campaign setting changed to ${setting.name}. Terrain set to default: ${formattedTerrain}`,
+            speaker: { alias: "Dimensional Weather" },
+            whisper: [game.user.id],
+          };
+        }
+
+        // Only allow GMs to use other subcommands
         if (!game.user.isGM) {
           ui.notifications.warn("Only the GM can modify weather conditions.");
           await game.dimWeather.displayWeatherReport();
           return;
         }
-
-        const args = parameters.split(" ");
-        const subcommand = args[0]?.toLowerCase();
 
         switch (subcommand) {
           case "terrain":
@@ -1396,7 +1241,11 @@ Hooks.on("chatCommandsReady", (commands) => {
               .replace(/\s+(\w)/g, (match, letter) => letter.toUpperCase())
               .replace(/^(\w)/, (match, letter) => letter.toLowerCase());
 
-            if (Object.keys(game.dimWeather.terrains).includes(terrain)) {
+            if (
+              Object.keys(game.dimWeather.settingsData.terrains).includes(
+                terrain
+              )
+            ) {
               game.settings.set("dimensional-weather", "terrain", terrain);
               game.dimWeather.initWeather();
               await game.dimWeather.updateWeather(false);
@@ -1479,10 +1328,49 @@ Hooks.on("chatCommandsReady", (commands) => {
     },
     autocompleteCallback: (menu, alias, parameters) => {
       try {
-        if (!parameters) {
+        if (!game.dimWeather?.settingsData?.terrains) {
           return [
             game.chatCommands.createInfoElement(
-              "Display current weather conditions or use subcommands: terrain, update, stats, forecast, help"
+              "Weather system not initialized. Please wait a moment and try again."
+            ),
+          ];
+        }
+
+        // Define available subcommands
+        const subcommands = [
+          { cmd: "terrain", desc: "Set the current terrain type" },
+          { cmd: "setting", desc: "Change campaign setting" },
+          { cmd: "update", desc: "Force weather update" },
+          { cmd: "random", desc: "Set weather variability (0-10)" },
+          { cmd: "stats", desc: "Display weather statistics" },
+          { cmd: "forecast", desc: "Show weather forecast" },
+          { cmd: "help", desc: "Show weather command help" },
+        ];
+
+        // If no parameters, show all available commands
+        if (!parameters || parameters === "") {
+          if (!game.user.isGM) {
+            return [
+              game.chatCommands.createCommandElement(
+                `${alias}`,
+                "Display current weather conditions"
+              ),
+              game.chatCommands.createCommandElement(
+                `${alias} help`,
+                "Show weather command help"
+              ),
+            ];
+          }
+          return [
+            game.chatCommands.createCommandElement(
+              `${alias}`,
+              "Display current weather conditions"
+            ),
+            ...subcommands.map((cmd) =>
+              game.chatCommands.createCommandElement(
+                `${alias} ${cmd.cmd}`,
+                cmd.desc
+              )
             ),
           ];
         }
@@ -1497,41 +1385,100 @@ Hooks.on("chatCommandsReady", (commands) => {
         }
 
         const args = parameters.split(" ");
-        if (args[0] === "terrain" && args.length === 2) {
-          const partial = args[1].toLowerCase();
-          const matches = Object.keys(game.dimWeather?.terrains || {})
-            .map((key) => key.replace(/([A-Z])/g, " $1").trim())
-            .map(
-              (terrain) => terrain.charAt(0).toUpperCase() + terrain.slice(1)
-            )
-            .filter((terrain) => terrain.toLowerCase().startsWith(partial));
 
-          return matches.map((terrain) =>
-            game.chatCommands.createCommandElement(
-              `${alias} terrain ${terrain}`,
-              `Set terrain to ${terrain}`
-            )
-          );
+        // Handle terrain subcommand
+        if (
+          args[0] === "terrain" ||
+          (args[0] && "terrain".startsWith(args[0]))
+        ) {
+          // If just "terrain" or partial match, show all terrains
+          if (args.length === 1) {
+            return Object.entries(game.dimWeather.settingsData.terrains)
+              .map(([key, terrain]) => ({
+                key,
+                name: terrain.name || key.replace(/([A-Z])/g, " $1").trim(),
+              }))
+              .map(({ key, name }) =>
+                game.chatCommands.createCommandElement(
+                  `${alias} terrain ${name}`,
+                  `Set terrain to ${name}`
+                )
+              );
+          }
+          // If we have a partial terrain name, filter matches
+          if (args.length === 2) {
+            const partial = args[1].toLowerCase();
+            return Object.entries(game.dimWeather.settingsData.terrains)
+              .map(([key, terrain]) => ({
+                key,
+                name: terrain.name || key.replace(/([A-Z])/g, " $1").trim(),
+              }))
+              .filter(({ name }) => name.toLowerCase().startsWith(partial))
+              .map(({ key, name }) =>
+                game.chatCommands.createCommandElement(
+                  `${alias} terrain ${name}`,
+                  `Set terrain to ${name}`
+                )
+              );
+          }
         }
 
-        // Show available subcommands for GMs
-        const subcommands = [
-          { cmd: "terrain", desc: "Set the current terrain type" },
-          { cmd: "update", desc: "Force weather update" },
-          { cmd: "random", desc: "Set weather variability (0-10)" },
-          { cmd: "stats", desc: "Display weather statistics" },
-          { cmd: "forecast", desc: "Show weather forecast" },
-          { cmd: "help", desc: "Show weather command help" },
-        ];
+        // Handle setting subcommand
+        if (
+          args[0] === "setting" ||
+          (args[0] && "setting".startsWith(args[0]))
+        ) {
+          if (!game.user.isGM) {
+            return [
+              game.chatCommands.createInfoElement(
+                "Only GMs can change campaign settings."
+              ),
+            ];
+          }
 
-        return subcommands
-          .filter((cmd) => cmd.cmd.startsWith(args[0] || ""))
+          // If just "setting" or partial match, show all settings
+          if (args.length === 1) {
+            return game.dimWeather.settingsIndex.campaignSettings.map(
+              (setting) =>
+                game.chatCommands.createCommandElement(
+                  `${alias} setting ${setting.id}`,
+                  `Change to ${setting.name} campaign setting`
+                )
+            );
+          }
+
+          // If we have a partial setting name, filter matches
+          if (args.length === 2) {
+            const partial = args[1].toLowerCase();
+            return game.dimWeather.settingsIndex.campaignSettings
+              .filter((setting) => setting.id.toLowerCase().startsWith(partial))
+              .map((setting) =>
+                game.chatCommands.createCommandElement(
+                  `${alias} setting ${setting.id}`,
+                  `Change to ${setting.name} campaign setting`
+                )
+              );
+          }
+        }
+
+        // Show matching subcommands based on partial input
+        const partialCmd = args[0] || "";
+        const matchingCommands = subcommands
+          .filter(({ cmd }) => cmd.startsWith(partialCmd))
           .map((cmd) =>
             game.chatCommands.createCommandElement(
               `${alias} ${cmd.cmd}`,
               cmd.desc
             )
           );
+
+        return matchingCommands.length > 0
+          ? matchingCommands
+          : [
+              game.chatCommands.createInfoElement(
+                "No matching commands found. Type /weather help for available options."
+              ),
+            ];
       } catch (error) {
         console.error("Weather autocomplete error:", error);
         return [];
@@ -1586,34 +1533,47 @@ Hooks.on("chatCommandsReady", (commands) => {
 
 // Helper function to show weather help
 function showWeatherHelp() {
+  if (!game.dimWeather?.settingsData?.terrains) {
+    ui.notifications.warn(
+      "Weather system not initialized. Please wait a moment and try again."
+    );
+    return;
+  }
+
+  // Get terrain list from settings
+  const terrainList = Object.entries(game.dimWeather.settingsData.terrains)
+    .map(([key, terrain]) => {
+      const name = terrain.name || key.replace(/([A-Z])/g, " $1").trim();
+      const description = terrain.description ? `: ${terrain.description}` : "";
+      return `<li>${name}${description}</li>`;
+    })
+    .join("\n");
+
+  // Get settings list
+  const settingsList = game.dimWeather.settingsIndex.campaignSettings
+    .map((setting) => `<li>${setting.name}</li>`)
+    .join("\n");
+
   ChatMessage.create({
     content: `<div class="weather-report">
                 <h3>Weather Commands Help</h3>
                 <ul>
                   <li><code>/weather</code> - Display current weather</li>
                   <li><code>/weather terrain [Terrain]</code> - Set the current terrain type</li>
+                  <li><code>/weather setting [Setting]</code> - Change campaign setting (GM only)</li>
                   <li><code>/weather update</code> - Force weather update</li>
                   <li><code>/weather stats</code> - Display weather statistics (GM only)</li>
                   <li><code>/weather forecast</code> - Show weather forecast (GM only)</li>
                   <li><code>/weather random [0-10]</code> - Set weather variability (GM only)</li>
                   <li><code>/date</code> - Show calendar information</li>
                 </ul>
+                <h4>Available Campaign Settings:</h4>
+                <ul>
+                  ${settingsList}
+                </ul>
                 <h4>Available Terrains:</h4>
                 <ul>
-                  <li>Boulder Fields</li>
-                  <li>Dust Sinks</li>
-                  <li>Mountains</li>
-                  <li>Mudflats</li>
-                  <li>Rocky Badlands</li>
-                  <li>Salt Flats</li>
-                  <li>Salt Marshes</li>
-                  <li>Sandy Wastes</li>
-                  <li>Scrub Plains</li>
-                  <li>Stony Barrens</li>
-                  <li>Verdant Belt</li>
-                  <li>Sea of Silt</li>
-                  <li>Ringing Mountains</li>
-                  <li>Forest Ridge</li>
+                  ${terrainList}
                 </ul>
               </div>`,
     speaker: { alias: "Dimensional Weather" },
@@ -1621,10 +1581,12 @@ function showWeatherHelp() {
 }
 
 // Create and initialize the weather system
-Hooks.once("ready", () => {
+Hooks.once("ready", async () => {
   console.log("Dimensional Weather | Ready hook called");
   game.dimWeather = new DimensionalWeather();
-  game.dimWeather.initWeather();
-  game.dimWeather.updateWeather();
-  console.log("Dimensional Weather | Module initialized");
+  await game.dimWeather.loadSettings();
+  console.log(
+    "Dimensional Weather | Module initialized with settings:",
+    game.dimWeather.settingsData
+  );
 });

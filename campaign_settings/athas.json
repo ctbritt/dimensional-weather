@@ -1,0 +1,273 @@
+{
+    "name": "Athas",
+    "description": "Dark Sun campaign setting weather system",
+    "version": "TEST-1.0",
+    "weatherDimensions": {
+        "temperature": {
+            "descriptions": {
+                "-10": "Freezing (40° F) — Nightfall brings piercing cold, numbing exposed skin and turning breath into icy vapor, a stark contrast to the relentless daytime heat.",
+                "-9": "Very Cold (45° F) — The air is sharply cold, chilling but refreshing, a rare and cherished respite from Athas's harsh sun.",
+                "-8": "Cold (50° F) — A crisp wind chills the skin, a welcome relief from the oppressive heat that usually dominates the desert.",
+                "-7": "Cool (55° F) — The air feels surprisingly fresh and cool, an uncommon luxury in this sun-scorched world.",
+                "-6": "Mildly Cool (60° F) — Pleasantly mild by Athasian standards, the coolness offers comfort and temporary ease.",
+                "-5": "Brisk (65° F) — The refreshing coolness invigorates travelers, a fleeting comfort against the desert's constant warmth.",
+                "-4": "Comfortable (70° F) — Ideal traveling conditions, the air neither too hot nor too cold, a rare equilibrium in Athas.",
+                "-3": "Mild (75° F) — The heat is bearable, offering favorable conditions for those accustomed to the harsh climate.",
+                "-2": "Temperate (80° F) — Warm, yet manageable, a moderate day in Athas's relentless climate.",
+                "-1": "Warm (85° F) — Heat begins to seep in, signaling the return of the sun's harsh dominion.",
+                "0": "Hot (90° F) — The sun's intensity is noticeable, sweat beads forming as the heat starts to reclaim the desert.",
+                "1": "Very Warm (95° F) — The air becomes heavy, oppressive, signaling danger for those unaccustomed to Athasian extremes.",
+                "2": "Hot (100° F) — The blistering rays burn exposed flesh, testing endurance and resilience.",
+                "3": "Very Hot (105° F) — Heat radiates mercilessly, sapping strength and presenting real danger to the unprepared.",
+                "4": "Extremely Hot (110° F) — The horizon shimmers, heat waves dance visibly, distorting vision and draining stamina.",
+                "5": "Sweltering (115° F) — Each breath feels searing; the oppressive air threatens exhaustion and collapse.",
+                "6": "Blistering (120° F) — The atmosphere resembles an open furnace, punishing flesh and will alike.",
+                "7": "Oppressive (125° F) — The heat suffocates, relentless and brutal, pushing survival instincts to their limits.",
+                "8": "Scorching (130° F) — A deadly, relentless inferno, lethal for the unprepared, where water and shade mean life or death.",
+                "9": "Deadly (135° F) — The desert's wrath reaches lethal intensity; heatstroke and death loom imminent without shelter.",
+                "10": "Unbearable (140° F+) — A catastrophic inferno, instantly life-threatening; survival demands immediate refuge from the merciless sun."
+            },
+            "rules": {
+                "2": {
+                    "description": "Extreme Heat",
+                    "effect": "DC 5 Constitution save each hour (increases by 1 per hour) or gain 1 Exhaustion level",
+                    "disadvantage": "Creatures wearing Medium/Heavy armor have Disadvantage",
+                    "immunity": "Creatures with Fire Resistance/Immunity automatically succeed",
+                    "applies_to": "Temperature 2 and higher"
+                }
+            }
+        },
+        "wind": {
+            "descriptions": {
+                "-10": "Dead Still — The silence is oppressive, an unnatural stillness that feels as if even time has stopped breathing.",
+                "-8": "Eerie Calm — The air is unsettlingly quiet, hinting ominously that the desert awaits something.",
+                "-6": "Whispering Breeze — The faintest movement stirs dust lightly, gentle murmurs from the wastelands.",
+                "-4": "Gentle Breeze — A soft wind caresses skin, momentarily soothing travelers amidst the harsh sands.",
+                "-2": "Rising Breeze — The air comes alive, rustling fabric and scattering grains of sand in playful eddies.",
+                "0": "Steady Wind — A persistent breeze pushes gently yet steadily, offering comfort and aiding travel.",
+                "2": "Biting Gusts — Winds carry abrasive sand, stinging exposed flesh and forcing eyes to narrow against the rising threat.",
+                "4": "Strong Wind — Fierce gusts whip around travelers, screaming through rocky crags and demanding vigilance.",
+                "6": "Raging Gale — Powerful winds batter relentlessly, threatening to knock travelers off their feet and obscuring vision with swirling dust.",
+                "8": "Furious Tempest — Violent gusts roar with terrifying intensity, capable of uprooting tents, scattering equipment, and endangering lives.",
+                "10": "Hurricane Fury — The full wrath of Athas unleashed; winds shred anything in their path, leaving devastation and despair in their wake."
+            }
+        },
+        "precipitation": {
+            "descriptions": {
+                "-10": "None — The sky is harshly clear, a merciless expanse devoid of even the faintest hint of clouds.",
+                "-5": "None — A few thin, ghostly clouds drift silently, an exceedingly rare and fleeting sight.",
+                "-1": "None — Sparse clouds dot the vast sky, barely shading the relentless sun.",
+                "0": "None — Larger clouds drift along the distant horizon, hinting faintly at moisture that rarely arrives.",
+                "1": "Light — An astonishingly rare mist gently dampens the air, offering brief wonder to desert travelers.",
+                "5": "Medium — Precious droplets fall softly from above, a gentle rain celebrated as a life-giving blessing.",
+                "10": "Heavy — A miraculous downpour drenches the earth, a legendary event transforming the harsh landscape into a fleeting oasis."
+            },
+            "rules": {
+                "5": {
+                    "description": "Heavy Precipitation",
+                    "effect": "Area is Lightly Obscured",
+                    "disadvantage": "Disadvantage on Wisdom (Perception) checks"
+                }
+            }
+        },
+        "humidity": {
+            "descriptions": {
+                "-10": "Extremely Dry — The air is parched, painfully devoid of moisture, cracking lips and drying skin instantly.",
+                "-5": "Very Dry — The atmosphere is intensely dry, each breath feeling like sandpaper in the throat.",
+                "-1": "Dry — Air is characteristically arid, typical for Athas, harsh yet expected.",
+                "0": "Normal — Standard Athasian dryness; oppressive compared to other worlds but routine here.",
+                "1": "Slightly Humid — An uncommon hint of moisture lingers briefly, providing surprising relief to weary travelers.",
+                "5": "Moderately Humid — The air carries a comforting touch of humidity, almost reminiscent of gentler lands.",
+                "10": "Very Humid — Moisture thickens the air, heavy and stifling, causing sweat to pour and sapping strength rapidly."
+            }
+        }
+    },
+    "timeModifiers": {
+        "Early Morning": {
+            "temperature": -2
+        },
+        "Noon": {
+            "temperature": 3
+        },
+        "Afternoon": {
+            "temperature": 5
+        },
+        "Night": {
+            "temperature": -1
+        },
+        "Late Night": {
+            "temperature": -3
+        }
+    },
+    "terrains": {
+        "boulderFields": {
+            "name": "Boulder Fields",
+            "description": "Jagged rocks and broken terrain stretch endlessly. Some are old lava flows long since cooled, while others are valleys choked with rockslides. Deep gulches and crevices crisscross the landscape, offering plenty of hiding places.",
+            "temperature": 9,
+            "wind": 6,
+            "precipitation": -10,
+            "humidity": -10,
+            "variability": 6,
+            "rules": [
+                "Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)"
+            ]
+        },
+        "dustSinks": {
+            "name": "Dust Sinks",
+            "description": "Windblown dust, ash, and silt accumulate in depressions, forming billowing clouds at the slightest breeze. The ground appears smooth but conceals treacherous depths.",
+            "temperature": 10,
+            "wind": 7,
+            "precipitation": -10,
+            "humidity": -5,
+            "variability": 8,
+            "rules": [
+                "Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)",
+                "Creatures can become trapped in deep dust (DC 15 Strength check to escape)"
+            ]
+        },
+        "forestRidge": {
+            "name": "Forest Ridge",
+            "description": "A dense, dark forest provides rare relief from the sun. The air is thick with the scent of pine and the sound of wind through branches. Ancient trees rise from rocky ridges.",
+            "temperature": 3,
+            "wind": -2,
+            "precipitation": 5,
+            "humidity": 10,
+            "variability": 7,
+            "rules": [
+                "Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)"
+            ]
+        },
+        "mountains": {
+            "name": "Mountains",
+            "description": "Bare, rocky peaks rise dramatically, offering little water or shelter. The exposed rock crumbles under the twin hammers of heat and cold, creating treacherous slopes of broken rock.",
+            "temperature": 4,
+            "wind": 8,
+            "precipitation": -10,
+            "humidity": -5,
+            "variability": 9,
+            "rules": [
+                "Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)",
+                "If above 10,000 feet, each hour of travel counts as 2 hours due to high altitude effects",
+                "Creatures can become acclimated after 30 days at this elevation"
+            ]
+        },
+        "mudflats": {
+            "name": "Mudflats",
+            "description": "Water seeps upward, saturating the land to create a soupy mess. Some areas are lush with vegetation, while others are hard, cracked clay that might not support a traveler's weight.",
+            "temperature": 8,
+            "wind": 3,
+            "precipitation": -5,
+            "humidity": 5,
+            "variability": 7,
+            "rules": [
+                "Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)"
+            ]
+        },
+        "ringingMountains": {
+            "name": "Ringing Mountains",
+            "description": "Rugged peaks rise into the sky, their slopes covered in loose scree and jagged rocks.",
+            "temperature": -2,
+            "wind": 8,
+            "precipitation": -10,
+            "humidity": -5,
+            "variability": 9,
+            "rules": [
+                "Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)",
+                "If above 10,000 feet, each hour of travel counts as 2 hours due to high altitude effects",
+                "Creatures can become acclimated after 30 days at this elevation"
+            ]
+        },
+        "rockyBadlands": {
+            "name": "Rocky Badlands",
+            "description": "Highly eroded mazes of sharp-edged ridges, winding canyons, and thorn-choked ravines stretch endlessly. Daunting escarpments force travelers into meandering courses.",
+            "temperature": 9,
+            "wind": 6,
+            "precipitation": -10,
+            "humidity": -10,
+            "variability": 6,
+            "rules": [
+                "Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)"
+            ]
+        },
+        "saltFlats": {
+            "name": "Salt Flats",
+            "description": "Great flat plains encrusted with salt that is white, brown, or black stretch for miles. The ground crunches underfoot, and temperatures reach brutal extremes.",
+            "temperature": 10,
+            "wind": 4,
+            "precipitation": -10,
+            "humidity": -10,
+            "variability": 3,
+            "rules": [
+                "During the day, creatures without eye protection have disadvantage on Perception checks"
+            ]
+        },
+        "saltMarshes": {
+            "name": "Salt Marshes",
+            "description": "Low grasses and reeds dot the landscape, with ankle-deep channels of briny water winding through. Tough stands of scrub and occasional trees rise above the vegetation.",
+            "temperature": 8,
+            "wind": 2,
+            "precipitation": -5,
+            "humidity": 5,
+            "variability": 5,
+            "rules": []
+        },
+        "sandyWastes": {
+            "name": "Sandy Wastes",
+            "description": "Vast stretches of yellow sand stretch to the horizon. Some areas are flat and still, while others feature great dunes that shift endlessly under the wind.",
+            "temperature": 10,
+            "wind": 8,
+            "precipitation": -10,
+            "humidity": -10,
+            "variability": 10,
+            "rules": [
+                "During the day, creatures without eye protection have disadvantage on Perception checks"
+            ]
+        },
+        "scrubPlains": {
+            "name": "Scrub Plains",
+            "description": "Tough, dry grass punctuated by creosote bushes and tumbleweed dominates the ground. A few small trees are scattered across the landscape.",
+            "temperature": 8,
+            "wind": 3,
+            "precipitation": -10,
+            "humidity": -5,
+            "variability": 4,
+            "rules": [
+                "Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)"
+            ]
+        },
+        "seaOfSilt": {
+            "name": "Sea of Silt",
+            "description": "A vast expanse of fine, powdery silt. The wind stirs up clouds of dust.",
+            "temperature": 10,
+            "wind": 7,
+            "precipitation": -10,
+            "humidity": -5,
+            "variability": 9,
+            "rules": [
+                "Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)"
+            ]
+        },
+        "stonyBarrens": {
+            "name": "Stony Barrens",
+            "description": "Weathered plains covered with rocks ranging from pebbles to huge piles of standing boulders. Huge mesas and pointed buttes dot the landscape.",
+            "temperature": 9,
+            "wind": 5,
+            "precipitation": -10,
+            "humidity": -10,
+            "variability": 5,
+            "rules": [
+                "Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)"
+            ]
+        },
+        "verdantBelt": {
+            "name": "Verdant Belt",
+            "description": "A rare oasis of life in the desert. Ancient magic or underground springs sustain lush vegetation.",
+            "temperature": 7,
+            "wind": 2,
+            "precipitation": 0,
+            "humidity": 5,
+            "variability": 3,
+            "rules": []
+        }
+    }
+}
