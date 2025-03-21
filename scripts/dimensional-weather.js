@@ -1353,7 +1353,6 @@ Hooks.on("chatCommandsReady", (commands) => {
   commands.register({
     name: "/weather",
     module: "dimensional-weather",
-    aliases: ["/w"],
     description: "Display current weather conditions",
     icon: "<i class='fas fa-cloud-sun'></i>",
     requiredRole: "NONE",
@@ -1446,22 +1445,6 @@ Hooks.on("chatCommandsReady", (commands) => {
               terrain: game.settings.get("dimensional-weather", "terrain"),
             };
 
-            // Add hex map information if enabled
-            if (game.dimWeather.useHexMap) {
-              const hexPosition = game.settings.get(
-                "dimensional-weather",
-                "currentHexPosition"
-              );
-              const weatherType = game.settings.get(
-                "dimensional-weather",
-                "currentWeatherType"
-              );
-              stats.hexMap = {
-                position: hexPosition,
-                weatherType: weatherType,
-              };
-            }
-
             return {
               content: `Weather Statistics (GM Only):\n${JSON.stringify(
                 stats,
@@ -1479,10 +1462,6 @@ Hooks.on("chatCommandsReady", (commands) => {
               speaker: { alias: "Dimensional Weather" },
               whisper: [game.user.id],
             };
-
-          case "hex":
-            new WeatherMapApplication().render(true);
-            break;
 
           case "help":
             showWeatherHelp();
@@ -1503,7 +1482,7 @@ Hooks.on("chatCommandsReady", (commands) => {
         if (!parameters) {
           return [
             game.chatCommands.createInfoElement(
-              "Display current weather conditions or use subcommands: terrain, update, stats, forecast, hex, help"
+              "Display current weather conditions or use subcommands: terrain, update, stats, forecast, help"
             ),
           ];
         }
@@ -1542,7 +1521,6 @@ Hooks.on("chatCommandsReady", (commands) => {
           { cmd: "random", desc: "Set weather variability (0-10)" },
           { cmd: "stats", desc: "Display weather statistics" },
           { cmd: "forecast", desc: "Show weather forecast" },
-          { cmd: "hex", desc: "Show the weather hex map" },
           { cmd: "help", desc: "Show weather command help" },
         ];
 
@@ -1566,7 +1544,6 @@ Hooks.on("chatCommandsReady", (commands) => {
   commands.register({
     name: "/date",
     module: "dimensional-weather",
-    aliases: ["/d"],
     description: "Display calendar information (GM only)",
     icon: "<i class='fas fa-calendar'></i>",
     requiredRole: "GAMEMASTER",
@@ -1619,7 +1596,6 @@ function showWeatherHelp() {
                   <li><code>/weather stats</code> - Display weather statistics (GM only)</li>
                   <li><code>/weather forecast</code> - Show weather forecast (GM only)</li>
                   <li><code>/weather random [0-10]</code> - Set weather variability (GM only)</li>
-                  <li><code>/weather hex</code> - Show the weather hex map</li>
                   <li><code>/date</code> - Show calendar information</li>
                 </ul>
                 <h4>Available Terrains:</h4>
