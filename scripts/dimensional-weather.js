@@ -87,6 +87,29 @@ class DimensionalWeather {
         },
       });
 
+      // Register chat commands setting
+      game.settings.register("dimensional-weather", "chatCommands", {
+        name: "Chat Commands",
+        scope: "world",
+        config: false,
+        type: Object,
+        default: {
+          weather: {
+            usage:
+              "/weather [terrain|season|update|random|stats|forecast|help]",
+            description: "Display or modify weather conditions",
+          },
+          forecast: {
+            usage: "/forecast",
+            description: "Show weather forecast",
+          },
+          date: {
+            usage: "/date",
+            description: "Display calendar information",
+          },
+        },
+      });
+
       // Load the settings index first
       const response = await fetch(
         "/modules/dimensional-weather/campaign_settings/index.json"
@@ -1138,7 +1161,8 @@ class DimensionalWeather {
    * Displays a 5-day weather forecast in chat.
    */
   async displayForecast() {
-    const currentTerrain = game.settings.get("dimensional-weather", "terrain");
+    const settings = game.settings.get("dimensional-weather", "settings");
+    const currentTerrain = settings.terrain;
     const terrain =
       this.settingsData.terrains[currentTerrain] ||
       this.settingsData.terrains["scrubPlains"];
@@ -1149,24 +1173,16 @@ class DimensionalWeather {
       // Use the terrain as a base and add some randomness
       const dayWeather = {
         temperature: Math.round(
-          terrain.temperature +
-            (Math.random() * 2 - 1) *
-              game.settings.get("dimensional-weather", "variability")
+          terrain.temperature + (Math.random() * 2 - 1) * settings.variability
         ),
         wind: Math.round(
-          terrain.wind +
-            (Math.random() * 2 - 1) *
-              game.settings.get("dimensional-weather", "variability")
+          terrain.wind + (Math.random() * 2 - 1) * settings.variability
         ),
         precipitation: Math.round(
-          terrain.precipitation +
-            (Math.random() * 2 - 1) *
-              game.settings.get("dimensional-weather", "variability")
+          terrain.precipitation + (Math.random() * 2 - 1) * settings.variability
         ),
         humidity: Math.round(
-          terrain.humidity +
-            (Math.random() * 2 - 1) *
-              game.settings.get("dimensional-weather", "variability")
+          terrain.humidity + (Math.random() * 2 - 1) * settings.variability
         ),
       };
 
@@ -1415,14 +1431,24 @@ ${forecastHtml}`;
    * Returns help text for available commands
    */
   getHelpText() {
-    const commands = game.settings.get("dimensional-weather", "chatCommands");
-    const weatherCmd = commands.weather;
-    const forecastCmd = commands.forecast;
-    const dateCmd = commands.date;
+    const commands = {
+      weather: {
+        usage: "/weather [terrain|season|update|random|stats|forecast|help]",
+        description: "Display or modify weather conditions",
+      },
+      forecast: {
+        usage: "/forecast",
+        description: "Show weather forecast",
+      },
+      date: {
+        usage: "/date",
+        description: "Display calendar information",
+      },
+    };
 
     const helpText = `
 Weather System Commands:
-${weatherCmd.usage}
+${commands.weather.usage}
   terrain [name] - Change terrain type (GM only)
   season [name] - Change current season (GM only)
   update - Force weather update (GM only)
@@ -1430,8 +1456,8 @@ ${weatherCmd.usage}
   random - Generate random weather (GM only)
   help - Show this help message
 
-${forecastCmd.usage} - Show weather forecast
-${dateCmd.usage} - Show calendar information
+${commands.forecast.usage} - Show weather forecast
+${commands.date.usage} - Show calendar information
 
 Available Terrains:
 ${Object.entries(this.settingsData.terrains)
@@ -2181,10 +2207,22 @@ Hooks.on("chatCommandsReady", (commands) => {
               );
               return;
             }
-            game.settings.set("dimensional-weather", "variability", value);
-            game.dimWeather.variability = value;
-            ui.notifications.info(`Weather variability set to ${value}`);
-            break;
+            const weatherSettings = game.settings.get(
+              "dimensional-weather",
+              "settings"
+            );
+            weatherSettings.variability = value;
+            await game.settings.set(
+              "dimensional-weather",
+              "settings",
+              weatherSettings
+            );
+            await game.dimWeather.updateWeather(true);
+            return {
+              content: `Weather variability set to ${value}. Weather has been updated.`,
+              speaker: { alias: "Dimensional Weather" },
+              whisper: [game.user.id],
+            };
 
           case "stats":
             const scene = game.scenes.viewed;
@@ -2224,11 +2262,13 @@ Hooks.on("chatCommandsReady", (commands) => {
             return {
               content: forecast,
               speaker: { alias: "Dimensional Weather" },
-              whisper: [game.user.id],
             };
 
           case "help":
-            return game.dimWeather.getHelpText();
+            return {
+              content: game.dimWeather.getHelpText(),
+              speaker: { alias: "Dimensional Weather" },
+            };
 
           case "terrains":
             const availableTerrains = Object.entries(
