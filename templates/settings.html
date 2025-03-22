@@ -9,16 +9,6 @@
     <!-- General Tab -->
     <div class="tab" data-tab="general" data-group="primary-tabs">
       <div class="form-group">
-        <label>Campaign Setting</label>
-        <select name="campaign">
-          {{#each campaignChoices as |name id|}}
-          <option value="{{id}}" {{#if (eq ../settings.campaign id)}}selected{{/if}}>{{name}}</option>
-          {{/each}}
-        </select>
-        <p class="notes">Select the campaign setting to use for weather rules</p>
-      </div>
-
-      <div class="form-group">
         <label>
           <input type="checkbox" name="useSimpleCalendar" {{checked settings.useSimpleCalendar}}>
           Use Simple Calendar
@@ -48,7 +38,7 @@
     <div class="tab" data-tab="weather" data-group="primary-tabs">
       <div class="form-group">
         <label>Terrain Type</label>
-        <select name="terrain" {{#if settings.useSimpleCalendar}}disabled{{/if}}>
+        <select name="terrain">
           {{#each terrainChoices as |name id|}}
           <option value="{{id}}" {{#if (eq ../settings.terrain id)}}selected{{/if}}>{{name}}</option>
           {{/each}}

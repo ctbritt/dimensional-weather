@@ -841,17 +841,20 @@
 }
 
 .dimensional-weather-settings .sheet-footer button {
-  background: var(--color-primary);
+  background: var(--color-primary, #1e88e5);
   color: white;
   border: none;
   border-radius: 4px;
   padding: 8px 16px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  font-weight: bold;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .dimensional-weather-settings .sheet-footer button:hover {
-  background: var(--color-primary-dark);
+  background: var(--color-primary-dark, #1565c0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* Dark theme support */
