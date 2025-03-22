@@ -75,7 +75,7 @@
                 {
                     "extremeHeat": 2,
                     "description": "Extreme Heat",
-                    "effect": "DC 5 Constitution save each hour (increases by 1 per hour) or gain 1 Exhaustion level. Creatures wearing Medium/Heavy armor have Disadvantage. Creatures with Fire Resistance/Immunity automatically succeed."
+                    "effect": "A creature exposed to the extreme heat and without access to drinkable water must succeed on a Constitution saving throw at the end of each hour or gain 1 Exhaustion level; the DC is 5 for the first hour and increases by 1 for each additional hour. Creatures wearing Medium or Heavy armor have Disadvantage on the save. Creatures that have Resistance or Immunity to Fire damage automatically succeed on the save.."
                 }
             ]
         },
@@ -113,7 +113,7 @@
             },
             "rules": [
                 {
-                    "heavyPrecipitation": 5,
+                    "heavyPrecipitation": 10,
                     "description": "Heavy Precipitation",
                     "effect": "Everything within an area of heavy rain or heavy snowfall is Lightly Obscured, and creatures in the area have Disadvantage on all Wisdom (Perception) checks. Heavy rain also extinguishes open flames."
                 }
@@ -142,10 +142,10 @@
             "temperature": 3
         },
         "Night": {
-            "temperature": -1
+            "temperature": -6
         },
         "Late Night": {
-            "temperature": -3
+            "temperature": -8
         }
     },
     "terrains": {
@@ -157,9 +157,7 @@
             "precipitation": -10,
             "humidity": -10,
             "variability": 6,
-            "rules": [
-                "Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)"
-            ]
+            "rules": []
         },
         "dustSinks": {
             "name": "Dust Sinks",
@@ -170,7 +168,6 @@
             "humidity": -5,
             "variability": 8,
             "rules": [
-                "Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)",
                 "Creatures can become trapped in deep dust (DC 15 Strength check to escape)"
             ]
         },
@@ -284,17 +281,19 @@
             "variability": 4,
             "rules": []
         },
-        "siltSea": {
+        "seaOfSilt": {
             "name": "Sea of Silt",
-            "description": "A vast expanse of fine, powdery silt that shifts and flows like water. The surface is treacherous, and the fine dust can choke the unwary.",
-            "temperature": 7,
+            "description": "A vast expanse of fine, powdery silt that behaves like a liquid. The surface ripples and flows like water, concealing deadly depths. Extreme heat and strong winds create dangerous conditions, while the fine particles can choke the unwary.",
+            "temperature": 8,
             "wind": 7,
             "precipitation": -10,
-            "humidity": -5,
-            "variability": 8,
+            "humidity": -10,
+            "variability": 4,
             "rules": [
                 "Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)",
-                "Creatures can become trapped in deep silt (DC 15 Strength check to escape)"
+                "Creatures without eye protection have Disadvantage on Perception checks during the day",
+                "Creatures can become trapped in the silt if they fail a DC 12 Strength (Athletics) check",
+                "Swimming creatures must make a DC 15 Constitution save each hour or gain 1 Exhaustion level from breathing in silt particles"
             ]
         },
         "stonyBarrens": {
@@ -317,9 +316,7 @@
             "precipitation": 5,
             "humidity": 10,
             "variability": 6,
-            "rules": [
-                "Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)"
-            ]
+            "rules": []
         }
     }
 }

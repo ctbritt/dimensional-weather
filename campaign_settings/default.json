@@ -164,6 +164,21 @@
                 "Movement is Difficult terrain in deep snow"
             ]
         },
+        "seaOfSilt": {
+            "name": "Sea of Silt",
+            "description": "A vast expanse of fine, powdery silt that behaves like a liquid. Extreme heat and strong winds create dangerous conditions.",
+            "temperature": 8,
+            "wind": 5,
+            "precipitation": -10,
+            "humidity": -5,
+            "variability": 3,
+            "rules": [
+                "Movement is Difficult terrain",
+                "Creatures without eye protection have Disadvantage on Perception checks during the day",
+                "DC 10 Constitution save each hour or gain 1 Exhaustion level due to heat",
+                "Creatures can become trapped in the silt if they fail a DC 12 Strength (Athletics) check"
+            ]
+        },
         "subarctic": {
             "name": "Subarctic Taiga",
             "description": "Cold forest region with long winters and short summers. Dense coniferous forests dominate.",
