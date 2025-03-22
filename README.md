@@ -76,7 +76,7 @@ Let's see how weather is generated for a Scrub Plains terrain (from my Dark Sun 
    - Wind ≥ 6: Ranged attack penalties
    - Precipitation ≥ 3: Visibility penalties
 
-These thresholds are determined by a setting json file (see below). In this example, a wind score of more than 5 corresponds to a Strong Wind, as governed by the DMG. 
+These thresholds are determined by a setting json file ([see below](#makin-it-rain)). In this example, a wind score of more than 5 corresponds to a Strong Wind, as governed by the DMG. 
 
 ### Example: Weather Report
 
