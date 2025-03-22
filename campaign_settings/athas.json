@@ -121,10 +121,10 @@
             "temperature": -2
         },
         "Noon": {
-            "temperature": 3
+            "temperature": 2
         },
         "Afternoon": {
-            "temperature": 5
+            "temperature": 3
         },
         "Night": {
             "temperature": -1
@@ -137,7 +137,7 @@
         "boulderFields": {
             "name": "Boulder Fields",
             "description": "Jagged rocks and broken terrain stretch endlessly. Some are old lava flows long since cooled, while others are valleys choked with rockslides. Deep gulches and crevices crisscross the landscape, offering plenty of hiding places.",
-            "temperature": 9,
+            "temperature": 6,
             "wind": 6,
             "precipitation": -10,
             "humidity": -10,
@@ -149,7 +149,7 @@
         "dustSinks": {
             "name": "Dust Sinks",
             "description": "Windblown dust, ash, and silt accumulate in depressions, forming billowing clouds at the slightest breeze. The ground appears smooth but conceals treacherous depths.",
-            "temperature": 10,
+            "temperature": 7,
             "wind": 7,
             "precipitation": -10,
             "humidity": -5,
@@ -162,7 +162,7 @@
         "forestRidge": {
             "name": "Forest Ridge",
             "description": "A dense, dark forest provides rare relief from the sun. The air is thick with the scent of pine and the sound of wind through branches. Ancient trees rise from rocky ridges.",
-            "temperature": 3,
+            "temperature": 2,
             "wind": -2,
             "precipitation": 5,
             "humidity": 10,
@@ -174,7 +174,7 @@
         "mountains": {
             "name": "Mountains",
             "description": "Bare, rocky peaks rise dramatically, offering little water or shelter. The exposed rock crumbles under the twin hammers of heat and cold, creating treacherous slopes of broken rock.",
-            "temperature": 4,
+            "temperature": 3,
             "wind": 8,
             "precipitation": -10,
             "humidity": -5,
@@ -188,7 +188,7 @@
         "mudflats": {
             "name": "Mudflats",
             "description": "Water seeps upward, saturating the land to create a soupy mess. Some areas are lush with vegetation, while others are hard, cracked clay that might not support a traveler's weight.",
-            "temperature": 8,
+            "temperature": 5,
             "wind": 3,
             "precipitation": -5,
             "humidity": 5,
@@ -214,7 +214,7 @@
         "rockyBadlands": {
             "name": "Rocky Badlands",
             "description": "Highly eroded mazes of sharp-edged ridges, winding canyons, and thorn-choked ravines stretch endlessly. Daunting escarpments force travelers into meandering courses.",
-            "temperature": 9,
+            "temperature": 6,
             "wind": 6,
             "precipitation": -10,
             "humidity": -10,
@@ -226,7 +226,7 @@
         "saltFlats": {
             "name": "Salt Flats",
             "description": "Great flat plains encrusted with salt that is white, brown, or black stretch for miles. The ground crunches underfoot, and temperatures reach brutal extremes.",
-            "temperature": 10,
+            "temperature": 7,
             "wind": 4,
             "precipitation": -10,
             "humidity": -10,
@@ -238,7 +238,7 @@
         "saltMarshes": {
             "name": "Salt Marshes",
             "description": "Low grasses and reeds dot the landscape, with ankle-deep channels of briny water winding through. Tough stands of scrub and occasional trees rise above the vegetation.",
-            "temperature": 8,
+            "temperature": 5,
             "wind": 2,
             "precipitation": -5,
             "humidity": 5,
@@ -248,60 +248,61 @@
         "sandyWastes": {
             "name": "Sandy Wastes",
             "description": "Vast stretches of yellow sand stretch to the horizon. Some areas are flat and still, while others feature great dunes that shift endlessly under the wind.",
-            "temperature": 10,
-            "wind": 8,
+            "temperature": 6,
+            "wind": 5,
             "precipitation": -10,
             "humidity": -10,
-            "variability": 10,
-            "rules": [
-                "During the day, creatures without eye protection have disadvantage on Perception checks"
-            ]
-        },
-        "scrubPlains": {
-            "name": "Scrub Plains",
-            "description": "Tough, dry grass punctuated by creosote bushes and tumbleweed dominates the ground. A few small trees are scattered across the landscape.",
-            "temperature": 8,
-            "wind": 3,
-            "precipitation": -10,
-            "humidity": -5,
             "variability": 4,
             "rules": [
                 "Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)"
             ]
         },
-        "seaOfSilt": {
+        "scrubPlains": {
+            "name": "Scrub Plains",
+            "description": "Low, thorny vegetation dots the landscape, with occasional clusters of stunted trees. The ground is hard-packed earth, cracked and dry.",
+            "temperature": 5,
+            "wind": 3,
+            "precipitation": -5,
+            "humidity": -5,
+            "variability": 4,
+            "rules": []
+        },
+        "siltSea": {
             "name": "Sea of Silt",
-            "description": "A vast expanse of fine, powdery silt. The wind stirs up clouds of dust.",
-            "temperature": 10,
+            "description": "A vast expanse of fine, powdery silt that shifts and flows like water. The surface is treacherous, and the fine dust can choke the unwary.",
+            "temperature": 7,
             "wind": 7,
             "precipitation": -10,
             "humidity": -5,
-            "variability": 9,
+            "variability": 8,
             "rules": [
-                "Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)"
+                "Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)",
+                "Creatures can become trapped in deep silt (DC 15 Strength check to escape)"
             ]
         },
         "stonyBarrens": {
             "name": "Stony Barrens",
-            "description": "Weathered plains covered with rocks ranging from pebbles to huge piles of standing boulders. Huge mesas and pointed buttes dot the landscape.",
-            "temperature": 9,
-            "wind": 5,
+            "description": "Rocky terrain with sparse vegetation. The ground is covered in loose stones and gravel, making travel difficult.",
+            "temperature": 5,
+            "wind": 4,
             "precipitation": -10,
-            "humidity": -10,
+            "humidity": -5,
             "variability": 5,
             "rules": [
                 "Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)"
             ]
         },
-        "verdantBelt": {
-            "name": "Verdant Belt",
-            "description": "A rare oasis of life in the desert. Ancient magic or underground springs sustain lush vegetation.",
-            "temperature": 7,
-            "wind": 2,
-            "precipitation": 0,
-            "humidity": 5,
-            "variability": 3,
-            "rules": []
+        "verdantBelts": {
+            "name": "Verdant Belts",
+            "description": "Lush vegetation lines the banks of rivers and oases. The air is thick with moisture, and the ground is soft and fertile.",
+            "temperature": 4,
+            "wind": -2,
+            "precipitation": 5,
+            "humidity": 10,
+            "variability": 6,
+            "rules": [
+                "Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)"
+            ]
         }
     }
 }
