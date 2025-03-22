@@ -1,7 +1,16 @@
 {
-    "name": "Default Climate System",
-    "description": "A comprehensive weather system simulating Earth-like climates, from arctic to tropical regions.",
-    "version": "1.0",
+    "id": "default",
+    "name": "Default",
+    "description": "A balanced weather system suitable for most fantasy campaigns.",
+    "styles": {
+        "headingFont": "Georgia, serif",
+        "textFont": "Verdana, sans-serif",
+        "headingColor": "#2C3E50",
+        "textColor": "#34495E",
+        "backgroundColor": "#ECF0F1",
+        "accentColor": "#3498DB",
+        "borderColor": "#2980B9"
+    },
     "seasons": {
         "spring": {
             "name": "Spring",
@@ -60,16 +69,18 @@
                 "8": "Very hot (95°F)",
                 "10": "Extreme heat (100°F or higher)"
             },
-            "rules": {
-                "-10": {
-                    "description": "Extreme Cold",
-                    "effect": "DC 10 Constitution save each hour or gain 1 Exhaustion level. Creatures with Cold Resistance/Immunity automatically succeed."
-                },
-                "10": {
+            "rules": [
+                {
+                    "extremeHeat": 10,
                     "description": "Extreme Heat",
                     "effect": "DC 5 Constitution save each hour (increases by 1 per hour) or gain 1 Exhaustion level. Creatures wearing Medium/Heavy armor have Disadvantage. Creatures with Fire Resistance/Immunity automatically succeed."
+                },
+                {
+                    "extremeCold": -10,
+                    "description": "Extreme Cold",
+                    "effect": "DC 10 Constitution save each hour or gain 1 Exhaustion level. Creatures with Cold Resistance/Immunity automatically succeed."
                 }
-            }
+            ]
         },
         "wind": {
             "descriptions": {
@@ -83,18 +94,13 @@
                 "8": "Gale Force Wind",
                 "10": "Hurricane Force"
             },
-            "rules": {
-                "2": {
+            "rules": [
+                {
+                    "strongWind": 2,
                     "description": "Strong Wind",
-                    "effect": [
-                        "Disadvantage on ranged attack rolls with weapons",
-                        "Extinguishes open flames",
-                        "Disperses fog",
-                        "Flying creatures must land at the end of their turn or fall",
-                        "In desert terrain: Could create sandstorm that imposes Disadvantage on Wisdom (Perception) checks"
-                    ]
+                    "effect": "A strong wind imposes Disadvantage on ranged attack rolls with weapons. It also extinguishes open flames and disperses fog. A flying creature in a strong wind must land at the end of its turn or fall. A strong wind in a desert can create a sandstorm that imposes Disadvantage on Wisdom (Perception) checks."
                 }
-            }
+            ]
         },
         "precipitation": {
             "descriptions": {
@@ -107,18 +113,13 @@
                 "8": "Torrential downpour",
                 "10": "Severe storm"
             },
-            "rules": {
-                "5": {
+            "rules": [
+                {
+                    "heavyPrecipitation": 5,
                     "description": "Heavy Precipitation",
-                    "effect": [
-                        "Area is Lightly Obscured",
-                        "Disadvantage on Wisdom (Perception) checks",
-                        "Extinguishes open flames",
-                        "Disperses fog",
-                        "Flying creatures must land at the end of their turn or fall"
-                    ]
+                    "effect": "Everything within an area of heavy rain or heavy snowfall is Lightly Obscured, and creatures in the area have Disadvantage on all Wisdom (Perception) checks. Heavy rain also extinguishes open flames."
                 }
-            }
+            ]
         },
         "humidity": {
             "descriptions": {
@@ -258,7 +259,7 @@
             "description": "Wetland with standing water, high humidity, and dense vegetation.",
             "temperature": 1,
             "wind": -1,
-            "precipitation": 1,
+            "precipitation": 2,
             "humidity": 4,
             "variability": 3,
             "rules": [

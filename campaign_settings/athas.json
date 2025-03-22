@@ -1,6 +1,16 @@
 {
+    "id": "athas",
     "name": "Athas",
-    "description": "Dark Sun campaign setting weather system",
+    "description": "A harsh desert world where survival is a daily struggle. The sun burns relentlessly, and water is the most precious resource.",
+    "styles": {
+        "headingFont": "Papyrus, Uncial Antiqua, Luminari, fantasy",
+        "textFont": "Arial, sans-serif",
+        "headingColor": "#8B4513",
+        "textColor": "#4A4A4A",
+        "backgroundColor": "#FFF8DC",
+        "accentColor": "#D2691E",
+        "borderColor": "#8B4513"
+    },
     "seasons": {
         "highSun": {
             "name": "High Sun",
@@ -61,15 +71,13 @@
                 "9": "Deadly (135° F) — The desert's wrath reaches lethal intensity; heatstroke and death loom imminent without shelter.",
                 "10": "Unbearable (140° F+) — A catastrophic inferno, instantly life-threatening; survival demands immediate refuge from the merciless sun."
             },
-            "rules": {
-                "2": {
+            "rules": [
+                {
+                    "extremeHeat": 2,
                     "description": "Extreme Heat",
-                    "effect": "DC 5 Constitution save each hour (increases by 1 per hour) or gain 1 Exhaustion level",
-                    "disadvantage": "Creatures wearing Medium/Heavy armor have Disadvantage",
-                    "immunity": "Creatures with Fire Resistance/Immunity automatically succeed",
-                    "applies_to": "Temperature 2 and higher"
+                    "effect": "DC 5 Constitution save each hour (increases by 1 per hour) or gain 1 Exhaustion level. Creatures wearing Medium/Heavy armor have Disadvantage. Creatures with Fire Resistance/Immunity automatically succeed."
                 }
-            }
+            ]
         },
         "wind": {
             "descriptions": {
@@ -84,7 +92,14 @@
                 "6": "Raging Gale — Powerful winds batter relentlessly, threatening to knock travelers off their feet and obscuring vision with swirling dust.",
                 "8": "Furious Tempest — Violent gusts roar with terrifying intensity, capable of uprooting tents, scattering equipment, and endangering lives.",
                 "10": "Hurricane Fury — The full wrath of Athas unleashed; winds shred anything in their path, leaving devastation and despair in their wake."
-            }
+            },
+            "rules": [
+                {
+                    "strongWind": 4,
+                    "description": "Strong Wind",
+                    "effect": "A strong wind imposes Disadvantage on ranged attack rolls with weapons. It also extinguishes open flames and disperses fog. A flying creature in a strong wind must land at the end of its turn or fall. A strong wind in a desert can create a sandstorm that imposes Disadvantage on Wisdom (Perception) checks."
+                }
+            ]
         },
         "precipitation": {
             "descriptions": {
@@ -93,16 +108,16 @@
                 "-1": "None — Sparse clouds dot the vast sky, barely shading the relentless sun.",
                 "0": "None — Larger clouds drift along the distant horizon, hinting faintly at moisture that rarely arrives.",
                 "1": "Light — An astonishingly rare mist gently dampens the air, offering brief wonder to desert travelers.",
-                "5": "Medium — Precious droplets fall softly from above, a gentle rain celebrated as a life-giving blessing.",
+                "5": "Medium — Precious droplets fall from above.",
                 "10": "Heavy — A miraculous downpour drenches the earth, a legendary event transforming the harsh landscape into a fleeting oasis."
             },
-            "rules": {
-                "5": {
+            "rules": [
+                {
+                    "heavyPrecipitation": 5,
                     "description": "Heavy Precipitation",
-                    "effect": "Area is Lightly Obscured",
-                    "disadvantage": "Disadvantage on Wisdom (Perception) checks"
+                    "effect": "Everything within an area of heavy rain or heavy snowfall is Lightly Obscured, and creatures in the area have Disadvantage on all Wisdom (Perception) checks. Heavy rain also extinguishes open flames."
                 }
-            }
+            ]
         },
         "humidity": {
             "descriptions": {
@@ -242,8 +257,10 @@
             "wind": 2,
             "precipitation": -5,
             "humidity": 5,
-            "variability": 5,
-            "rules": []
+            "variability": 7,
+            "rules": [
+                "Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)"
+            ]
         },
         "sandyWastes": {
             "name": "Sandy Wastes",
