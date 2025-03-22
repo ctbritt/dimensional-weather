@@ -195,7 +195,7 @@
 .weather-report .terrain-type {
   font-size: 0.9em;
   color: #b8732d;
-  font-style: italic;
+  font-style: bold;
   margin: 0.2em 0 0.5em 0;
 }
 
@@ -724,4 +724,161 @@
 /* Dark mode adjustments */
 .dark-theme .weather-report.dark-sun .weather-atmosphere::before {
   background: rgba(0, 0, 0, 0.4); /* Darker overlay for dark mode */
+}
+
+.dimensional-weather-settings {
+  min-height: 400px;
+}
+
+.dimensional-weather-settings .window-content {
+  padding: 8px;
+  background: var(--color-background, #f0f0e0);
+}
+
+.dimensional-weather-settings form {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.dimensional-weather-settings .tabs {
+  flex: 0;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--color-border-dark, #666);
+}
+
+.dimensional-weather-settings .tabs .item {
+  padding: 8px 16px;
+  margin: 0 4px;
+  border-radius: 4px 4px 0 0;
+  background: rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.dimensional-weather-settings .tabs .item.active {
+  background: var(--color-primary, #1e88e5);
+  color: white;
+  border-bottom: none;
+}
+
+.dimensional-weather-settings .tabs .item:hover {
+  text-shadow: 0 0 8px var(--color-shadow-primary);
+}
+
+.dimensional-weather-settings .content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.dimensional-weather-settings .form-group {
+  margin-bottom: 16px;
+}
+
+.dimensional-weather-settings .form-group label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: bold;
+  color: var(--color-text-dark);
+}
+
+.dimensional-weather-settings .form-group select,
+.dimensional-weather-settings .form-group input[type="text"],
+.dimensional-weather-settings .form-group input[type="password"] {
+  width: 100%;
+  padding: 4px 8px;
+  border: 1px solid var(--color-border-light);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.dimensional-weather-settings .form-group .notes {
+  margin-top: 4px;
+  color: var(--color-text-dark-secondary);
+  font-size: 0.9em;
+  font-style: italic;
+}
+
+.dimensional-weather-settings .range-with-value {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dimensional-weather-settings input[type="range"] {
+  flex: 1;
+}
+
+.dimensional-weather-settings .range-value {
+  min-width: 2em;
+  text-align: center;
+  padding: 2px 4px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+
+.dimensional-weather-settings .preview-weather {
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.dimensional-weather-settings .preview-weather:hover {
+  background: var(--color-primary-dark);
+}
+
+.dimensional-weather-settings .sheet-footer {
+  flex: 0;
+  margin-top: 8px;
+  padding: 8px;
+  border-top: 1px solid var(--color-border-light);
+}
+
+.dimensional-weather-settings .sheet-footer button {
+  background: var(--color-primary, #1e88e5);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-weight: bold;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.dimensional-weather-settings .sheet-footer button:hover {
+  background: var(--color-primary-dark, #1565c0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Dark theme support */
+.dark-theme .dimensional-weather-settings .window-content {
+  background: var(--color-background-dark, #333);
+  color: var(--color-text-light);
+}
+
+.dark-theme .dimensional-weather-settings .form-group select,
+.dark-theme .dimensional-weather-settings .form-group input[type="text"],
+.dark-theme .dimensional-weather-settings .form-group input[type="password"] {
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--color-text-light);
+  border-color: var(--color-border-dark);
+}
+
+.dark-theme .dimensional-weather-settings .form-group .notes {
+  color: var(--color-text-light-secondary);
+}
+
+.dark-theme .dimensional-weather-settings .tabs .item {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.dark-theme .dimensional-weather-settings .range-value {
+  background: rgba(255, 255, 255, 0.1);
 }

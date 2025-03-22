@@ -1,6 +1,6 @@
 {
   "id": "dimensional-weather",
-  "title": "DimensionalWeather",
+  "title": "Dimensional Weather",
   "description": "A module that adds weather effects to the game in a modular and dimensional manner.",
   "esmodules": [
     "scripts/dimensional-weather.js"
@@ -12,7 +12,8 @@
     {
       "lang": "en",
       "name": "English",
-      "path": "lang/en.json"
+      "path": "lang/en.json",
+      "flags": {}
     }
   ],
   "version": "0.0.1",
