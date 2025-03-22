@@ -1073,12 +1073,6 @@ class DimensionalWeather {
                   <hr>
                   <p>${description}</p>
                 </div>`;
-    console.log("Dimensional Weather | Chat Card Text:", chatCardText);
-    console.log("Dimensional Weather | Weather Stats:", {
-      ...savedState,
-      timePeriod: this.getTimePeriod(),
-      variability: game.settings.get("dimensional-weather", "variability"),
-    });
     ChatMessage.create({
       content: chatCardText,
       speaker: { alias: "Dimensional Weather" },
