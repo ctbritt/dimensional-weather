@@ -149,9 +149,9 @@ class DimensionalWeather {
             seasonSetting.choices = seasonChoices;
             seasonSetting.default = defaultSeason;
 
-            // Force a UI update for the settings panel to show new choices
+            // Force a UI update for the settings panel
             if (game.settings.sheet) {
-              game.settings.sheet.render(true);
+              await game.settings.sheet.render(true);
             }
 
             // Now set the values after the UI is updated
@@ -212,28 +212,24 @@ class DimensionalWeather {
         type: Boolean,
         default: false,
         onChange: (value) => {
-          // Disable/enable season setting based on Simple Calendar integration
-          const seasonSetting = game.settings.get(
-            "dimensional-weather",
-            "season"
+          // Get the season setting
+          const seasonSetting = game.settings.settings.get(
+            "dimensional-weather.season"
           );
+
+          // Update the disabled state
+          seasonSetting.disabled = value;
+
+          // Force a UI update to show the disabled state
+          if (game.settings.sheet) {
+            game.settings.sheet.render(true);
+          }
+
           if (value) {
-            // When enabling Simple Calendar, store current season and disable setting
-            const currentSeason = seasonSetting.value || seasonSetting.default;
-            game.settings.set("dimensional-weather", "season", {
-              ...seasonSetting,
-              value: currentSeason,
-              disabled: true,
-            });
             ui.notifications.info(
               "Season changes are now controlled by Simple Calendar"
             );
           } else {
-            // When disabling Simple Calendar, re-enable setting
-            game.settings.set("dimensional-weather", "season", {
-              ...seasonSetting,
-              disabled: false,
-            });
             ui.notifications.info("Season changes are now manual");
           }
         },
@@ -319,6 +315,7 @@ class DimensionalWeather {
         default: false,
       });
 
+      // Register OpenAI API Key setting
       game.settings.register("dimensional-weather", "llmApiKey", {
         name: "OpenAI API Key",
         hint: "Your OpenAI API key for ChatGPT weather descriptions.",
@@ -326,6 +323,9 @@ class DimensionalWeather {
         config: true,
         type: String,
         default: "",
+        restricted: true,
+        // Add input type password for masking
+        inputType: "password",
       });
 
       // Store the terrain choices separately for reference
