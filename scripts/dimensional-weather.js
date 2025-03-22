@@ -140,6 +140,9 @@ class DimensionalWeather {
 
   static async loadCampaignSettings() {
     try {
+      // Initialize campaignSettings object
+      let campaignSettings = {};
+
       // Load the settings index
       const response = await fetch(
         "/modules/dimensional-weather/campaign_settings/index.json"
@@ -151,15 +154,125 @@ class DimensionalWeather {
       }
       const settingsIndex = await response.json();
 
-      // Load each campaign setting
-      const campaignSettings = {};
-      for (const setting of settingsIndex.campaignSettings) {
+      // Create choices object for the campaign setting dropdown
+      const choices = {};
+      settingsIndex.campaignSettings.forEach((setting) => {
+        choices[setting.id] = setting.name;
+      });
+
+      // Register campaign setting choice first
+      game.settings.register("dimensional-weather", "campaignSetting", {
+        name: "Campaign Setting",
+        hint: "Select the campaign setting to use for weather rules",
+        scope: "world",
+        config: true,
+        type: String,
+        choices: choices,
+        default: "default",
+        onChange: async (value) => {
+          try {
+            // Fetch new settings data
+            const settingsData = await DimensionalWeather.fetchSettingsData(
+              value
+            );
+            if (!settingsData) {
+              console.warn(
+                `Dimensional Weather | Failed to load settings for ${value}`
+              );
+              return;
+            }
+
+            // Update the instance's settings data first
+            if (game.dimWeather) {
+              game.dimWeather.settingsData = settingsData;
+              game.dimWeather.settingsIndex = value;
+            }
+
+            // Update terrain choices
+            const terrainChoices = {};
+            Object.entries(settingsData.terrains).forEach(([key, terrain]) => {
+              terrainChoices[key] = terrain.name || key;
+            });
+
+            // Update season choices
+            const seasonChoices = {};
+            Object.entries(settingsData.seasons).forEach(([key, season]) => {
+              seasonChoices[key] = season.name || key;
+            });
+
+            // Get the first available terrain and season from the new settings
+            const defaultTerrain = Object.keys(terrainChoices)[0];
+            const defaultSeason = Object.keys(seasonChoices)[0];
+
+            // Update the settings with new choices and defaults
+            const settings = game.settings.get(
+              "dimensional-weather",
+              "settings"
+            );
+            settings.terrain = defaultTerrain;
+            settings.season = defaultSeason;
+            await game.settings.set(
+              "dimensional-weather",
+              "settings",
+              settings
+            );
+
+            // Update scene flags with new terrain and season
+            const scene = game.scenes.viewed;
+            if (scene?.id) {
+              const savedState = scene.getFlag(
+                "dimensional-weather",
+                "weatherState"
+              );
+              if (savedState) {
+                // Update with new default values
+                await scene.setFlag("dimensional-weather", "weatherState", {
+                  ...savedState,
+                  terrain: defaultTerrain,
+                  season: defaultSeason,
+                });
+              }
+            }
+
+            // Update the weather state
+            if (game.dimWeather) {
+              await game.dimWeather.loadSceneWeather();
+            }
+
+            // Force a UI update for the settings panel
+            if (game.settings.sheet) {
+              await game.settings.sheet.render(true);
+            }
+
+            ui.notifications.info(
+              "Weather system updated with new campaign setting"
+            );
+          } catch (error) {
+            console.error(
+              "Dimensional Weather | Error updating campaign setting:",
+              error
+            );
+            ui.notifications.error(
+              "Failed to update campaign setting. Check the console for details."
+            );
+          }
+        },
+      });
+
+      // Load the selected campaign setting to update choices
+      const selectedSetting =
+        game.settings.get("dimensional-weather", "campaignSetting") ||
+        "default";
+      const settingInfo = settingsIndex.campaignSettings.find(
+        (s) => s.id === selectedSetting
+      );
+      if (settingInfo) {
         const response = await fetch(
-          `/modules/dimensional-weather/campaign_settings/${setting.path}`
+          `/modules/dimensional-weather/campaign_settings/${settingInfo.path}`
         );
-        if (!response.ok) continue;
+        if (!response.ok) return;
         const data = await response.json();
-        campaignSettings[setting.id] = data;
+        campaignSettings[settingInfo.id] = data;
       }
 
       // Save campaign settings
