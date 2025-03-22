@@ -1,7 +1,8 @@
 {
-    "id": "default",
-    "name": "Default",
-    "description": "A balanced weather system suitable for most fantasy campaigns.",
+    "id": "greyhawk",
+    "name": "Greyhawk",
+    "description": "A balanced weather system correspondent to Earth.",
+    "defaultTerrain": "temperate",
     "styles": {
         "headingFont": "Georgia, serif",
         "textFont": "Verdana, sans-serif",

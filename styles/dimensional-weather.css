@@ -882,3 +882,53 @@
 .dark-theme .dimensional-weather-settings .range-value {
   background: rgba(255, 255, 255, 0.1);
 }
+
+.weather-help {
+  font-family: "Signika", sans-serif;
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid #999;
+  border-radius: 4px;
+  padding: 8px;
+}
+
+.weather-help h2 {
+  color: #782e22;
+  font-size: 1.2em;
+  border-bottom: 1px solid #782e22;
+  margin: 0 0 8px 0;
+  padding-bottom: 4px;
+}
+
+.weather-help h3 {
+  color: #666;
+  font-size: 1.1em;
+  margin: 8px 0 4px 0;
+}
+
+.weather-help .command {
+  margin: 4px 0;
+  padding: 2px 0 2px 8px;
+  border-left: 2px solid #782e22;
+}
+
+.weather-help .command-name {
+  color: #782e22;
+  font-weight: bold;
+}
+
+.weather-help .command-desc {
+  color: #666;
+  font-style: italic;
+  margin-left: 8px;
+}
+
+.weather-help .list-section {
+  columns: 2;
+  margin: 4px 0;
+}
+
+.weather-help .list-item {
+  margin: 2px 0;
+  padding-left: 8px;
+  break-inside: avoid;
+}

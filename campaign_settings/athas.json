@@ -2,6 +2,7 @@
     "id": "athas",
     "name": "Athas",
     "description": "A harsh desert world where survival is a daily struggle. The sun burns relentlessly, and water is the most precious resource.",
+    "defaultTerrain": "scrubPlains",
     "styles": {
         "headingFont": "Papyrus, Uncial Antiqua, Luminari, fantasy",
         "textFont": "Arial, sans-serif",
