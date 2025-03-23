@@ -108,9 +108,13 @@ export class ChatCommands {
         }
 
         return {
-          content: `Weather System Info:<br>
-            Name: ${this.api.settingsData.name}<br>
-            Description: ${this.api.settingsData.description}`,
+          content: `<div class="weather-report">
+            <h3>Weather System Info</h3>
+            <ul>
+              <li>Name: ${this.api.settingsData.name}</li>
+              <li>Description: ${this.api.settingsData.description}</li>
+            </ul>
+          </div>`,
           speaker: { alias: "Dimensional Weather" },
         };
       }
@@ -150,6 +154,82 @@ export class ChatCommands {
           return {
             content: forecast,
             speaker: { alias: "Dimensional Weather" },
+          };
+
+        case "calc":
+          if (!game.user.isGM) {
+            ui.notifications.warn("Only GMs can use the calc command.");
+            return;
+          }
+          const calc = this.api.engine.getLastCalculation();
+          if (!calc) {
+            ui.notifications.warn("No weather calculation data available.");
+            return;
+          }
+
+          const details = `<div class="weather-report">
+            <h3>Weather Calculation Details</h3>
+            <hr>
+            <h4>Base Values (${calc.terrain.name})</h4>
+            <ul>
+              <li>Temperature: ${calc.terrain.baseTemp}</li>
+              <li>Wind: ${calc.terrain.baseWind}</li>
+              <li>Precipitation: ${calc.terrain.basePrecip}</li>
+              <li>Humidity: ${calc.terrain.baseHumid}</li>
+            </ul>
+            ${
+              calc.previous
+                ? `
+            <h4>Previous Values</h4>
+            <ul>
+              <li>Temperature: ${calc.previous.temp}</li>
+              <li>Wind: ${calc.previous.wind}</li>
+              <li>Precipitation: ${calc.previous.precip}</li>
+              <li>Humidity: ${calc.previous.humid}</li>
+            </ul>`
+                : ""
+            }
+            <h4>Random Factors (Variability: ${calc.variability})</h4>
+            <ul>
+              <li>Temperature: ${calc.randomFactors.temp.toFixed(2)}</li>
+              <li>Wind: ${calc.randomFactors.wind.toFixed(2)}</li>
+              <li>Precipitation: ${calc.randomFactors.precip.toFixed(2)}</li>
+              <li>Humidity: ${calc.randomFactors.humid.toFixed(2)}</li>
+            </ul>
+            <h4>Time Modifiers (${calc.timePeriod})</h4>
+            <ul>
+              <li>Temperature: ${calc.timeModifiers.temperature || 0}</li>
+              <li>Wind: ${calc.timeModifiers.wind || 0}</li>
+              <li>Precipitation: ${calc.timeModifiers.precipitation || 0}</li>
+              <li>Humidity: ${calc.timeModifiers.humidity || 0}</li>
+            </ul>
+            <h4>Season Modifiers (${calc.season})</h4>
+            <ul>
+              <li>Temperature: ${calc.seasonModifiers.temperature || 0}</li>
+              <li>Wind: ${calc.seasonModifiers.wind || 0}</li>
+              <li>Precipitation: ${calc.seasonModifiers.precipitation || 0}</li>
+              <li>Humidity: ${calc.seasonModifiers.humidity || 0}</li>
+            </ul>
+            <h4>Intermediate Values (After Random)</h4>
+            <ul>
+              <li>Temperature: ${calc.intermediate.temp}</li>
+              <li>Wind: ${calc.intermediate.wind}</li>
+              <li>Precipitation: ${calc.intermediate.precip}</li>
+              <li>Humidity: ${calc.intermediate.humid}</li>
+            </ul>
+            <h4>Final Values (After Modifiers)</h4>
+            <ul>
+              <li>Temperature: ${calc.final.temp}</li>
+              <li>Wind: ${calc.final.wind}</li>
+              <li>Precipitation: ${calc.final.precip}</li>
+              <li>Humidity: ${calc.final.humid}</li>
+            </ul>
+          </div>`;
+
+          return {
+            content: details,
+            speaker: { alias: "Dimensional Weather Calculation" },
+            whisper: ChatMessage.getWhisperRecipients("GM"),
           };
 
         case "help":
@@ -548,6 +628,7 @@ export class ChatCommands {
         { cmd: "season", desc: "Change current season" },
         { cmd: "settings", desc: "Open weather settings panel" },
         { cmd: "debug", desc: "Toggle time period debug logging" },
+        { cmd: "calc", desc: "Show weather calculation details (GM only)" },
         { cmd: "help", desc: "Show weather command help" },
       ];
 

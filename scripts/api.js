@@ -339,10 +339,13 @@ export class DimensionalWeatherAPI {
       .map(([_, s]) => `<div class="list-item">• ${s.name}</div>`)
       .join("");
 
-    // List available campaign settings
-    const campaignList = Settings.getSetting("campaignSettings")
-      .map((setting) => `<div class="list-item">• ${setting.name}</div>`)
-      .join("");
+    // List available campaign settings - safely handle non-array values
+    const campaignSettings = Settings.getSetting("campaignSettings");
+    const campaignList = Array.isArray(campaignSettings)
+      ? campaignSettings
+          .map((setting) => `<div class="list-item">• ${setting.name}</div>`)
+          .join("")
+      : "<div class='list-item'>No campaign settings available</div>";
 
     return `<div class="weather-help">
       <h2>Weather System Commands</h2>
@@ -376,6 +379,10 @@ export class DimensionalWeatherAPI {
         <span class="command-name">/weather settings</span>
         <span class="command-desc">Open settings</span>
       </div>
+      <div class="command">
+        <span class="command-name">/weather calc</span>
+        <span class="command-desc">Show weather calculation details (GM only)</span>
+      </div>
       
       <h3>Available Campaign Settings:</h3>
       <div class="list-section">${campaignList}</div>
@@ -405,5 +412,141 @@ export class DimensionalWeatherAPI {
    */
   clearCaches() {
     Cache.clear();
+  }
+
+  /**
+   * Process chat commands
+   * @param {string} command - Command name
+   * @param {string[]} args - Command arguments
+   * @returns {Promise<void>}
+   */
+  async _processChatCommand(command, args) {
+    try {
+      switch (command) {
+        case "help":
+          await this.displayHelp();
+          break;
+        case "update":
+          await this.engine.updateWeather(true);
+          await this.ui.displayWeatherReport();
+          break;
+        case "forecast":
+          const forecast = await this.engine.generateForecast();
+          await ChatMessage.create({
+            content: `<div class="weather-report"><h3>Weather Forecast</h3><pre>${forecast}</pre></div>`,
+            speaker: { alias: "Dimensional Weather" },
+          });
+          break;
+        case "calc":
+          if (!game.user.isGM) {
+            ui.notifications.warn("Only GMs can use the calc command.");
+            return;
+          }
+          const calc = this.engine.getLastCalculation();
+          if (!calc) {
+            ui.notifications.warn("No weather calculation data available.");
+            return;
+          }
+
+          const details = `<div class="weather-report">
+            <h3>Weather Calculation Details</h3>
+            <hr>
+            <h4>Base Values (${calc.terrain.name})</h4>
+            <ul>
+              <li>Temperature: ${calc.terrain.baseTemp}</li>
+              <li>Wind: ${calc.terrain.baseWind}</li>
+              <li>Precipitation: ${calc.terrain.basePrecip}</li>
+              <li>Humidity: ${calc.terrain.baseHumid}</li>
+            </ul>
+            ${
+              calc.previous
+                ? `
+            <h4>Previous Values</h4>
+            <ul>
+              <li>Temperature: ${calc.previous.temp}</li>
+              <li>Wind: ${calc.previous.wind}</li>
+              <li>Precipitation: ${calc.previous.precip}</li>
+              <li>Humidity: ${calc.previous.humid}</li>
+            </ul>`
+                : ""
+            }
+            <h4>Random Factors (Variability: ${calc.variability})</h4>
+            <ul>
+              <li>Temperature: ${calc.randomFactors.temp.toFixed(2)}</li>
+              <li>Wind: ${calc.randomFactors.wind.toFixed(2)}</li>
+              <li>Precipitation: ${calc.randomFactors.precip.toFixed(2)}</li>
+              <li>Humidity: ${calc.randomFactors.humid.toFixed(2)}</li>
+            </ul>
+            <h4>Time Modifiers (${calc.timePeriod})</h4>
+            <ul>
+              <li>Temperature: ${calc.timeModifiers.temperature || 0}</li>
+              <li>Wind: ${calc.timeModifiers.wind || 0}</li>
+              <li>Precipitation: ${calc.timeModifiers.precipitation || 0}</li>
+              <li>Humidity: ${calc.timeModifiers.humidity || 0}</li>
+            </ul>
+            <h4>Season Modifiers (${calc.season})</h4>
+            <ul>
+              <li>Temperature: ${calc.seasonModifiers.temperature || 0}</li>
+              <li>Wind: ${calc.seasonModifiers.wind || 0}</li>
+              <li>Precipitation: ${calc.seasonModifiers.precipitation || 0}</li>
+              <li>Humidity: ${calc.seasonModifiers.humidity || 0}</li>
+            </ul>
+            <h4>Intermediate Values (After Random)</h4>
+            <ul>
+              <li>Temperature: ${calc.intermediate.temp}</li>
+              <li>Wind: ${calc.intermediate.wind}</li>
+              <li>Precipitation: ${calc.intermediate.precip}</li>
+              <li>Humidity: ${calc.intermediate.humid}</li>
+            </ul>
+            <h4>Final Values (After Modifiers)</h4>
+            <ul>
+              <li>Temperature: ${calc.final.temp}</li>
+              <li>Wind: ${calc.final.wind}</li>
+              <li>Precipitation: ${calc.final.precip}</li>
+              <li>Humidity: ${calc.final.humid}</li>
+            </ul>
+          </div>`;
+
+          await ChatMessage.create({
+            content: details,
+            speaker: { alias: "Dimensional Weather Calculation" },
+            whisper: ChatMessage.getWhisperRecipients("GM"),
+          });
+          break;
+        default:
+          ui.notifications.warn(
+            `Unknown command: ${command}. Type /weather help for usage.`
+          );
+      }
+    } catch (error) {
+      ErrorHandler.logAndNotify("Error processing chat command", error);
+    }
+  }
+
+  /**
+   * Display help information in chat
+   * @returns {Promise<void>}
+   */
+  async displayHelp() {
+    const isGM = game.user.isGM;
+    const commands = `<h3>Available Commands:</h3>
+<ul>
+  <li><code>/weather help</code> - Display this help message</li>
+  <li><code>/weather update</code> - Force a weather update</li>
+  <li><code>/weather forecast</code> - Display a 5-day weather forecast</li>
+  ${
+    isGM
+      ? `<li><code>/weather calc</code> - (GM Only) Show detailed weather calculation breakdown</li>`
+      : ""
+  }
+</ul>`;
+
+    await ChatMessage.create({
+      content: `<div class="weather-report">
+        <h2>Dimensional Weather Help</h2>
+        ${commands}
+      </div>`,
+      speaker: { alias: "Dimensional Weather" },
+    });
   }
 }

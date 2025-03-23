@@ -296,6 +296,25 @@ export class Settings {
   }
 
   /**
+   * Load settings index from the index.json file
+   * @returns {Promise<Object>} Settings index data
+   */
+  static async loadSettingsIndex() {
+    try {
+      const indexPath = `${this.SETTINGS_PATH}/index.json`;
+      return await Cache.getOrFetch("settings_index", async () => {
+        return await ErrorHandler.handleFetch(
+          indexPath,
+          "Failed to load settings index"
+        );
+      });
+    } catch (error) {
+      ErrorHandler.logAndNotify("Failed to load settings index", error);
+      return null;
+    }
+  }
+
+  /**
    * Get current campaign setting ID
    * @returns {string} Campaign setting ID
    */

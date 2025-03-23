@@ -316,7 +316,13 @@ export class UIController {
         // Get survival rules
         const survivalRules = this._getSurvivalRules(weatherState);
 
-        return `${aiDescription} ${survivalRules}`;
+        // Format the weather conditions with appropriate styling
+        const weatherDetails = `<p><strong>Heat:</strong> ${tempDesc}</p>
+<p><strong>Wind:</strong> ${windDesc}</p>
+<p><strong>Humidity:</strong> ${humidDesc}</p>
+<p><strong>Precipitation:</strong> ${precipDesc}</p>`;
+
+        return `${aiDescription} ${weatherDetails} ${survivalRules}`;
       } catch (error) {
         console.error("AI description generation failed:", error);
         // Fall back to basic description

@@ -25,23 +25,23 @@
         },
         "sunDescending": {
             "name": "Sun Descending",
-            "description": "",
+            "description": "The coldest season, though still hot by most standards.",
             "modifiers": {
                 "temperature": -1,
                 "wind": 0,
                 "precipitation": 1,
                 "humidity": 1,
-                "variability": 1
+                "variability": 2
             }
         },
         "sunAscending": {
             "name": "Sun Ascending",
-            "description": "",
+            "description": "The hottest season, when the sun's wrath is most intense.",
             "modifiers": {
-                "temperature": 1,
-                "wind": 0,
-                "precipitation": 0,
-                "humidity": 0,
+                "temperature": 2,
+                "wind": 1,
+                "precipitation": -1,
+                "humidity": -1,
                 "variability": 1
             }
         }
@@ -173,6 +173,26 @@
             "precipitation": -10,
             "humidity": -5,
             "variability": 8,
+            "timeModifiers": {
+                "Early Morning": {
+                    "temperature": -3,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 1
+                },
+                "Night": {
+                    "temperature": -8,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "Late Night": {
+                    "temperature": -10,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                }
+            },
             "rules": [
                 "Creatures can become trapped in deep dust (DC 15 Strength check to escape)"
             ]
@@ -249,6 +269,26 @@
             "precipitation": -10,
             "humidity": -10,
             "variability": 3,
+            "timeModifiers": {
+                "Early Morning": {
+                    "temperature": -4,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 1
+                },
+                "Night": {
+                    "temperature": -9,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "Late Night": {
+                    "temperature": -10,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                }
+            },
             "rules": [
                 "During the day, creatures without eye protection have disadvantage on Perception checks"
             ]
@@ -273,6 +313,26 @@
             "precipitation": -10,
             "humidity": -10,
             "variability": 4,
+            "timeModifiers": {
+                "Early Morning": {
+                    "temperature": -3,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 1
+                },
+                "Night": {
+                    "temperature": -8,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "Late Night": {
+                    "temperature": -10,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                }
+            },
             "rules": [
                 "Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)"
             ]
@@ -295,6 +355,26 @@
             "precipitation": -10,
             "humidity": -10,
             "variability": 4,
+            "timeModifiers": {
+                "Early Morning": {
+                    "temperature": -3,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 1
+                },
+                "Night": {
+                    "temperature": -8,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "Late Night": {
+                    "temperature": -10,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                }
+            },
             "rules": [
                 "Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)",
                 "Creatures without eye protection have Disadvantage on Perception checks during the day",

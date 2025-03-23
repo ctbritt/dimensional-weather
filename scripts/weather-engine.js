@@ -18,6 +18,7 @@ export class WeatherEngine {
       period: null,
     };
     this._lastDebugTimestamp = null;
+    this._lastCalculation = null;
   }
 
   /**
@@ -226,28 +227,54 @@ export class WeatherEngine {
     currentTime,
     currentSeason
   ) {
+    // Store calculation details
+    const details = {
+      terrain: {
+        name: terrain.name,
+        baseTemp: terrain.temperature,
+        baseWind: terrain.wind,
+        basePrecip: terrain.precipitation,
+        baseHumid: terrain.humidity,
+      },
+      previous: savedState
+        ? {
+            temp: savedState.temperature,
+            wind: savedState.wind,
+            precip: savedState.precipitation,
+            humid: savedState.humidity,
+          }
+        : null,
+      variability,
+    };
+
     // Apply terrain baseline with random variation
-    const temperature = Math.round(
-      terrain.temperature + // Start with base terrain temperature
-        ((Math.random() * 2 - 1) * variability) / 4 // Reduce variability impact
-    );
+    const randTemp = ((Math.random() * 2 - 1) * variability) / 4;
+    const temperature = Math.round(terrain.temperature + randTemp);
 
+    const randWind = ((Math.random() * 2 - 1) * variability) / 2;
     const wind = Math.round(
-      (terrain.wind + (savedState?.wind ?? terrain.wind)) / 2 +
-        ((Math.random() * 2 - 1) * variability) / 2
+      (terrain.wind + (savedState?.wind ?? terrain.wind)) / 2 + randWind
     );
 
-    const precipitation = Math.round(
+    const randPrecip = ((Math.random() * 2 - 1) * variability) / 2;
+    const precipitation =
       (terrain.precipitation +
         (savedState?.precipitation ?? terrain.precipitation)) /
         2 +
-        ((Math.random() * 2 - 1) * variability) / 2
-    );
+      randPrecip;
 
+    const randHumid = ((Math.random() * 2 - 1) * variability) / 2;
     const humidity = Math.round(
       (terrain.humidity + (savedState?.humidity ?? terrain.humidity)) / 2 +
-        ((Math.random() * 2 - 1) * variability) / 2
+        randHumid
     );
+
+    details.randomFactors = {
+      temp: randTemp,
+      wind: randWind,
+      precip: randPrecip,
+      humid: randHumid,
+    };
 
     // Get current time period
     const dt = SimpleCalendar.api.currentDateTimeDisplay();
@@ -271,11 +298,16 @@ export class WeatherEngine {
       timePeriod = "Late Night";
     }
 
+    details.timePeriod = timePeriod;
+
     // Apply time-of-day modifier from campaign settings
     const timeModifiers = this.settingsData?.timeModifiers?.[timePeriod] || {};
+    details.timeModifiers = timeModifiers;
 
     // Apply season modifiers
     const seasonModifiers = this._getSeasonModifiers(currentSeason);
+    details.seasonModifiers = seasonModifiers;
+    details.season = currentSeason;
 
     // Calculate final values with time and season modifiers
     const finalTemperature =
@@ -296,17 +328,44 @@ export class WeatherEngine {
       (timeModifiers.humidity || 0) +
       (seasonModifiers.humidity || 0);
 
+    // Store intermediate values
+    details.intermediate = {
+      temp: temperature,
+      wind: wind,
+      precip: precipitation,
+      humid: humidity,
+    };
+
+    // Store final values
+    details.final = {
+      temp: Math.max(-10, Math.min(10, finalTemperature)),
+      wind: Math.max(-10, Math.min(10, finalWind)),
+      precip: Math.max(-10, Math.min(10, finalPrecipitation)),
+      humid: Math.max(-10, Math.min(10, finalHumidity)),
+    };
+
+    // Store the calculation details
+    this._lastCalculation = details;
+
     // Clamp values within -10 and 10
     return {
-      temperature: Math.max(-10, Math.min(10, finalTemperature)),
-      wind: Math.max(-10, Math.min(10, finalWind)),
-      precipitation: Math.max(-10, Math.min(10, finalPrecipitation)),
-      humidity: Math.max(-10, Math.min(10, finalHumidity)),
+      temperature: details.final.temp,
+      wind: details.final.wind,
+      precipitation: details.final.precip,
+      humidity: details.final.humid,
       lastUpdate: currentTime,
       terrain:
         savedState?.terrain || terrain.name.toLowerCase().replace(/\s+/g, ""),
       season: currentSeason,
     };
+  }
+
+  /**
+   * Get the last weather calculation details
+   * @returns {Object|null} Calculation details or null if no calculation performed
+   */
+  getLastCalculation() {
+    return this._lastCalculation;
   }
 
   /**
@@ -546,7 +605,12 @@ export class WeatherEngine {
       rulesList = "<li>No special rules apply to current conditions.</li>";
     }
 
-    return `<h4>Survival Rules:</h4><ul>${rulesList}</ul>`;
+    return `<div class="weather-rules">
+      <details>
+        <summary>Survival Rules</summary>
+        <ul>${rulesList}</ul>
+      </details>
+    </div>`;
   }
 
   /**
