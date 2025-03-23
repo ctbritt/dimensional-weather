@@ -143,6 +143,16 @@ export class Settings {
       type: String,
       default: "",
     },
+    useCustomStyles: {
+      name: "Use Custom Campaign Styles",
+      hint:
+        "Use custom styles defined in campaign JSON files for weather displays",
+      scope: "world",
+      config: true,
+      type: Boolean,
+      default: true,
+    },
+
     campaignSettings: {
       name: "Campaign Settings Data",
       scope: "world",

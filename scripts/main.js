@@ -215,3 +215,38 @@ async function onCampaignChange(value) {
     ErrorHandler.logAndNotify("Failed to update campaign settings", error);
   }
 }
+
+// Add hook for Simple Calendar season changes
+Hooks.on("simple-calendar.seasonChange", async (season) => {
+  if (!Settings.isSimpleCalendarEnabled()) return;
+
+  const scene = game.scenes.viewed;
+  if (!scene?.id) return;
+
+  // Get current weather state
+  const weatherState = scene.getFlag("dimensional-weather", "weatherState");
+  if (!weatherState) return;
+
+  // Find matching season in campaign settings
+  let matchingSeasonKey = null;
+  for (const [key, s] of Object.entries(
+    weatherEngine.settingsData?.seasons || {}
+  )) {
+    if (s.name.toLowerCase() === season.name.toLowerCase()) {
+      matchingSeasonKey = key;
+      break;
+    }
+  }
+
+  // If we found a matching season, update the weather state
+  if (matchingSeasonKey) {
+    await scene.setFlag("dimensional-weather", "weatherState", {
+      ...weatherState,
+      season: matchingSeasonKey,
+      lastUpdate: Date.now(), // Force a weather update
+    });
+
+    // Force a weather update to apply the new season
+    await weatherEngine.updateWeather(true);
+  }
+});

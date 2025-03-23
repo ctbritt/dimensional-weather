@@ -32,6 +32,14 @@ export class UIController {
       accentColor: "#3498DB",
       borderColor: "#2980B9",
     };
+
+    // Always apply styles based on useCustomStyles setting
+    const useCustomStyles = Settings.getSetting("useCustomStyles");
+    if (useCustomStyles && settingsData?.styles) {
+      this.updateStyles(settingsData.styles);
+    } else {
+      this.updateStyles(this.defaultStyles);
+    }
   }
 
   /**
@@ -41,9 +49,12 @@ export class UIController {
   updateSettingsData(settingsData) {
     this.settingsData = settingsData;
 
-    // Update styles if available
-    if (settingsData?.styles) {
+    // Update styles based on useCustomStyles setting
+    const useCustomStyles = Settings.getSetting("useCustomStyles");
+    if (useCustomStyles && settingsData?.styles) {
       this.updateStyles(settingsData.styles);
+    } else {
+      this.updateStyles(this.defaultStyles);
     }
   }
 
@@ -52,74 +63,139 @@ export class UIController {
    * @param {Object} styles - The styles object from campaign settings
    */
   updateStyles(styles = {}) {
-    const finalStyles = { ...this.defaultStyles, ...styles };
+    // Only use custom styles if the setting is enabled
+    const useCustomStyles = Settings.getSetting("useCustomStyles");
+    const finalStyles = useCustomStyles ? styles : this.defaultStyles;
     const styleId = "dimensional-weather-styles";
 
+    // Only inject custom CSS variables if they differ from defaults
+    let customVars = [];
+    if (finalStyles.headingFont !== this.defaultStyles.headingFont) {
+      customVars.push(`--dw-font-heading: ${finalStyles.headingFont};`);
+    }
+    if (finalStyles.textFont !== this.defaultStyles.textFont) {
+      customVars.push(`--dw-font-text: ${finalStyles.textFont};`);
+    }
+    if (finalStyles.headingColor !== this.defaultStyles.headingColor) {
+      customVars.push(`--dw-color-heading: ${finalStyles.headingColor};`);
+    }
+    if (finalStyles.textColor !== this.defaultStyles.textColor) {
+      customVars.push(`--dw-color-text: ${finalStyles.textColor};`);
+    }
+    if (finalStyles.backgroundColor !== this.defaultStyles.backgroundColor) {
+      customVars.push(`--dw-color-bg: ${finalStyles.backgroundColor};`);
+    }
+    if (finalStyles.accentColor !== this.defaultStyles.accentColor) {
+      customVars.push(`--dw-color-accent: ${finalStyles.accentColor};`);
+    }
+    if (finalStyles.borderColor !== this.defaultStyles.borderColor) {
+      customVars.push(`--dw-color-border: ${finalStyles.borderColor};`);
+    }
+
+    // Only create root styles if we have custom variables
+    const rootStyles =
+      customVars.length > 0
+        ? `
+      :root {
+        ${customVars.join("\n        ")}
+      }
+    `
+        : "";
+
     // Build CSS rules as a string
-    const cssRules = this._buildCssRules(finalStyles);
+    const cssRules = this._buildCssRules();
 
     // Update or create style element
-    DOMUtils.updateStyleElement(styleId, cssRules);
+    DOMUtils.updateStyleElement(styleId, rootStyles + cssRules);
   }
 
   /**
    * Build CSS rules as a string
    * @private
-   * @param {Object} styles - Style definitions
    * @returns {string} CSS rules
    */
-  _buildCssRules(styles) {
+  _buildCssRules() {
     return `
-      .weather-help {
-        font-family: ${styles.textFont};
-        color: ${styles.textColor};
-        background: ${styles.backgroundColor};
-        padding: 10px;
-        border-radius: 5px;
+      /* Light Theme Styles */
+      .weather-help,
+      .weather-report {
+        font-family: var(--dw-font-text);
+        color: var(--dw-color-text);
+        background: var(--dw-color-bg);
+        padding: var(--dw-spacing-md);
+        border-radius: var(--dw-border-radius);
+        border: var(--dw-border-width) solid var(--dw-color-border);
       }
-      .weather-help h2, .weather-help h3 {
-        font-family: ${styles.headingFont};
-        color: ${styles.headingColor};
+
+      .weather-help h2, 
+      .weather-help h3,
+      .weather-report h3,
+      .weather-report h4 {
+        font-family: var(--dw-font-heading);
+        color: var(--dw-color-heading);
         margin: 5px 0;
-        border-bottom: 2px solid ${styles.accentColor};
+        border-bottom: 2px solid var(--dw-color-accent);
       }
-      .weather-help .command {
-        margin: 5px 0;
-      }
-      .weather-help .command-name {
-        color: ${styles.accentColor};
+
+      .weather-help .command-name,
+      .weather-report strong {
+        color: var(--dw-color-accent);
         font-weight: bold;
-        margin-right: 10px;
       }
-      .weather-help .command-desc {
-        color: ${styles.textColor};
-        font-style: italic;
+
+      .weather-help .command-desc,
+      .weather-help .list-item,
+      .weather-report p,
+      .weather-report ul,
+      .weather-report li {
+        color: var(--dw-color-text);
       }
-      .weather-help .list-section {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 5px;
-      }
-      .weather-help .list-item {
-        color: ${styles.textColor};
-        padding: 2px 5px;
-      }
-      
-      .weather-report.${this.settingsData?.id || "default"} {
-        font-family: ${styles.textFont};
-      }
-      .weather-report.${this.settingsData?.id || "default"} h4 {
-        font-family: ${styles.headingFont};
-        color: ${styles.headingColor};
-        border-bottom: 2px solid ${styles.accentColor};
-      }
-      .weather-report.${this.settingsData?.id || "default"} ul {
-        color: ${styles.textColor};
-      }
-      .weather-report.${this.settingsData?.id || "default"} li {
-        border-left: 3px solid ${styles.accentColor};
+
+      .weather-report li {
+        border-left: 3px solid var(--dw-color-accent);
         padding-left: 10px;
         margin-bottom: 8px;
+      }
+
+      /* Dark Theme Overrides */
+      .dark-mode .weather-help,
+      .dark-mode .weather-report,
+      html[data-theme="dark"] .weather-help,
+      html[data-theme="dark"] .weather-report {
+        background: rgba(0, 0, 0, 0.8);
+        color: #ffffff;
+        border-color: rgba(255, 255, 255, 0.1);
+      }
+
+      .dark-mode .weather-help h2,
+      .dark-mode .weather-help h3,
+      .dark-mode .weather-report h3,
+      .dark-mode .weather-report h4,
+      html[data-theme="dark"] .weather-help h2,
+      html[data-theme="dark"] .weather-help h3,
+      html[data-theme="dark"] .weather-report h3,
+      html[data-theme="dark"] .weather-report h4 {
+        color: #ffffff;
+      }
+
+      .dark-mode .weather-help .command-desc,
+      .dark-mode .weather-help .list-item,
+      .dark-mode .weather-report p,
+      .dark-mode .weather-report ul,
+      .dark-mode .weather-report li,
+      html[data-theme="dark"] .weather-help .command-desc,
+      html[data-theme="dark"] .weather-help .list-item,
+      html[data-theme="dark"] .weather-report p,
+      html[data-theme="dark"] .weather-report ul,
+      html[data-theme="dark"] .weather-report li {
+        color: #ffffff;
+      }
+
+      .dark-mode .weather-help .command-name,
+      .dark-mode .weather-report strong,
+      html[data-theme="dark"] .weather-help .command-name,
+      html[data-theme="dark"] .weather-report strong {
+        color: #3498db;
       }
     `;
   }
@@ -162,11 +238,8 @@ export class UIController {
       const seasonDisplay = this._getSeasonName(weatherState.season);
       const timeDisplay = this._getTimePeriod();
 
-      // Get campaign ID for styling
-      const campaignId = this.settingsData?.id || "default";
-
       // Build chat card
-      const chatCardText = `<div class="weather-report ${campaignId}">
+      const chatCardText = `<div class="weather-report">
         <h3>Current Weather</h3>
         <p class="terrain-type">${terrainDisplay} - ${timeDisplay} - ${seasonDisplay}</p>
         <hr>
@@ -347,14 +420,24 @@ export class UIController {
     // Try to get season from Simple Calendar first
     if (Settings.isSimpleCalendarEnabled() && SimpleCalendar?.api) {
       const currentSeason = SimpleCalendar.api.getCurrentSeason();
-      if (currentSeason) {
+      if (currentSeason?.name) {
         return currentSeason.name;
       }
     }
 
-    // Fall back to settings
+    // Fall back to settings if Simple Calendar is not available or has no season
     const season = this.settingsData?.seasons?.[seasonKey];
-    return season?.name || seasonKey;
+    if (season?.name) {
+      return season.name;
+    }
+
+    // If all else fails, format the season key
+    return seasonKey
+      .replace(/([A-Z])/g, " $1")
+      .trim()
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
   }
 
   /**
@@ -363,57 +446,31 @@ export class UIController {
    * @returns {string} Time period name
    */
   _getTimePeriod() {
-    const timestamp = SimpleCalendar?.api?.timestamp?.();
-
-    if (!timestamp || !SimpleCalendar?.api) {
+    if (!SimpleCalendar?.api) {
       return "Unknown Time";
     }
 
-    const dateData = SimpleCalendar.api.timestampToDate(timestamp);
-    const { sunrise, sunset, midday } = dateData;
-
-    // Validate the time values
-    if (sunrise === undefined || sunset === undefined || midday === undefined) {
+    // Get current time display which includes formatted time
+    const dt = SimpleCalendar.api.currentDateTimeDisplay();
+    if (!dt?.time) {
       return "Unknown Time";
     }
 
-    // Calculate period boundaries in timestamps
-    const daylightDuration = sunset - sunrise;
-    const nightDuration = 24 - daylightDuration;
+    // Parse the time string (e.g. "10:10:50")
+    const [hours] = dt.time.split(":").map(Number);
 
-    // Ensure durations are positive
-    if (daylightDuration <= 0 || nightDuration <= 0) {
-      return "Unknown Time";
-    }
-
-    const earlyMorningEnd = sunrise + daylightDuration * 0.25;
-    const noonEnd = sunrise + daylightDuration * 0.5;
-    const afternoonEnd = sunset;
-    const nightEnd = sunset + nightDuration * 0.5;
-
-    // Normalize timestamp to 24-hour cycle
-    const normalizedTimestamp = timestamp % 24;
-
-    // Determine current time period based on normalized timestamp
-    if (
-      normalizedTimestamp >= sunrise &&
-      normalizedTimestamp < earlyMorningEnd
-    ) {
+    // Define time periods based on hour ranges to match campaign settings
+    if (hours >= 5 && hours < 8) {
       return "Early Morning";
-    } else if (
-      normalizedTimestamp >= earlyMorningEnd &&
-      normalizedTimestamp < noonEnd
-    ) {
+    } else if (hours >= 8 && hours < 12) {
+      return "Morning";
+    } else if (hours >= 12 && hours < 14) {
       return "Noon";
-    } else if (
-      normalizedTimestamp >= noonEnd &&
-      normalizedTimestamp < afternoonEnd
-    ) {
+    } else if (hours >= 14 && hours < 18) {
       return "Afternoon";
-    } else if (
-      normalizedTimestamp >= afternoonEnd &&
-      normalizedTimestamp < nightEnd
-    ) {
+    } else if (hours >= 18 && hours < 21) {
+      return "Evening";
+    } else if (hours >= 21 || hours < 2) {
       return "Night";
     } else {
       return "Late Night";

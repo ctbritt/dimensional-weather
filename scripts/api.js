@@ -96,7 +96,9 @@ export class DimensionalWeatherAPI {
       this.ui.updateSettingsData(newSettingsData);
 
       // Get default terrain and season
-      const defaultTerrain = Object.keys(newSettingsData.terrains)[0];
+      const defaultTerrain =
+        newSettingsData.defaultTerrain ||
+        Object.keys(newSettingsData.terrains)[0];
       const defaultSeason = Object.keys(newSettingsData.seasons)[0];
 
       // Update scene flags if a scene is active

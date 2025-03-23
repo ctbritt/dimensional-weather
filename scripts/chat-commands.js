@@ -5,7 +5,6 @@
 
 import { ErrorHandler } from "./utils.js";
 import { Settings } from "./settings.js";
-import { SettingsPanel } from "./settings-panel.js";
 
 export class ChatCommands {
   /**

@@ -55,7 +55,28 @@ export class WeatherEngine {
 
     // Get current terrain and season from settings
     const terrain = Settings.getSetting("terrain");
-    const season = Settings.getSetting("season");
+
+    // Try to get season from Simple Calendar first
+    let season;
+    if (Settings.isSimpleCalendarEnabled() && SimpleCalendar?.api) {
+      const currentSeason = SimpleCalendar.api.getCurrentSeason();
+      if (currentSeason?.name) {
+        // Find matching season in campaign settings
+        for (const [key, s] of Object.entries(
+          this.settingsData?.seasons || {}
+        )) {
+          if (s.name.toLowerCase() === currentSeason.name.toLowerCase()) {
+            season = key;
+            break;
+          }
+        }
+      }
+    }
+
+    // If no season found from Simple Calendar, use setting
+    if (!season) {
+      season = Settings.getSetting("season");
+    }
 
     // Validate terrain exists
     if (!this.settingsData?.terrains?.[terrain]) {
@@ -118,54 +139,62 @@ export class WeatherEngine {
       return;
     }
 
-    // Get current time once at the start
+    // Get current time and data from Simple Calendar
     const currentTime = this._getCurrentTimestamp();
+    const dateData = SimpleCalendar?.api?.timestampToDate(currentTime);
+    const currentSeason = SimpleCalendar?.api?.getCurrentSeason();
 
+    // Get current terrain from saved state or settings
     const savedState = scene.getFlag("dimensional-weather", "weatherState");
-    const autoUpdate = Settings.getSetting("autoUpdate");
-    const updateFrequency = Settings.getSetting("updateFrequency");
-    const weatherVariability = Settings.getSetting("variability");
-
-    const lastUpdateTime = savedState?.lastUpdate || 0;
-    const hoursSinceLastUpdate = (currentTime - lastUpdateTime) / 3600;
-
-    // If this is a forced update, we'll update regardless of time
-    // If it's not forced, check if auto-update is enabled and enough time has passed
-    if (!forced && (!autoUpdate || hoursSinceLastUpdate < updateFrequency)) {
-      console.log(
-        "Dimensional Weather | Skipping update - not enough time has passed or auto-update disabled"
-      );
-      return;
-    }
-
-    // Get current terrain and season from saved state or settings
     const currentTerrain =
       savedState?.terrain || Settings.getSetting("terrain");
-    const currentSeason = savedState?.season || Settings.getSetting("season");
+
+    // Find matching season in campaign settings
+    let seasonKey = null;
+    if (currentSeason?.name) {
+      // Convert Simple Calendar season name to lowercase for comparison
+      const simpleCalendarSeasonName = currentSeason.name.toLowerCase();
+
+      // Find matching season in campaign settings
+      for (const [key, s] of Object.entries(this.settingsData?.seasons || {})) {
+        const campaignSeasonName = s.name.toLowerCase();
+        // Handle both "Fall" and "Autumn" names
+        if (
+          campaignSeasonName === simpleCalendarSeasonName ||
+          (simpleCalendarSeasonName === "fall" &&
+            campaignSeasonName === "autumn") ||
+          (simpleCalendarSeasonName === "autumn" &&
+            campaignSeasonName === "fall")
+        ) {
+          seasonKey = key;
+          break;
+        }
+      }
+    }
+
+    // If no matching season found, use setting
+    if (!seasonKey) {
+      seasonKey = Settings.getSetting("season");
+    }
 
     // Validate terrain exists
-    if (!this.settingsData.terrains[currentTerrain]) {
-      ErrorHandler.logAndNotify(
-        `Invalid terrain: ${currentTerrain}, falling back to first available terrain`,
-        null,
-        true
+    if (!this.settingsData?.terrains[currentTerrain]) {
+      console.warn(
+        `Invalid terrain "${currentTerrain}", falling back to default terrain`
       );
-      const defaultTerrain = Object.keys(this.settingsData.terrains)[0];
-      await Settings.updateSetting("terrain", defaultTerrain);
+      currentTerrain = Object.keys(this.settingsData?.terrains)[0];
+    }
 
-      // Update scene flags with the new terrain
-      await SceneUtils.updateFlags(scene, "weatherState", {
-        terrain: defaultTerrain,
-      });
-
-      ui.notifications.warn(
-        `Invalid terrain "${currentTerrain}" for current campaign setting. Changed to "${defaultTerrain}".`
+    // Validate season exists
+    if (!this.settingsData?.seasons[seasonKey]) {
+      console.warn(
+        `Invalid season "${seasonKey}", falling back to default season`
       );
-
-      return; // Exit and wait for next update cycle
+      seasonKey = Object.keys(this.settingsData?.seasons)[0];
     }
 
     const terrain = this.settingsData.terrains[currentTerrain];
+    const weatherVariability = Settings.getSetting("variability");
 
     // Calculate weather changes
     const newWeather = this._calculateWeatherChanges(
@@ -173,7 +202,7 @@ export class WeatherEngine {
       savedState,
       weatherVariability,
       currentTime,
-      currentSeason
+      seasonKey
     );
 
     // Save the new weather state to scene flags
@@ -220,30 +249,52 @@ export class WeatherEngine {
         ((Math.random() * 2 - 1) * variability) / 2
     );
 
-    // Apply time-of-day modifier
-    const timePeriod = this.getTimePeriod(currentTime);
-    const modifiers = this.settingsData?.timeModifiers?.[timePeriod] || {};
+    // Get current time period
+    const dt = SimpleCalendar.api.currentDateTimeDisplay();
+    const [hours] = dt.time.split(":").map(Number);
+
+    // Define time periods based on hour ranges to match campaign settings
+    let timePeriod;
+    if (hours >= 5 && hours < 8) {
+      timePeriod = "Early Morning";
+    } else if (hours >= 8 && hours < 12) {
+      timePeriod = "Morning";
+    } else if (hours >= 12 && hours < 14) {
+      timePeriod = "Midday";
+    } else if (hours >= 14 && hours < 18) {
+      timePeriod = "Afternoon";
+    } else if (hours >= 18 && hours < 21) {
+      timePeriod = "Evening";
+    } else if (hours >= 21 || hours < 2) {
+      timePeriod = "Night";
+    } else {
+      timePeriod = "Late Night";
+    }
+
+    // Apply time-of-day modifier from campaign settings
+    const timeModifiers = this.settingsData?.timeModifiers?.[timePeriod] || {};
 
     // Apply season modifiers
     const seasonModifiers = this._getSeasonModifiers(currentSeason);
 
     // Calculate final values with time and season modifiers
-    // Reduce the impact of time modifiers on temperature
     const finalTemperature =
       temperature +
-      (modifiers.temperature || 0) / 2 +
+      (timeModifiers.temperature || 0) +
       (seasonModifiers.temperature || 0);
 
     const finalWind =
-      wind + (modifiers.wind || 0) + (seasonModifiers.wind || 0);
+      wind + (timeModifiers.wind || 0) + (seasonModifiers.wind || 0);
 
     const finalPrecipitation =
       precipitation +
-      (modifiers.precipitation || 0) +
+      (timeModifiers.precipitation || 0) +
       (seasonModifiers.precipitation || 0);
 
     const finalHumidity =
-      humidity + (modifiers.humidity || 0) + (seasonModifiers.humidity || 0);
+      humidity +
+      (timeModifiers.humidity || 0) +
+      (seasonModifiers.humidity || 0);
 
     // Clamp values within -10 and 10
     return {

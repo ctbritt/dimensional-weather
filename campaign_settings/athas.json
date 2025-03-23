@@ -5,9 +5,9 @@
     "defaultTerrain": "scrubPlains",
     "styles": {
         "headingFont": "Papyrus, Uncial Antiqua, Luminari, fantasy",
+        "textFont": "Signika",
         "headingColor": "#8B4513",
         "textColor": "#4A4A4A",
-        "backgroundColor": "#FFF8DC",
         "accentColor": "#D2691E",
         "borderColor": "#8B4513"
     },
@@ -133,19 +133,25 @@
     },
     "timeModifiers": {
         "Early Morning": {
-            "temperature": -2
+            "temperature": -5
         },
-        "Noon": {
+        "Morning": {
+            "temperature": 1
+        },
+        "Midday": {
             "temperature": 2
         },
         "Afternoon": {
             "temperature": 3
         },
+        "Evening": {
+            "temperature": -1
+        },
         "Night": {
-            "temperature": -6
+            "temperature": -3
         },
         "Late Night": {
-            "temperature": -8
+            "temperature": -6
         }
     },
     "terrains": {

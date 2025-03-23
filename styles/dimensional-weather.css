@@ -4,15 +4,15 @@
 
 /* Global Variables */
 :root {
-  /* Default Theme Colors - Matching Foundry's Modern Theme */
-  --dw-color-bg: rgba(0, 0, 0, 0.8);
-  --dw-color-text: #ffffff;
-  --dw-color-heading: #ffffff;
-  --dw-color-accent: #ff6400;
-  --dw-color-border: rgba(255, 255, 255, 0.1);
-  --dw-color-bg-alt: rgba(255, 255, 255, 0.05);
-  --dw-color-bg-alt-dark: rgba(0, 0, 0, 0.2);
-  --dw-color-shadow: rgba(0, 0, 0, 0.5);
+  /* Default Theme Colors - Light Mode */
+  /*  --dw-color-bg: #ecf0f1;
+  --dw-color-text: #34495e;
+  --dw-color-heading: #bb6f1e; */
+  --dw-color-accent: #d86717;
+  --dw-color-border: #232526;
+  --dw-color-bg-alt: rgba(0, 0, 0, 0.05);
+  --dw-color-bg-alt-dark: rgba(0, 0, 0, 0.1);
+  --dw-color-shadow: rgba(0, 0, 0, 0.1);
 
   /* Fonts - Using Foundry's Default Fonts */
   --dw-font-heading: "Signika", sans-serif;
@@ -31,12 +31,14 @@
 }
 
 /* Dark Mode Overrides */
-.dark-theme {
-  --dw-color-bg: #333;
-  --dw-color-text: #eee;
-  --dw-color-heading: #3498db;
-  --dw-color-bg-alt: rgba(255, 255, 255, 0.1);
-  --dw-color-border: #444;
+.theme-dark {
+  --dw-color-bg: rgba(0, 0, 0, 0.8);
+  --dw-color-text: #ffffff;
+  --dw-color-heading: #ffffff;
+  --dw-color-border: rgba(255, 255, 255, 0.1);
+  --dw-color-bg-alt: rgba(255, 255, 255, 0.05);
+  --dw-color-bg-alt-dark: rgba(0, 0, 0, 0.2);
+  --dw-color-shadow: rgba(0, 0, 0, 0.5);
 }
 
 /* Base Styles */
@@ -128,7 +130,7 @@
 }
 
 /* Weather Report Styling */
-.weather-report {
+#chat-log .chat-message .message-content .weather-report {
   background: var(--dw-color-bg);
   border: var(--dw-border-width) solid var(--dw-color-border);
   border-radius: var(--dw-border-radius);
@@ -136,13 +138,10 @@
   margin: var(--dw-spacing-sm) 0;
   color: var(--dw-color-text);
   font-family: var(--dw-font-text);
-  font-size: 14px;
-  line-height: 1.4;
   box-shadow: var(--dw-box-shadow);
 }
 
-.weather-report h3,
-#chat .chat-message .message-content .weather-report h3 {
+#chat-log .chat-message .message-content .weather-report h3 {
   font-family: var(--dw-font-heading);
   font-size: 1.2em;
   font-weight: 600;
@@ -155,8 +154,7 @@
   text-shadow: none;
 }
 
-.weather-report h4,
-#chat .chat-message .message-content .weather-report h4 {
+#chat-log .chat-message .message-content .weather-report h4 {
   font-family: var(--dw-font-heading);
   font-size: 1.1em;
   font-weight: 500;
@@ -167,45 +165,48 @@
   text-shadow: none;
 }
 
-.weather-report p {
+#chat-log .chat-message .message-content .weather-report p {
   margin: 0.5em 0;
   text-shadow: none;
-  opacity: 0.9;
+  opacity: 1;
 }
 
-.weather-report hr {
+#chat-log .chat-message .message-content .weather-report hr {
   border: none;
   border-top: var(--dw-border-width) solid var(--dw-color-border);
   margin: 0.5em 0;
 }
 
-.weather-report ul {
+#chat-log .chat-message .message-content .weather-report ul {
   list-style-type: none;
   padding-left: 0;
   margin: 0.5em 0;
 }
 
-.weather-report li {
+#chat-log .chat-message .message-content .weather-report li {
   margin: 0.3em 0;
-  padding-left: 1.5em;
   position: relative;
-  opacity: 0.9;
+  opacity: 1;
 }
 
-.weather-report li:before {
-  content: "•";
+#chat-log .chat-message .message-content .weather-report li:before {
   color: var(--dw-color-accent);
   position: absolute;
   left: 0.5em;
 }
 
-.weather-report .terrain-type {
+#chat-log .chat-message .message-content .weather-report .terrain-type {
   font-size: 0.9em;
   color: var(--dw-color-accent);
   font-weight: 500;
   margin: 0.2em 0 0.5em 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+#chat-log .chat-message .message-content .weather-report strong {
+  color: var(--dw-color-accent);
+  font-weight: 600;
 }
 
 /* Calendar Info Styling */
@@ -237,143 +238,7 @@
 
 .weather-calendar p {
   margin: 0.5em 0;
-  opacity: 0.9;
-}
-
-/* Settings Panel Styling */
-.dimensional-weather-settings {
-  padding: var(--dw-spacing-md);
-}
-
-.dimensional-weather-settings .window-content {
-  padding: var(--dw-spacing-md);
-  background: var(--dw-color-bg);
-}
-
-.dimensional-weather-settings form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--dw-spacing-md);
-}
-
-.dimensional-weather-settings .tabs {
-  display: flex;
-  gap: var(--dw-spacing-sm);
-  border-bottom: var(--dw-border-width) solid var(--dw-color-border);
-  margin-bottom: var(--dw-spacing-md);
-}
-
-.dimensional-weather-settings .tabs .item {
-  padding: var(--dw-spacing-sm) var(--dw-spacing-md);
-  cursor: pointer;
-  border: var(--dw-border-width) solid transparent;
-  border-radius: var(--dw-border-radius) var(--dw-border-radius) 0 0;
-  color: var(--dw-color-text);
-  opacity: 0.7;
-  transition: all 0.2s ease;
-}
-
-.dimensional-weather-settings .tabs .item.active {
-  border-color: var(--dw-color-border) var(--dw-color-border) transparent;
-  background: var(--dw-color-bg);
   opacity: 1;
-  color: var(--dw-color-accent);
-}
-
-.dimensional-weather-settings .tabs .item:hover {
-  background: var(--dw-color-bg-alt);
-  opacity: 0.9;
-}
-
-.dimensional-weather-settings .content {
-  padding: var(--dw-spacing-md);
-}
-
-.dimensional-weather-settings .form-group {
-  margin-bottom: var(--dw-spacing-md);
-}
-
-.dimensional-weather-settings .form-group label {
-  display: block;
-  margin-bottom: var(--dw-spacing-xs);
-  font-weight: 500;
-  color: var(--dw-color-text);
-  opacity: 0.9;
-}
-
-.dimensional-weather-settings .form-group select,
-.dimensional-weather-settings .form-group input[type="text"] {
-  width: 100%;
-  padding: var(--dw-spacing-sm);
-  border: var(--dw-border-width) solid var(--dw-color-border);
-  border-radius: var(--dw-border-radius);
-  background: var(--dw-color-bg-alt);
-  color: var(--dw-color-text);
-  transition: all 0.2s ease;
-}
-
-.dimensional-weather-settings .form-group select:focus,
-.dimensional-weather-settings .form-group input[type="text"]:focus {
-  border-color: var(--dw-color-accent);
-  box-shadow: 0 0 0 1px var(--dw-color-accent);
-}
-
-.dimensional-weather-settings .form-group .notes {
-  font-size: 0.9em;
-  color: var(--dw-color-text);
-  margin-top: var(--dw-spacing-xs);
-  opacity: 0.7;
-}
-
-.dimensional-weather-settings .range-with-value {
-  display: flex;
-  align-items: center;
-  gap: var(--dw-spacing-sm);
-}
-
-.dimensional-weather-settings input[type="range"] {
-  flex: 1;
-  -webkit-appearance: none;
-  height: 4px;
-  background: var(--dw-color-bg-alt);
-  border-radius: 2px;
-  outline: none;
-}
-
-.dimensional-weather-settings input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 16px;
-  height: 16px;
-  background: var(--dw-color-accent);
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.dimensional-weather-settings input[type="range"]::-webkit-slider-thumb:hover {
-  transform: scale(1.1);
-}
-
-.dimensional-weather-settings .range-value {
-  min-width: 3em;
-  text-align: right;
-  color: var(--dw-color-text);
-  opacity: 0.9;
-}
-
-.dimensional-weather-settings .preview-weather {
-  margin-top: var(--dw-spacing-md);
-  padding: var(--dw-spacing-md);
-  border: var(--dw-border-width) solid var(--dw-color-border);
-  border-radius: var(--dw-border-radius);
-  background: var(--dw-color-bg-alt);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.dimensional-weather-settings .preview-weather:hover {
-  background: var(--dw-color-bg-alt-dark);
-  border-color: var(--dw-color-accent);
 }
 
 /* Responsive Design */
