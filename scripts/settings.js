@@ -12,6 +12,31 @@ export class Settings {
 
   // Settings definitions with default values
   static SETTINGS = {
+    campaignSettingsIndex: {
+      name: "Campaign Settings Index",
+      scope: "world",
+      config: false,
+      type: Object,
+      default: {
+        campaignSettings: [
+          {
+            id: "earth",
+            name: "Earth",
+            path: "earth.json",
+          },
+          {
+            id: "athas",
+            name: "Dark Sun: Athas",
+            path: "athas.json",
+          },
+          {
+            id: "greyhawk",
+            name: "Greyhawk",
+            path: "greyhawk.json",
+          },
+        ],
+      },
+    },
     campaign: {
       name: "Campaign Setting",
       hint:
@@ -133,13 +158,17 @@ export class Settings {
    */
   static async register(onCampaignChange) {
     try {
-      // First load the campaign settings index to populate choices
-      const settingsIndex = await this.loadSettingsIndex();
+      // Register all settings first
+      for (const [key, config] of Object.entries(this.SETTINGS)) {
+        game.settings.register(this.NAMESPACE, key, config);
+      }
 
-      if (settingsIndex && settingsIndex.campaignSettings) {
+      // Load campaign settings from directory
+      const campaignSettings = await this.loadCampaignSettingsFromDirectory();
+      if (campaignSettings && campaignSettings.length > 0) {
         // Create choices object for campaign settings dropdown
         const choices = {};
-        settingsIndex.campaignSettings.forEach((setting) => {
+        campaignSettings.forEach((setting) => {
           choices[setting.id] = setting.name;
         });
 
@@ -148,11 +177,9 @@ export class Settings {
 
         // Set onChange handler for campaign setting
         this.SETTINGS.campaign.onChange = onCampaignChange;
-      }
 
-      // Register all settings
-      for (const [key, config] of Object.entries(this.SETTINGS)) {
-        game.settings.register(this.NAMESPACE, key, config);
+        // Update the index.json file with current campaign settings
+        await this.updateSettingsIndex(campaignSettings);
       }
 
       console.log("Dimensional Weather | Settings registered successfully");
@@ -162,21 +189,76 @@ export class Settings {
   }
 
   /**
-   * Load the settings index file that lists available campaign settings
-   * @returns {Promise<Object>} Index data
+   * Load campaign settings from the directory
+   * @private
+   * @returns {Promise<Array>} Array of campaign settings
    */
-  static async loadSettingsIndex() {
+  static async loadCampaignSettingsFromDirectory() {
     try {
-      const indexPath = `${this.SETTINGS_PATH}/index.json`;
-      return await Cache.getOrFetch("settingsIndex", async () => {
-        return await ErrorHandler.handleFetch(
-          indexPath,
-          "Failed to load settings index"
+      const campaignSettings = [];
+      const campaignFiles = ["earth.json", "athas.json", "greyhawk.json"];
+
+      for (const fileName of campaignFiles) {
+        // Skip the index file
+        if (fileName === "index.json") continue;
+
+        // Extract the campaign ID from the filename
+        const campaignId = fileName.replace(".json", "");
+
+        // Load the campaign setting file
+        const settingPath = `${this.SETTINGS_PATH}/${fileName}`;
+        const settingData = await Cache.getOrFetch(
+          `campaign_${campaignId}`,
+          async () => {
+            return await ErrorHandler.handleFetch(
+              settingPath,
+              `Failed to load campaign setting: ${campaignId}`
+            );
+          }
         );
-      });
+
+        if (settingData && settingData.id && settingData.name) {
+          campaignSettings.push({
+            id: settingData.id,
+            name: settingData.name,
+            path: fileName,
+          });
+        }
+      }
+
+      return campaignSettings;
     } catch (error) {
-      ErrorHandler.logAndNotify("Failed to load settings index", error);
+      ErrorHandler.logAndNotify(
+        "Failed to load campaign settings from directory",
+        error
+      );
       return null;
+    }
+  }
+
+  /**
+   * Update the settings index file with available campaign settings
+   * @private
+   * @param {Array} campaignSettings - Array of campaign settings
+   */
+  static async updateSettingsIndex(campaignSettings) {
+    try {
+      const settingsIndex = {
+        campaignSettings: campaignSettings,
+      };
+
+      // Use Foundry's FilePicker to save the updated index
+      const file = new File(
+        [JSON.stringify(settingsIndex, null, 4)],
+        "index.json",
+        { type: "application/json" }
+      );
+      await FilePicker.upload("data", this.SETTINGS_PATH, file, {
+        overwrite: true,
+      });
+      console.log("Dimensional Weather | Settings index updated successfully");
+    } catch (error) {
+      ErrorHandler.logAndNotify("Failed to update settings index", error);
     }
   }
 

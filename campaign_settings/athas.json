@@ -5,7 +5,6 @@
     "defaultTerrain": "scrubPlains",
     "styles": {
         "headingFont": "Papyrus, Uncial Antiqua, Luminari, fantasy",
-        "textFont": "Arial, sans-serif",
         "headingColor": "#8B4513",
         "textColor": "#4A4A4A",
         "backgroundColor": "#FFF8DC",

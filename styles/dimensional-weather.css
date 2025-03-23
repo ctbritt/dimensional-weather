@@ -4,36 +4,30 @@
 
 /* Global Variables */
 :root {
-  /* Default Theme Colors */
-  --dw-color-bg: #f0f0e0;
-  --dw-color-text: #34495e;
-  --dw-color-heading: #2c3e50;
-  --dw-color-accent: #3498db;
-  --dw-color-border: #2980b9;
-  --dw-color-bg-alt: rgba(0, 0, 0, 0.05);
-  --dw-color-bg-alt-dark: rgba(255, 255, 255, 0.05);
+  /* Default Theme Colors - Matching Foundry's Modern Theme */
+  --dw-color-bg: rgba(0, 0, 0, 0.8);
+  --dw-color-text: #ffffff;
+  --dw-color-heading: #ffffff;
+  --dw-color-accent: #ff6400;
+  --dw-color-border: rgba(255, 255, 255, 0.1);
+  --dw-color-bg-alt: rgba(255, 255, 255, 0.05);
+  --dw-color-bg-alt-dark: rgba(0, 0, 0, 0.2);
+  --dw-color-shadow: rgba(0, 0, 0, 0.5);
 
-  /* Dark Sun Theme Colors */
-  --dw-athas-title-bg: #632a1a;
-  --dw-athas-body-bg: #e0bc8a;
-  --dw-athas-section-bg: #7d4529;
-  --dw-athas-highlight: #ffd54f;
-  --dw-athas-text-dark: #1e1107;
-  --dw-athas-text-light: #fff8eb;
-
-  /* Fonts */
+  /* Fonts - Using Foundry's Default Fonts */
   --dw-font-heading: "Signika", sans-serif;
   --dw-font-text: "Signika", sans-serif;
-  --dw-font-fantasy: "Papyrus", "Uncial Antiqua", "Luminari", fantasy;
+  --dw-font-fantasy: "Signika", sans-serif;
 
   /* UI Measurements */
   --dw-spacing-xs: 4px;
   --dw-spacing-sm: 8px;
   --dw-spacing-md: 12px;
   --dw-spacing-lg: 16px;
-  --dw-border-radius: 5px;
+  --dw-border-radius: 3px;
   --dw-border-width: 1px;
-  --dw-border-accent-width: 2px;
+  --dw-border-accent-width: 1px;
+  --dw-box-shadow: 0 2px 4px var(--dw-color-shadow);
 }
 
 /* Dark Mode Overrides */
@@ -43,11 +37,6 @@
   --dw-color-heading: #3498db;
   --dw-color-bg-alt: rgba(255, 255, 255, 0.1);
   --dw-color-border: #444;
-
-  /* Dark Sun Dark Mode */
-  --dw-athas-body-bg: #352617;
-  --dw-athas-section-bg: #4e2813;
-  --dw-athas-text-dark: #e0d0c0;
 }
 
 /* Base Styles */
@@ -58,6 +47,7 @@
   border-radius: var(--dw-border-radius);
   background-color: var(--dw-color-bg);
   color: var(--dw-color-text);
+  box-shadow: var(--dw-box-shadow);
 }
 
 .dimensional-weather-title {
@@ -67,6 +57,8 @@
   border-bottom: var(--dw-border-width) solid var(--dw-color-border);
   padding-bottom: var(--dw-spacing-sm);
   color: var(--dw-color-heading);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .dimensional-weather-dimension {
@@ -146,39 +138,39 @@
   font-family: var(--dw-font-text);
   font-size: 14px;
   line-height: 1.4;
+  box-shadow: var(--dw-box-shadow);
 }
 
 .weather-report h3,
 #chat .chat-message .message-content .weather-report h3 {
-  font-family: var(--dw-font-fantasy);
-  font-size: 1.4em;
-  font-weight: 700;
+  font-family: var(--dw-font-heading);
+  font-size: 1.2em;
+  font-weight: 600;
   color: var(--dw-color-accent);
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   margin: 0 0 0.5em 0;
-  border-bottom: none;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-  padding: 0;
-  background: none;
+  border-bottom: var(--dw-border-width) solid var(--dw-color-border);
+  padding-bottom: var(--dw-spacing-sm);
+  text-shadow: none;
 }
 
 .weather-report h4,
 #chat .chat-message .message-content .weather-report h4 {
-  font-family: var(--dw-font-fantasy);
-  font-size: 1.2em;
-  font-weight: 600;
+  font-family: var(--dw-font-heading);
+  font-size: 1.1em;
+  font-weight: 500;
   color: var(--dw-color-accent);
   margin: 1em 0 0.5em 0;
-  border-bottom: none;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-  padding: 0;
-  background: none;
+  border-bottom: var(--dw-border-width) solid var(--dw-color-border);
+  padding-bottom: var(--dw-spacing-xs);
+  text-shadow: none;
 }
 
 .weather-report p {
   margin: 0.5em 0;
   text-shadow: none;
+  opacity: 0.9;
 }
 
 .weather-report hr {
@@ -197,6 +189,7 @@
   margin: 0.3em 0;
   padding-left: 1.5em;
   position: relative;
+  opacity: 0.9;
 }
 
 .weather-report li:before {
@@ -209,184 +202,127 @@
 .weather-report .terrain-type {
   font-size: 0.9em;
   color: var(--dw-color-accent);
-  font-style: bold;
-  margin: 0.2em 0 0.5em 0;
-}
-
-/* Calendar Info Styling */
-.weather-calendar {
-  background: rgba(0, 0, 0, 0.8);
-  border: var(--dw-border-width) solid #000;
-  border-radius: var(--dw-border-radius);
-  padding: var(--dw-spacing-md);
-  margin: var(--dw-spacing-sm) 0;
-  color: #fff;
-  font-family: var(--dw-font-text);
-  font-size: 14px;
-  line-height: 1.4;
-}
-
-.weather-calendar h3 {
-  font-family: var(--dw-font-fantasy);
-  font-size: 1.4em;
-  font-weight: 700;
-  color: var(--dw-color-accent);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin: 0 0 0.5em 0;
-  border-bottom: none;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-.weather-calendar p {
-  margin: 0.5em 0;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-}
-
-/* Dark Sun Theme Specific Styles */
-.weather-report.athas {
-  background: var(--dw-athas-body-bg)
-    url("https://www.transparenttextures.com/patterns/sand-paper.png");
-  border-radius: var(--dw-border-radius);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  font-family: "Segoe UI", Roboto, Ubuntu, sans-serif;
-  margin: var(--dw-spacing-sm) 0;
-  overflow: hidden;
-  color: var(--dw-athas-text-dark);
-}
-
-.weather-report.athas h3 {
-  background: var(--dw-athas-title-bg)
-    url("https://www.transparenttextures.com/patterns/dark-leather.png");
-  color: var(--dw-athas-highlight);
-  margin: 0;
-  padding: var(--dw-spacing-md) var(--dw-spacing-lg);
-  font-size: 1.3rem;
   font-weight: 500;
-  text-shadow: none;
-  border: none;
-  display: flex;
-  align-items: center;
-}
-
-.weather-report.athas .terrain-item {
-  background: var(--dw-athas-title-bg);
-  padding: var(--dw-spacing-md) var(--dw-spacing-lg);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-.weather-report.athas .weather-atmosphere,
-.weather-report.athas .weather-description {
-  position: relative;
-  background: transparent;
-  padding: var(--dw-spacing-lg);
-  margin: 0;
-  margin-bottom: var(--dw-spacing-sm);
-  font-family: var(--dw-font-fantasy);
-  line-height: 1.6;
-  color: var(--dw-athas-text-dark);
-  font-weight: 700;
-  font-size: 1.05rem;
-  z-index: 0;
-}
-
-.weather-report.athas .weather-effects {
-  background: var(--dw-athas-section-bg);
-  margin: 0;
-  padding: var(--dw-spacing-lg);
-  color: var(--dw-athas-text-light);
-  border-top: none;
-  border-radius: 0 0 var(--dw-border-radius) var(--dw-border-radius);
-}
-
-.weather-report.athas .weather-effects h4 {
-  color: var(--dw-athas-highlight);
-  margin: 0 0 var(--dw-spacing-md);
-  padding: 0 0 var(--dw-spacing-sm);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  font-size: 1rem;
-  font-weight: 600;
+  margin: 0.2em 0 0.5em 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-.weather-report.athas .weather-effects li:before {
-  color: var(--dw-athas-highlight);
+/* Calendar Info Styling */
+.weather-calendar {
+  background: var(--dw-color-bg);
+  border: var(--dw-border-width) solid var(--dw-color-border);
+  border-radius: var(--dw-border-radius);
+  padding: var(--dw-spacing-md);
+  margin: var(--dw-spacing-sm) 0;
+  color: var(--dw-color-text);
+  font-family: var(--dw-font-text);
+  font-size: 14px;
+  line-height: 1.4;
+  box-shadow: var(--dw-box-shadow);
 }
 
-/* Settings UI */
+.weather-calendar h3 {
+  font-family: var(--dw-font-heading);
+  font-size: 1.2em;
+  font-weight: 600;
+  color: var(--dw-color-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 0.5em 0;
+  border-bottom: var(--dw-border-width) solid var(--dw-color-border);
+  padding-bottom: var(--dw-spacing-sm);
+  text-shadow: none;
+}
+
+.weather-calendar p {
+  margin: 0.5em 0;
+  opacity: 0.9;
+}
+
+/* Settings Panel Styling */
 .dimensional-weather-settings {
-  min-height: 400px;
+  padding: var(--dw-spacing-md);
 }
 
 .dimensional-weather-settings .window-content {
-  padding: var(--dw-spacing-sm);
+  padding: var(--dw-spacing-md);
   background: var(--dw-color-bg);
 }
 
 .dimensional-weather-settings form {
-  height: 100%;
   display: flex;
   flex-direction: column;
+  gap: var(--dw-spacing-md);
 }
 
 .dimensional-weather-settings .tabs {
-  flex: 0;
-  margin-bottom: var(--dw-spacing-sm);
+  display: flex;
+  gap: var(--dw-spacing-sm);
   border-bottom: var(--dw-border-width) solid var(--dw-color-border);
+  margin-bottom: var(--dw-spacing-md);
 }
 
 .dimensional-weather-settings .tabs .item {
-  padding: var(--dw-spacing-sm) var(--dw-spacing-lg);
-  margin: 0 var(--dw-spacing-xs);
+  padding: var(--dw-spacing-sm) var(--dw-spacing-md);
+  cursor: pointer;
+  border: var(--dw-border-width) solid transparent;
   border-radius: var(--dw-border-radius) var(--dw-border-radius) 0 0;
-  background: var(--dw-color-bg-alt);
-  transition: all 0.3s ease;
+  color: var(--dw-color-text);
+  opacity: 0.7;
+  transition: all 0.2s ease;
 }
 
 .dimensional-weather-settings .tabs .item.active {
-  background: var(--dw-color-accent);
-  color: white;
-  border-bottom: none;
+  border-color: var(--dw-color-border) var(--dw-color-border) transparent;
+  background: var(--dw-color-bg);
+  opacity: 1;
+  color: var(--dw-color-accent);
 }
 
 .dimensional-weather-settings .tabs .item:hover {
-  text-shadow: 0 0 var(--dw-spacing-sm) var(--dw-color-accent);
+  background: var(--dw-color-bg-alt);
+  opacity: 0.9;
 }
 
 .dimensional-weather-settings .content {
-  flex: 1;
-  overflow-y: auto;
-  padding: var(--dw-spacing-sm);
+  padding: var(--dw-spacing-md);
 }
 
 .dimensional-weather-settings .form-group {
-  margin-bottom: var(--dw-spacing-lg);
+  margin-bottom: var(--dw-spacing-md);
 }
 
 .dimensional-weather-settings .form-group label {
   display: block;
   margin-bottom: var(--dw-spacing-xs);
-  font-weight: bold;
+  font-weight: 500;
   color: var(--dw-color-text);
+  opacity: 0.9;
 }
 
 .dimensional-weather-settings .form-group select,
-.dimensional-weather-settings .form-group input[type="text"],
-.dimensional-weather-settings .form-group input[type="password"] {
+.dimensional-weather-settings .form-group input[type="text"] {
   width: 100%;
-  padding: var(--dw-spacing-xs) var(--dw-spacing-sm);
+  padding: var(--dw-spacing-sm);
   border: var(--dw-border-width) solid var(--dw-color-border);
   border-radius: var(--dw-border-radius);
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--dw-color-bg-alt);
+  color: var(--dw-color-text);
+  transition: all 0.2s ease;
+}
+
+.dimensional-weather-settings .form-group select:focus,
+.dimensional-weather-settings .form-group input[type="text"]:focus {
+  border-color: var(--dw-color-accent);
+  box-shadow: 0 0 0 1px var(--dw-color-accent);
 }
 
 .dimensional-weather-settings .form-group .notes {
-  margin-top: var(--dw-spacing-xs);
-  color: var(--dw-color-text);
   font-size: 0.9em;
-  font-style: italic;
+  color: var(--dw-color-text);
+  margin-top: var(--dw-spacing-xs);
+  opacity: 0.7;
 }
 
 .dimensional-weather-settings .range-with-value {
@@ -397,46 +333,51 @@
 
 .dimensional-weather-settings input[type="range"] {
   flex: 1;
+  -webkit-appearance: none;
+  height: 4px;
+  background: var(--dw-color-bg-alt);
+  border-radius: 2px;
+  outline: none;
+}
+
+.dimensional-weather-settings input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  background: var(--dw-color-accent);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dimensional-weather-settings input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
 }
 
 .dimensional-weather-settings .range-value {
-  min-width: 2em;
-  text-align: center;
-  padding: var(--dw-spacing-xs) var(--dw-spacing-xs);
-  background: var(--dw-color-bg-alt);
-  border-radius: 3px;
+  min-width: 3em;
+  text-align: right;
+  color: var(--dw-color-text);
+  opacity: 0.9;
 }
 
-.dimensional-weather-settings .preview-weather,
-.dimensional-weather-settings .sheet-footer button {
-  background: var(--dw-color-accent);
-  color: white;
-  border: none;
+.dimensional-weather-settings .preview-weather {
+  margin-top: var(--dw-spacing-md);
+  padding: var(--dw-spacing-md);
+  border: var(--dw-border-width) solid var(--dw-color-border);
   border-radius: var(--dw-border-radius);
-  padding: var(--dw-spacing-sm) var(--dw-spacing-lg);
+  background: var(--dw-color-bg-alt);
   cursor: pointer;
-  transition: background-color 0.3s ease;
-  font-weight: bold;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
 }
 
-.dimensional-weather-settings .preview-weather:hover,
-.dimensional-weather-settings .sheet-footer button:hover {
-  background: var(--dw-color-border);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+.dimensional-weather-settings .preview-weather:hover {
+  background: var(--dw-color-bg-alt-dark);
+  border-color: var(--dw-color-accent);
 }
 
-/* Responsive adjustments */
+/* Responsive Design */
 @media (max-width: 480px) {
-  .weather-report.athas .weather-context {
-    flex-direction: column;
-  }
-
-  .weather-report.athas .terrain-item {
-    margin-bottom: var(--dw-spacing-sm);
-    width: 100%;
-  }
-
   .weather-help .list-section {
     grid-template-columns: 1fr;
   }

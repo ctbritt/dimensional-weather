@@ -1,14 +1,19 @@
 {
     "campaignSettings": [
         {
-            "id": "default",
-            "name": "Default D&D 5e",
-            "path": "default.json"
+            "id": "earth",
+            "name": "Earth",
+            "path": "earth.json"
         },
         {
             "id": "athas",
-            "name": "Dark Sun: Athas",
+            "name": "Athas",
             "path": "athas.json"
+        },
+        {
+            "id": "greyhawk",
+            "name": "Greyhawk",
+            "path": "greyhawk.json"
         }
     ]
 }

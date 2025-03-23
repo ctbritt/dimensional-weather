@@ -60,9 +60,15 @@ Hooks.once("ready", async () => {
 /**
  * Hook into chat commands
  */
-Hooks.on("chatCommandsReady", () => {
+Hooks.on("chatCommandsReady", async () => {
   try {
     console.log(`${MODULE_TITLE} | Registering chat commands`);
+
+    // Ensure the API is fully initialized
+    if (!game.dimWeather?.initialized) {
+      await game.dimWeather.initialize();
+    }
+
     const commands = new ChatCommands(game.dimWeather);
     commands.register();
   } catch (error) {
