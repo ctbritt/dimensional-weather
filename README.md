@@ -304,6 +304,7 @@ Create a new JSON file in the `campaign_settings` directory with the following s
 - [ ] Create interface for building and editing custom json climate files.
 - [ ] Make sure Simple Calendar updates weather on schedule.
 - [ ] Mask OpenAI key
+- [ ] Develop API for other module developers
 
 
 
