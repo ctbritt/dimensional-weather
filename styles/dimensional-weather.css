@@ -1,25 +1,78 @@
-/* Dimensional Weather CSS */
+/* Dimensional Weather CSS
+ * Optimized version with CSS variables and reduced redundancy
+ */
 
+/* Global Variables */
+:root {
+  /* Default Theme Colors */
+  --dw-color-bg: #f0f0e0;
+  --dw-color-text: #34495e;
+  --dw-color-heading: #2c3e50;
+  --dw-color-accent: #3498db;
+  --dw-color-border: #2980b9;
+  --dw-color-bg-alt: rgba(0, 0, 0, 0.05);
+  --dw-color-bg-alt-dark: rgba(255, 255, 255, 0.05);
+
+  /* Dark Sun Theme Colors */
+  --dw-athas-title-bg: #632a1a;
+  --dw-athas-body-bg: #e0bc8a;
+  --dw-athas-section-bg: #7d4529;
+  --dw-athas-highlight: #ffd54f;
+  --dw-athas-text-dark: #1e1107;
+  --dw-athas-text-light: #fff8eb;
+
+  /* Fonts */
+  --dw-font-heading: "Signika", sans-serif;
+  --dw-font-text: "Signika", sans-serif;
+  --dw-font-fantasy: "Papyrus", "Uncial Antiqua", "Luminari", fantasy;
+
+  /* UI Measurements */
+  --dw-spacing-xs: 4px;
+  --dw-spacing-sm: 8px;
+  --dw-spacing-md: 12px;
+  --dw-spacing-lg: 16px;
+  --dw-border-radius: 5px;
+  --dw-border-width: 1px;
+  --dw-border-accent-width: 2px;
+}
+
+/* Dark Mode Overrides */
+.dark-theme {
+  --dw-color-bg: #333;
+  --dw-color-text: #eee;
+  --dw-color-heading: #3498db;
+  --dw-color-bg-alt: rgba(255, 255, 255, 0.1);
+  --dw-color-border: #444;
+
+  /* Dark Sun Dark Mode */
+  --dw-athas-body-bg: #352617;
+  --dw-athas-section-bg: #4e2813;
+  --dw-athas-text-dark: #e0d0c0;
+}
+
+/* Base Styles */
 .dimensional-weather-panel {
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  background-color: rgba(255, 255, 255, 0.9);
+  padding: var(--dw-spacing-md);
+  margin-bottom: var(--dw-spacing-md);
+  border: var(--dw-border-width) solid var(--dw-color-border);
+  border-radius: var(--dw-border-radius);
+  background-color: var(--dw-color-bg);
+  color: var(--dw-color-text);
 }
 
 .dimensional-weather-title {
   font-size: 1.2em;
   font-weight: bold;
-  margin-bottom: 5px;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 5px;
+  margin-bottom: var(--dw-spacing-sm);
+  border-bottom: var(--dw-border-width) solid var(--dw-color-border);
+  padding-bottom: var(--dw-spacing-sm);
+  color: var(--dw-color-heading);
 }
 
 .dimensional-weather-dimension {
   display: flex;
   justify-content: space-between;
-  margin: 5px 0;
+  margin: var(--dw-spacing-sm) 0;
 }
 
 .dimensional-weather-dimension-name {
@@ -30,103 +83,97 @@
   text-align: right;
 }
 
-.dimensional-weather-description {
-  margin-top: 10px;
+.dimensional-weather-description,
+.dimensional-weather-effects {
+  margin-top: var(--dw-spacing-md);
+  padding-top: var(--dw-spacing-sm);
+  border-top: var(--dw-border-width) solid var(--dw-color-border);
+}
+
+/* Weather Help Styling */
+.weather-help {
+  font-family: var(--dw-font-text);
+  color: var(--dw-color-text);
+  background: var(--dw-color-bg-alt);
+  padding: var(--dw-spacing-md);
+  border-radius: var(--dw-border-radius);
+  border: var(--dw-border-width) solid var(--dw-color-border);
+}
+
+.weather-help h2,
+.weather-help h3 {
+  font-family: var(--dw-font-heading);
+  color: var(--dw-color-heading);
+  margin: var(--dw-spacing-sm) 0;
+  border-bottom: var(--dw-border-accent-width) solid var(--dw-color-accent);
+  padding-bottom: var(--dw-spacing-xs);
+}
+
+.weather-help .command {
+  margin: var(--dw-spacing-sm) 0;
+}
+
+.weather-help .command-name {
+  color: var(--dw-color-accent);
+  font-weight: bold;
+  margin-right: var(--dw-spacing-md);
+}
+
+.weather-help .command-desc {
+  color: var(--dw-color-text);
   font-style: italic;
 }
 
-.dimensional-weather-effects {
-  margin-top: 10px;
-  padding-top: 5px;
-  border-top: 1px solid #ddd;
+.weather-help .list-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--dw-spacing-sm);
 }
 
-/* Weather icons */
-.weather-icon {
-  width: 32px;
-  height: 32px;
-  display: inline-block;
-  vertical-align: middle;
-  margin-right: 5px;
+.weather-help .list-item {
+  color: var(--dw-color-text);
+  padding: var(--dw-spacing-xs) var(--dw-spacing-sm);
 }
 
-/* Dark mode support */
-.dark-mode .dimensional-weather-panel {
-  background-color: rgba(50, 50, 50, 0.9);
-  color: #eee;
-  border-color: #444;
-}
-
-.dark-mode .dimensional-weather-title,
-.dark-mode .dimensional-weather-effects {
-  border-color: #444;
-}
-
-/* Main Weather Report Styling */
+/* Weather Report Styling */
 .weather-report {
-  background: var(--color-bg) !important;
-  border: 1px solid var(--color-border-dark) !important;
-  border-radius: 5px !important;
-  padding: 10px !important;
-  margin: 5px 0 !important;
-  color: var(--color-text-dark-primary) !important;
-  font-family: "Signika", sans-serif !important;
-  font-size: 14px !important;
-  line-height: 1.4 !important;
-}
-
-/* Dark mode specific styles */
-.dark .weather-report {
-  background: rgba(0, 0, 0, 0.8) !important;
-  color: #fff !important;
+  background: var(--dw-color-bg);
+  border: var(--dw-border-width) solid var(--dw-color-border);
+  border-radius: var(--dw-border-radius);
+  padding: var(--dw-spacing-md);
+  margin: var(--dw-spacing-sm) 0;
+  color: var(--dw-color-text);
+  font-family: var(--dw-font-text);
+  font-size: 14px;
+  line-height: 1.4;
 }
 
 .weather-report h3,
-.weather-report .message-content h3,
 #chat .chat-message .message-content .weather-report h3 {
-  font-family: "Uncial Antiqua", "Papyrus", "Luminari", fantasy !important;
-  font-size: 1.4em !important;
-  font-weight: 700 !important;
-  color: #b8732d !important;
-  text-transform: uppercase !important;
-  letter-spacing: 1px !important;
-  margin: 0 0 0.5em 0 !important;
-  border-bottom: none !important;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2) !important;
-  padding: 0 !important;
-  background: none !important;
-}
-
-/* Make headings more visible in dark mode */
-.dark .weather-report h3,
-.dark .weather-report .message-content h3,
-.dark #chat .chat-message .message-content .weather-report h3 {
-  color: #deb887 !important;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4) !important;
+  font-family: var(--dw-font-fantasy);
+  font-size: 1.4em;
+  font-weight: 700;
+  color: var(--dw-color-accent);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0 0 0.5em 0;
+  border-bottom: none;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  padding: 0;
+  background: none;
 }
 
 .weather-report h4,
-.weather-report .message-content h4,
 #chat .chat-message .message-content .weather-report h4 {
-  font-family: "Uncial Antiqua", "Papyrus", "Luminari", fantasy !important;
-  font-size: 1.2em !important;
-  font-weight: 600 !important;
-  color: #b8732d !important;
-  text-transform: uppercase !important;
-  letter-spacing: 1px !important;
-  margin: 1em 0 0.5em 0 !important;
-  border-bottom: none !important;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2) !important;
-  padding: 0 !important;
-  background: none !important;
-}
-
-/* Make subheadings more visible in dark mode */
-.dark .weather-report h4,
-.dark .weather-report .message-content h4,
-.dark #chat .chat-message .message-content .weather-report h4 {
-  color: #deb887 !important;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4) !important;
+  font-family: var(--dw-font-fantasy);
+  font-size: 1.2em;
+  font-weight: 600;
+  color: var(--dw-color-accent);
+  margin: 1em 0 0.5em 0;
+  border-bottom: none;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  padding: 0;
+  background: none;
 }
 
 .weather-report p {
@@ -134,20 +181,10 @@
   text-shadow: none;
 }
 
-/* Adjust paragraph text in dark mode */
-.dark .weather-report p {
-  color: #fff;
-}
-
 .weather-report hr {
   border: none;
-  border-top: 1px solid var(--color-border-dark-secondary);
+  border-top: var(--dw-border-width) solid var(--dw-color-border);
   margin: 0.5em 0;
-}
-
-/* Adjust horizontal rule in dark mode */
-.dark .weather-report hr {
-  border-top-color: rgba(255, 255, 255, 0.2);
 }
 
 .weather-report ul {
@@ -164,84 +201,36 @@
 
 .weather-report li:before {
   content: "•";
-  color: #b8732d;
+  color: var(--dw-color-accent);
   position: absolute;
   left: 0.5em;
 }
 
-/* Make list bullets more visible in dark mode */
-.dark .weather-report li:before {
-  color: #deb887;
-}
-
-.weather-report pre {
-  background: var(--color-bg-alt);
-  border: 1px solid var(--color-border-dark-tertiary);
-  border-radius: 3px;
-  padding: 0.5em;
-  margin: 0.5em 0;
-  font-family: monospace;
-  white-space: pre-wrap;
-  color: var(--color-text-dark-primary);
-}
-
-/* Adjust pre blocks in dark mode */
-.dark .weather-report pre {
-  background: rgba(0, 0, 0, 0.3);
-  border-color: rgba(255, 255, 255, 0.1);
-  color: #fff;
-}
-
 .weather-report .terrain-type {
   font-size: 0.9em;
-  color: #b8732d;
+  color: var(--dw-color-accent);
   font-style: bold;
   margin: 0.2em 0 0.5em 0;
-}
-
-/* Make terrain type more visible in dark mode */
-.dark .weather-report .terrain-type {
-  color: #deb887;
-}
-
-/* Forecast Day Styling */
-.forecast-day {
-  margin: 1em 0;
-  padding: 0.5em;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 3px;
-}
-
-.forecast-day h4 {
-  margin: 0 0 0.5em 0;
-  color: #8b4513;
-}
-
-.forecast-day pre {
-  margin: 0;
-  background: none;
-  border: none;
-  padding: 0;
 }
 
 /* Calendar Info Styling */
 .weather-calendar {
   background: rgba(0, 0, 0, 0.8);
-  border: 1px solid #000;
-  border-radius: 5px;
-  padding: 10px;
-  margin: 5px 0;
+  border: var(--dw-border-width) solid #000;
+  border-radius: var(--dw-border-radius);
+  padding: var(--dw-spacing-md);
+  margin: var(--dw-spacing-sm) 0;
   color: #fff;
-  font-family: "Signika", sans-serif;
+  font-family: var(--dw-font-text);
   font-size: 14px;
   line-height: 1.4;
 }
 
 .weather-calendar h3 {
-  font-family: "Uncial Antiqua", "Papyrus", "Luminari", fantasy;
+  font-family: var(--dw-font-fantasy);
   font-size: 1.4em;
   font-weight: 700;
-  color: #8b4513;
+  color: var(--dw-color-accent);
   text-transform: uppercase;
   letter-spacing: 1px;
   margin: 0 0 0.5em 0;
@@ -254,124 +243,24 @@
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
-.weather-atmosphere {
-  font-style: italic;
-  color: #555;
-  margin-bottom: 12px;
-  padding: 8px;
-  background: rgba(0, 0, 0, 0.03);
-  border-radius: 4px;
-  line-height: 1.4;
-}
-
-.weather-description {
-  margin: 12px 0;
-  line-height: 1.5;
-  color: #333;
-}
-
-.weather-details {
-  background: #f8f9fa;
-  border-radius: 6px;
-  padding: 12px;
-}
-
-.weather-dimensions {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.weather-dimensions span {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.weather-dimensions i {
-  width: 16px;
-  color: #666;
-}
-
-.weather-context {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin: 12px 0;
-  padding-top: 12px;
-  border-top: 1px solid #eee;
-}
-
-.weather-context span {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #555;
-}
-
-.weather-context i {
-  color: #666;
-}
-
-.weather-effects {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid #eee;
-}
-
-.weather-effects h4 {
-  color: #c0392b;
-  margin-bottom: 8px;
-  font-size: 1.1em;
-}
-
-.weather-effects ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.weather-effects li {
-  margin: 4px 0;
-  padding-left: 20px;
-  position: relative;
-}
-
-.weather-effects li:before {
-  content: "•";
-  color: #c0392b;
-  position: absolute;
-  left: 8px;
-}
-
-/* Clean, modern Dark Sun Weather design */
-.weather-report.dark-sun {
-  /* Core colors */
-  --title-bg: #632a1a;
-  --body-bg: #e0bc8a;
-  --section-bg: #7d4529;
-  --highlight: #ffd54f;
-  --text-dark: #1e1107;
-  --text-light: #fff8eb;
-
-  background: var(--body-bg)
+/* Dark Sun Theme Specific Styles */
+.weather-report.athas {
+  background: var(--dw-athas-body-bg)
     url("https://www.transparenttextures.com/patterns/sand-paper.png");
-  border-radius: 8px;
+  border-radius: var(--dw-border-radius);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   font-family: "Segoe UI", Roboto, Ubuntu, sans-serif;
-  margin: 8px 0;
+  margin: var(--dw-spacing-sm) 0;
   overflow: hidden;
-  color: var(--text-dark);
+  color: var(--dw-athas-text-dark);
 }
 
-/* Header */
-.weather-report.dark-sun h3 {
-  background: var(--title-bg)
+.weather-report.athas h3 {
+  background: var(--dw-athas-title-bg)
     url("https://www.transparenttextures.com/patterns/dark-leather.png");
-  color: var(--highlight);
+  color: var(--dw-athas-highlight);
   margin: 0;
-  padding: 12px 15px;
+  padding: var(--dw-spacing-md) var(--dw-spacing-lg);
   font-size: 1.3rem;
   font-weight: 500;
   text-shadow: none;
@@ -380,222 +269,41 @@
   align-items: center;
 }
 
-.weather-report.dark-sun h3 i {
-  margin-right: 10px;
-  color: var(--highlight);
-}
-
-/* Content area */
-.weather-report.dark-sun .weather-content {
-  padding: 0;
-}
-
-/* Terrain label */
-.weather-report.dark-sun .terrain-item {
-  background: var(--title-bg);
-  padding: 12px 15px;
+.weather-report.athas .terrain-item {
+  background: var(--dw-athas-title-bg);
+  padding: var(--dw-spacing-md) var(--dw-spacing-lg);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.weather-report.dark-sun .terrain-item label {
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.7);
-  margin: 0;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-}
-
-.weather-report.dark-sun .terrain-item span {
-  font-size: 1.1rem;
-  color: var(--highlight);
-  font-weight: 500;
-}
-
-/* Main sections */
-.weather-report.dark-sun .weather-atmosphere,
-.weather-report.dark-sun .weather-description {
-  border-left: none;
-  padding: 15px;
-  margin: 0;
-  margin-bottom: 8px;
-  border-radius: 0;
-  font-family: "Papyrus", "Uncial Antiqua", "Luminari", fantasy;
-  text-shadow: none;
-  line-height: 1.6;
-  color: #000000;
-  font-weight: 700;
-  font-size: 1.05rem;
-}
-
-.weather-report.dark-sun .weather-atmosphere {
+.weather-report.athas .weather-atmosphere,
+.weather-report.athas .weather-description {
   position: relative;
   background: transparent;
-  padding: 15px;
+  padding: var(--dw-spacing-lg);
   margin: 0;
-  margin-bottom: 8px;
-  font-family: "Papyrus", "Uncial Antiqua", "Luminari", fantasy;
+  margin-bottom: var(--dw-spacing-sm);
+  font-family: var(--dw-font-fantasy);
   line-height: 1.6;
-  color: #000000;
+  color: var(--dw-athas-text-dark);
   font-weight: 700;
   font-size: 1.05rem;
   z-index: 0;
 }
 
-/* Make the fade more gradual with a wider transition area */
-.weather-report.dark-sun .weather-atmosphere::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: url("https://www.graphicsfuel.com/wp-content/uploads/2023/01/beach-sand-texture-01.jpg");
-  background-size: cover;
-  background-position: center;
-  opacity: 1;
-  z-index: -1;
-
-  /* Gradual fade with more steps and wider transition area */
-  -webkit-mask-image: linear-gradient(
-      to right,
-      transparent 0%,
-      rgba(0, 0, 0, 0.2) 2%,
-      rgba(0, 0, 0, 0.4) 4%,
-      rgba(0, 0, 0, 0.6) 7%,
-      rgba(0, 0, 0, 0.8) 10%,
-      black 15%,
-      black 85%,
-      rgba(0, 0, 0, 0.8) 90%,
-      rgba(0, 0, 0, 0.6) 93%,
-      rgba(0, 0, 0, 0.4) 96%,
-      rgba(0, 0, 0, 0.2) 98%,
-      transparent 100%
-    ),
-    linear-gradient(
-      to bottom,
-      transparent 0%,
-      rgba(0, 0, 0, 0.2) 2%,
-      rgba(0, 0, 0, 0.4) 4%,
-      rgba(0, 0, 0, 0.6) 7%,
-      rgba(0, 0, 0, 0.8) 10%,
-      black 15%,
-      black 85%,
-      rgba(0, 0, 0, 0.8) 90%,
-      rgba(0, 0, 0, 0.6) 93%,
-      rgba(0, 0, 0, 0.4) 96%,
-      rgba(0, 0, 0, 0.2) 98%,
-      transparent 100%
-    );
-  -webkit-mask-composite: source-in;
-  mask-image: linear-gradient(
-      to right,
-      transparent 0%,
-      rgba(0, 0, 0, 0.2) 2%,
-      rgba(0, 0, 0, 0.4) 4%,
-      rgba(0, 0, 0, 0.6) 7%,
-      rgba(0, 0, 0, 0.8) 10%,
-      black 15%,
-      black 85%,
-      rgba(0, 0, 0, 0.8) 90%,
-      rgba(0, 0, 0, 0.6) 93%,
-      rgba(0, 0, 0, 0.4) 96%,
-      rgba(0, 0, 0, 0.2) 98%,
-      transparent 100%
-    ),
-    linear-gradient(
-      to bottom,
-      transparent 0%,
-      rgba(0, 0, 0, 0.2) 2%,
-      rgba(0, 0, 0, 0.4) 4%,
-      rgba(0, 0, 0, 0.6) 7%,
-      rgba(0, 0, 0, 0.8) 10%,
-      black 15%,
-      black 85%,
-      rgba(0, 0, 0, 0.8) 90%,
-      rgba(0, 0, 0, 0.6) 93%,
-      rgba(0, 0, 0, 0.4) 96%,
-      rgba(0, 0, 0, 0.2) 98%,
-      transparent 100%
-    );
-  mask-composite: intersect;
-}
-
-/* Keep overlay very light for good text contrast */
-.weather-report.dark-sun .weather-atmosphere::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(224, 188, 138, 0.15); /* Very light overlay */
-  z-index: -1;
-}
-
-.weather-report.dark-sun .weather-atmosphere > * {
-  position: relative;
-  z-index: 2;
-  color: #000000;
-  text-shadow: 0 0 2px rgba(255, 255, 255, 0.7);
-}
-
-/* Dark mode adjustments */
-.dark-theme .weather-report.dark-sun .weather-atmosphere::after {
-  background-color: rgba(53, 38, 23, 0.5);
-}
-
-/* Alternative approach with a specific mask image (if you have this asset) */
-.weather-report.dark-sun .weather-atmosphere.with-mask {
-  -webkit-mask-image: url("../modules/dimensional-weather/assets/masks/sand-mask.webp");
-  -webkit-mask-size: 100% 100%;
-  mask-image: url("../modules/dimensional-weather/assets/masks/sand-mask.webp");
-  mask-size: 100% 100%;
-  object-fit: cover;
-  border: none;
-  border-radius: 5px;
-  width: 100%;
-}
-
-/* Dark mode adjustments */
-.dark-theme .weather-report.dark-sun .weather-atmosphere::before {
-  background-color: rgba(
-    53,
-    38,
-    23,
-    0.6
-  ); /* Use dark mode body-bg with transparency */
-}
-
-.weather-report.dark-sun .weather-description {
-  background: transparent;
-  padding: 15px;
+.weather-report.athas .weather-effects {
+  background: var(--dw-athas-section-bg);
   margin: 0;
-  margin-bottom: 8px;
-  border-radius: 0;
-  font-family: "Papyrus", "Uncial Antiqua", "Luminari", fantasy;
-  text-shadow: none;
-  line-height: 1.6;
-  color: #000000;
-  font-weight: 700;
-  font-size: 1.05rem;
-}
-
-/* Survival section */
-.weather-report.dark-sun .weather-effects {
-  background: var(--section-bg);
-  margin: 0;
-  padding: 15px;
-  color: var(--text-light);
+  padding: var(--dw-spacing-lg);
+  color: var(--dw-athas-text-light);
   border-top: none;
-  border-radius: 0;
+  border-radius: 0 0 var(--dw-border-radius) var(--dw-border-radius);
 }
 
-.weather-report.dark-sun .weather-effects h4 {
-  color: var(--highlight);
-  margin: 0 0 12px;
-  padding: 0 0 8px;
+.weather-report.athas .weather-effects h4 {
+  color: var(--dw-athas-highlight);
+  margin: 0 0 var(--dw-spacing-md);
+  padding: 0 0 var(--dw-spacing-sm);
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   font-size: 1rem;
   font-weight: 600;
@@ -603,136 +311,18 @@
   letter-spacing: 0.5px;
 }
 
-.weather-report.dark-sun .weather-effects ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
+.weather-report.athas .weather-effects li:before {
+  color: var(--dw-athas-highlight);
 }
 
-.weather-report.dark-sun .weather-effects li {
-  padding-left: 20px;
-  position: relative;
-  margin-bottom: 8px;
-  line-height: 1.4;
-}
-
-.weather-report.dark-sun .weather-effects li:before {
-  content: "•";
-  color: var(--highlight);
-  position: absolute;
-  left: 0;
-  top: 0;
-}
-
-/* Dark mode adjustments */
-.dark-theme .weather-report.dark-sun {
-  --body-bg: #352617;
-  --section-bg: #4e2813;
-  --text-dark: #e0d0c0;
-}
-
-/* Remove conflicting styles */
-.weather-report.dark-sun * {
-  box-shadow: none;
-  border-radius: 0;
-}
-
-.weather-report.dark-sun .weather-effects {
-  border-radius: 0 0 8px 8px;
-}
-
-/* Weather controls styling */
-.chat-control-icon.weather-control {
-  color: var(--athas-orange);
-}
-
-/* Media query for smaller screens */
-@media (max-width: 480px) {
-  .weather-report.dark-sun .weather-context {
-    flex-direction: column;
-  }
-
-  .weather-report.dark-sun .terrain-item {
-    margin-bottom: 8px;
-    width: 100%;
-  }
-}
-
-/* Improve overall readability */
-.weather-report.dark-sun .weather-description,
-.weather-report.dark-sun .weather-atmosphere {
-  text-shadow: none;
-  font-size: 0.95rem;
-  line-height: 1.6;
-}
-
-.weather-report.dark-sun .weather-effects li {
-  text-shadow: none;
-}
-
-/* Make heading more prominent */
-.weather-report.dark-sun h3 {
-  font-size: 1.3rem;
-  padding: 14px 16px;
-  border-bottom: 2px solid var(--athas-orange);
-}
-
-/* Better contrast for survival section heading */
-.weather-report.dark-sun .weather-effects h4 {
-  color: var(--athas-highlight);
-  font-size: 1.1rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  text-shadow: none;
-}
-
-/* Make sure all other elements have text shadows removed */
-.weather-report.dark-sun h3,
-.weather-report.dark-sun .terrain-item,
-.weather-report.dark-sun .weather-effects,
-.weather-report.dark-sun .weather-effects h4,
-.weather-report.dark-sun .weather-effects li {
-  text-shadow: none;
-}
-
-/* Add a fallback stack for Papyrus to ensure it displays well across platforms */
-@font-face {
-  font-family: "Papyrus Fallback";
-  src: local("Papyrus"), local("Papyrus-Regular");
-  font-weight: normal;
-  font-style: normal;
-}
-
-/* Make sure Papyrus is readable in dark mode too */
-.dark-theme .weather-report.dark-sun .weather-atmosphere,
-.dark-theme .weather-report.dark-sun .weather-description {
-  color: #ffffff;
-  font-weight: 600;
-}
-
-/* For dark mode, use darker backgrounds with higher contrast */
-.dark-theme .weather-report.dark-sun .weather-atmosphere {
-  background: rgba(20, 10, 0, 0.3);
-}
-
-.dark-theme .weather-report.dark-sun .weather-description {
-  background: transparent;
-  color: #ffffff;
-  font-weight: 600;
-}
-
-/* Dark mode adjustments */
-.dark-theme .weather-report.dark-sun .weather-atmosphere::before {
-  background: rgba(0, 0, 0, 0.4); /* Darker overlay for dark mode */
-}
-
+/* Settings UI */
 .dimensional-weather-settings {
   min-height: 400px;
 }
 
 .dimensional-weather-settings .window-content {
-  padding: 8px;
-  background: var(--color-background, #f0f0e0);
+  padding: var(--dw-spacing-sm);
+  background: var(--dw-color-bg);
 }
 
 .dimensional-weather-settings form {
@@ -743,58 +333,58 @@
 
 .dimensional-weather-settings .tabs {
   flex: 0;
-  margin-bottom: 8px;
-  border-bottom: 1px solid var(--color-border-dark, #666);
+  margin-bottom: var(--dw-spacing-sm);
+  border-bottom: var(--dw-border-width) solid var(--dw-color-border);
 }
 
 .dimensional-weather-settings .tabs .item {
-  padding: 8px 16px;
-  margin: 0 4px;
-  border-radius: 4px 4px 0 0;
-  background: rgba(0, 0, 0, 0.05);
+  padding: var(--dw-spacing-sm) var(--dw-spacing-lg);
+  margin: 0 var(--dw-spacing-xs);
+  border-radius: var(--dw-border-radius) var(--dw-border-radius) 0 0;
+  background: var(--dw-color-bg-alt);
   transition: all 0.3s ease;
 }
 
 .dimensional-weather-settings .tabs .item.active {
-  background: var(--color-primary, #1e88e5);
+  background: var(--dw-color-accent);
   color: white;
   border-bottom: none;
 }
 
 .dimensional-weather-settings .tabs .item:hover {
-  text-shadow: 0 0 8px var(--color-shadow-primary);
+  text-shadow: 0 0 var(--dw-spacing-sm) var(--dw-color-accent);
 }
 
 .dimensional-weather-settings .content {
   flex: 1;
   overflow-y: auto;
-  padding: 8px;
+  padding: var(--dw-spacing-sm);
 }
 
 .dimensional-weather-settings .form-group {
-  margin-bottom: 16px;
+  margin-bottom: var(--dw-spacing-lg);
 }
 
 .dimensional-weather-settings .form-group label {
   display: block;
-  margin-bottom: 4px;
+  margin-bottom: var(--dw-spacing-xs);
   font-weight: bold;
-  color: var(--color-text-dark);
+  color: var(--dw-color-text);
 }
 
 .dimensional-weather-settings .form-group select,
 .dimensional-weather-settings .form-group input[type="text"],
 .dimensional-weather-settings .form-group input[type="password"] {
   width: 100%;
-  padding: 4px 8px;
-  border: 1px solid var(--color-border-light);
-  border-radius: 4px;
+  padding: var(--dw-spacing-xs) var(--dw-spacing-sm);
+  border: var(--dw-border-width) solid var(--dw-color-border);
+  border-radius: var(--dw-border-radius);
   background: rgba(255, 255, 255, 0.8);
 }
 
 .dimensional-weather-settings .form-group .notes {
-  margin-top: 4px;
-  color: var(--color-text-dark-secondary);
+  margin-top: var(--dw-spacing-xs);
+  color: var(--dw-color-text);
   font-size: 0.9em;
   font-style: italic;
 }
@@ -802,7 +392,7 @@
 .dimensional-weather-settings .range-with-value {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--dw-spacing-sm);
 }
 
 .dimensional-weather-settings input[type="range"] {
@@ -812,123 +402,42 @@
 .dimensional-weather-settings .range-value {
   min-width: 2em;
   text-align: center;
-  padding: 2px 4px;
-  background: rgba(0, 0, 0, 0.1);
+  padding: var(--dw-spacing-xs) var(--dw-spacing-xs);
+  background: var(--dw-color-bg-alt);
   border-radius: 3px;
 }
 
-.dimensional-weather-settings .preview-weather {
-  width: 100%;
-  margin-top: 8px;
-  padding: 8px;
-  background: var(--color-primary);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.dimensional-weather-settings .preview-weather:hover {
-  background: var(--color-primary-dark);
-}
-
-.dimensional-weather-settings .sheet-footer {
-  flex: 0;
-  margin-top: 8px;
-  padding: 8px;
-  border-top: 1px solid var(--color-border-light);
-}
-
+.dimensional-weather-settings .preview-weather,
 .dimensional-weather-settings .sheet-footer button {
-  background: var(--color-primary, #1e88e5);
+  background: var(--dw-color-accent);
   color: white;
   border: none;
-  border-radius: 4px;
-  padding: 8px 16px;
+  border-radius: var(--dw-border-radius);
+  padding: var(--dw-spacing-sm) var(--dw-spacing-lg);
   cursor: pointer;
   transition: background-color 0.3s ease;
   font-weight: bold;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
+.dimensional-weather-settings .preview-weather:hover,
 .dimensional-weather-settings .sheet-footer button:hover {
-  background: var(--color-primary-dark, #1565c0);
+  background: var(--dw-color-border);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* Dark theme support */
-.dark-theme .dimensional-weather-settings .window-content {
-  background: var(--color-background-dark, #333);
-  color: var(--color-text-light);
-}
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .weather-report.athas .weather-context {
+    flex-direction: column;
+  }
 
-.dark-theme .dimensional-weather-settings .form-group select,
-.dark-theme .dimensional-weather-settings .form-group input[type="text"],
-.dark-theme .dimensional-weather-settings .form-group input[type="password"] {
-  background: rgba(0, 0, 0, 0.2);
-  color: var(--color-text-light);
-  border-color: var(--color-border-dark);
-}
+  .weather-report.athas .terrain-item {
+    margin-bottom: var(--dw-spacing-sm);
+    width: 100%;
+  }
 
-.dark-theme .dimensional-weather-settings .form-group .notes {
-  color: var(--color-text-light-secondary);
-}
-
-.dark-theme .dimensional-weather-settings .tabs .item {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.dark-theme .dimensional-weather-settings .range-value {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.weather-help {
-  font-family: "Signika", sans-serif;
-  background: rgba(0, 0, 0, 0.05);
-  border: 1px solid #999;
-  border-radius: 4px;
-  padding: 8px;
-}
-
-.weather-help h2 {
-  color: #782e22;
-  font-size: 1.2em;
-  border-bottom: 1px solid #782e22;
-  margin: 0 0 8px 0;
-  padding-bottom: 4px;
-}
-
-.weather-help h3 {
-  color: #666;
-  font-size: 1.1em;
-  margin: 8px 0 4px 0;
-}
-
-.weather-help .command {
-  margin: 4px 0;
-  padding: 2px 0 2px 8px;
-  border-left: 2px solid #782e22;
-}
-
-.weather-help .command-name {
-  color: #782e22;
-  font-weight: bold;
-}
-
-.weather-help .command-desc {
-  color: #666;
-  font-style: italic;
-  margin-left: 8px;
-}
-
-.weather-help .list-section {
-  columns: 2;
-  margin: 4px 0;
-}
-
-.weather-help .list-item {
-  margin: 2px 0;
-  padding-left: 8px;
-  break-inside: avoid;
+  .weather-help .list-section {
+    grid-template-columns: 1fr;
+  }
 }
