@@ -299,7 +299,9 @@ Create a new JSON file in the `campaign_settings` directory with the following s
 3. Click "Install Module"
 4. Paste the manifest URL and click Install
 
-
+## To Do:
+- Enable custom styles for each campaign setting. In theory, Greyhawk current weather should not look the same as Athas current weather. 
+- Create interface for building and editing custom json climate files. 
 
 
 
