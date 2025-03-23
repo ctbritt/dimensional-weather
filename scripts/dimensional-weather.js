@@ -14,6 +14,11 @@ class DimensionalWeather {
     this.settingsData = null;
     this.settingsIndex = null;
     this.initialized = false;
+    this._timePeriodCache = {
+      timestamp: 0,
+      period: null,
+    };
+    this._lastDebugTimestamp = null; // Track the last debug timestamp
   }
 
   /**
@@ -145,6 +150,25 @@ class DimensionalWeather {
           precipitation: 0,
           humidity: 0,
         },
+      });
+
+      // Register debug setting
+      game.settings.register("dimensional-weather", "debugTimePeriod", {
+        name: "Debug Time Period",
+        hint: "Enable debug logging for time period calculations",
+        scope: "world",
+        config: true,
+        type: Boolean,
+        default: false,
+      });
+
+      // Register campaign settings data (not visible in settings panel)
+      game.settings.register("dimensional-weather", "campaignSettings", {
+        name: "Campaign Settings Data",
+        scope: "world",
+        config: false,
+        type: Object,
+        default: {},
       });
     } catch (error) {
       console.error("Failed to register settings:", error);
@@ -405,9 +429,7 @@ class DimensionalWeather {
    * @private
    */
   async _saveWeatherState() {
-    const currentTime = SimpleCalendar?.api
-      ? SimpleCalendar.api.currentDateTime().timestamp
-      : Date.now();
+    const currentTime = SimpleCalendar.api.timestamp();
 
     const weatherState = {
       temperature: this.temperature,
@@ -423,7 +445,6 @@ class DimensionalWeather {
     const scene = game.scenes.viewed;
     if (scene?.id) {
       await scene.setFlag("dimensional-weather", "weatherState", weatherState);
-      await scene.setFlag("dimensional-weather", "lastUpdateTime", currentTime);
     } else {
       console.warn(
         "Dimensional Weather | No viewed scene found to save weather state"
@@ -490,13 +511,12 @@ class DimensionalWeather {
       wind: terrainData.wind,
       precipitation: terrainData.precipitation,
       humidity: terrainData.humidity,
-      lastUpdate: Date.now(),
+      lastUpdate: SimpleCalendar.api.timestamp(),
       terrain: terrain,
       season: season,
     };
 
     await scene.setFlag("dimensional-weather", "weatherState", weatherState);
-    await scene.setFlag("dimensional-weather", "lastUpdateTime", Date.now());
   }
 
   /**
@@ -522,6 +542,11 @@ class DimensionalWeather {
       return;
     }
 
+    // Get current time once at the start
+    const currentTime = SimpleCalendar?.api
+      ? SimpleCalendar.api.timestamp()
+      : Date.now();
+
     const savedState = scene.getFlag("dimensional-weather", "weatherState");
     const settings = game.settings.get("dimensional-weather", "settings");
     const autoUpdate = game.settings.get("dimensional-weather", "autoUpdate");
@@ -534,13 +559,8 @@ class DimensionalWeather {
       "variability"
     );
 
-    const currentTime = SimpleCalendar?.api
-      ? SimpleCalendar.api.currentDateTime().timestamp
-      : Date.now();
-    const lastUpdateTime =
-      scene.getFlag("dimensional-weather", "lastUpdateTime") || 0;
-    const hoursSinceLastUpdate =
-      (currentTime - lastUpdateTime) / (1000 * 60 * 60);
+    const lastUpdateTime = savedState?.lastUpdate || 0;
+    const hoursSinceLastUpdate = (currentTime - lastUpdateTime) / 3600;
 
     // If this is a forced update, we'll update regardless of time
     // If it's not forced, check if auto-update is enabled and enough time has passed
@@ -600,7 +620,7 @@ class DimensionalWeather {
     );
 
     // Apply time-of-day modifier (if available via Simple Calendar)
-    const timePeriod = this.getTimePeriod();
+    const timePeriod = this.getTimePeriod(currentTime);
     const modifiers = this.settingsData?.timeModifiers?.[timePeriod] || {};
     // Reduce the impact of time modifiers on temperature
     const finalTemperature = temperature + (modifiers.temperature || 0) / 2;
@@ -618,17 +638,16 @@ class DimensionalWeather {
 
     // Save the new weather state to scene flags
     await scene.setFlag("dimensional-weather", "weatherState", weatherState);
-    await scene.setFlag("dimensional-weather", "lastUpdateTime", currentTime);
 
     if (forced) {
-      await this.displayWeatherReport();
+      await this.displayWeatherReport(currentTime);
     }
   }
 
   /**
    * Determines the current time period based on Simple Calendar data.
    */
-  getTimePeriod() {
+  getTimePeriod(timestamp) {
     if (!SimpleCalendar?.api) {
       console.warn(
         "Dimensional Weather | Simple Calendar not available for time period"
@@ -636,12 +655,99 @@ class DimensionalWeather {
       return "Unknown Time";
     }
 
-    const { hour } = SimpleCalendar.api.currentDateTime();
-    if (hour >= 4 && hour < 7) return "Early Morning";
-    if (hour >= 7 && hour < 10) return "Noon";
-    if (hour >= 10 && hour < 16) return "Afternoon";
-    if (hour >= 16 && hour < 22) return "Night";
-    return "Late Night";
+    // Use cached value if timestamp hasn't changed
+    if (this._timePeriodCache.timestamp === timestamp) {
+      return this._timePeriodCache.period;
+    }
+
+    // If no timestamp provided, get current time from Simple Calendar
+    if (!timestamp) {
+      timestamp = SimpleCalendar.api.timestamp();
+    }
+
+    const dateData = SimpleCalendar.api.timestampToDate(timestamp);
+    const { sunrise, sunset, midday } = dateData;
+
+    // Validate the time values
+    if (sunrise === undefined || sunset === undefined || midday === undefined) {
+      console.warn(
+        "Dimensional Weather | Invalid time values from Simple Calendar"
+      );
+      return "Unknown Time";
+    }
+
+    // Calculate period boundaries in timestamps
+    const daylightDuration = sunset - sunrise;
+    const nightDuration = 24 - daylightDuration;
+
+    // Ensure durations are positive
+    if (daylightDuration <= 0 || nightDuration <= 0) {
+      console.warn("Dimensional Weather | Invalid duration calculations");
+      return "Unknown Time";
+    }
+
+    const earlyMorningEnd = sunrise + daylightDuration * 0.25;
+    const noonEnd = sunrise + daylightDuration * 0.5;
+    const afternoonEnd = sunset;
+    const nightEnd = sunset + nightDuration * 0.5;
+
+    // Debug logging only if enabled and timestamp is different from last debug
+    if (
+      game.settings.get("dimensional-weather", "debugTimePeriod") &&
+      this._lastDebugTimestamp !== timestamp
+    ) {
+      this._lastDebugTimestamp = timestamp;
+      console.log("Dimensional Weather | Time Period Debug:", {
+        currentTimestamp: timestamp,
+        sunrise,
+        sunset,
+        midday,
+        earlyMorningEnd,
+        noonEnd,
+        afternoonEnd,
+        nightEnd,
+        nightDuration,
+        normalizedTimestamp: timestamp % 24,
+        source: new Error().stack.split("\n")[2], // Get the caller's location
+      });
+    }
+
+    // Normalize timestamp to 24-hour cycle
+    const normalizedTimestamp = timestamp % 24;
+
+    // Determine current time period based on normalized timestamp
+    let period;
+    if (
+      normalizedTimestamp >= sunrise &&
+      normalizedTimestamp < earlyMorningEnd
+    ) {
+      period = "Early Morning";
+    } else if (
+      normalizedTimestamp >= earlyMorningEnd &&
+      normalizedTimestamp < noonEnd
+    ) {
+      period = "Noon";
+    } else if (
+      normalizedTimestamp >= noonEnd &&
+      normalizedTimestamp < afternoonEnd
+    ) {
+      period = "Afternoon";
+    } else if (
+      normalizedTimestamp >= afternoonEnd &&
+      normalizedTimestamp < nightEnd
+    ) {
+      period = "Night";
+    } else {
+      period = "Late Night";
+    }
+
+    // Cache the result
+    this._timePeriodCache = {
+      timestamp,
+      period,
+    };
+
+    return period;
   }
 
   /**
@@ -1062,7 +1168,7 @@ class DimensionalWeather {
       : "Unknown Terrain";
 
     const seasonDisplay = this.getCurrentSeason();
-    const timeDisplay = this.getTimePeriod();
+    const timeDisplay = this.getTimePeriod(SimpleCalendar.api.timestamp());
     const campaignId = this.settingsData?.id || "default";
 
     const chatCardText = `<div class="weather-report ${campaignId}">
@@ -1190,6 +1296,14 @@ ${forecastHtml}`;
    * @param {string} season - The new season
    */
   async setSeason(season) {
+    // If Simple Calendar is available, don't allow manual season changes
+    if (SimpleCalendar?.api) {
+      console.warn(
+        "Dimensional Weather | Cannot manually set season while using Simple Calendar"
+      );
+      return;
+    }
+
     // Handle both object and string values from settings
     const seasonKey = typeof season === "object" ? season.value : season;
 
@@ -1217,11 +1331,8 @@ ${forecastHtml}`;
    * @returns {Object} The season modifiers
    */
   getSeasonModifiers() {
-    // Only try to get season from Simple Calendar if enabled
-    if (
-      game.settings.get("dimensional-weather", "settings").useSimpleCalendar &&
-      SimpleCalendar?.api
-    ) {
+    // Try to get season from Simple Calendar first
+    if (SimpleCalendar?.api) {
       const currentSeason = SimpleCalendar.api.getCurrentSeason();
       if (currentSeason) {
         const seasonKey = currentSeason.name.toLowerCase();
@@ -1250,18 +1361,15 @@ ${forecastHtml}`;
    * @returns {string} The current season name
    */
   getCurrentSeason() {
-    // Only try to get season from Simple Calendar if enabled
-    if (
-      game.settings.get("dimensional-weather", "settings").useSimpleCalendar &&
-      SimpleCalendar?.api
-    ) {
+    // Try to get season from Simple Calendar first
+    if (SimpleCalendar?.api) {
       const currentSeason = SimpleCalendar.api.getCurrentSeason();
       if (currentSeason) {
         return currentSeason.name;
       }
     }
 
-    // Get the current scene and its weather state
+    // Fall back to our JSON-defined season
     const scene = game.scenes.viewed;
     if (!scene?.id) {
       console.warn("Dimensional Weather | No viewed scene found to get season");
@@ -1274,7 +1382,6 @@ ${forecastHtml}`;
       return "Unknown Season";
     }
 
-    // Get the season name from settings
     return (
       this.settingsData?.seasons?.[savedState.season]?.name || "Unknown Season"
     );
@@ -1285,11 +1392,8 @@ ${forecastHtml}`;
    * @returns {string} The current season description
    */
   getSeasonDescription() {
-    // Only try to get season from Simple Calendar if enabled
-    if (
-      game.settings.get("dimensional-weather", "settings").useSimpleCalendar &&
-      SimpleCalendar?.api
-    ) {
+    // Try to get season from Simple Calendar first
+    if (SimpleCalendar?.api) {
       const currentSeason = SimpleCalendar.api.getCurrentSeason();
       if (currentSeason) {
         const seasonKey = currentSeason.name.toLowerCase();
@@ -1617,6 +1721,16 @@ Hooks.once("init", async () => {
       },
     });
 
+    // Register debug setting
+    game.settings.register("dimensional-weather", "debugTimePeriod", {
+      name: "Debug Time Period",
+      hint: "Enable debug logging for time period calculations",
+      scope: "world",
+      config: true,
+      type: Boolean,
+      default: false,
+    });
+
     // Register Simple Calendar integration setting
     game.settings.register("dimensional-weather", "useSimpleCalendar", {
       name: "Use Simple Calendar",
@@ -1712,6 +1826,9 @@ Hooks.once("ready", async () => {
 
     // Load settings for the weather system
     await game.dimWeather.loadSettings();
+
+    // Set initialization flag
+    game.dimWeather.initialized = true;
 
     console.log("Dimensional Weather | Module initialized successfully");
   } catch (error) {
@@ -2095,6 +2212,29 @@ Hooks.on("chatCommandsReady", (commands) => {
               whisper: [game.user.id],
             };
 
+          case "debug":
+            if (!game.user.isGM) {
+              ui.notifications.warn("Only the GM can toggle debug mode.");
+              return;
+            }
+            // Toggle debug mode using the global setting
+            const currentDebug = game.settings.get(
+              "dimensional-weather",
+              "debugTimePeriod"
+            );
+            await game.settings.set(
+              "dimensional-weather",
+              "debugTimePeriod",
+              !currentDebug
+            );
+            return {
+              content: `Time period debug logging ${
+                !currentDebug ? "enabled" : "disabled"
+              }.`,
+              speaker: { alias: "Dimensional Weather" },
+              whisper: [game.user.id],
+            };
+
           case "terrains":
             const availableTerrains = Object.entries(
               game.dimWeather.settingsData.terrains
@@ -2135,6 +2275,7 @@ Hooks.on("chatCommandsReady", (commands) => {
           { cmd: "forecast", desc: "Show weather forecast" },
           { cmd: "season", desc: "Change current season" },
           { cmd: "settings", desc: "Open weather settings panel" },
+          { cmd: "debug", desc: "Toggle time period debug logging" },
           { cmd: "help", desc: "Show weather command help" },
         ];
 
@@ -2355,32 +2496,138 @@ Hooks.on("chatCommandsReady", (commands) => {
 
 // Hook into Simple Calendar's time change event
 Hooks.on("simple-calendar-time-change", async () => {
-  if (game.dimWeather) {
-    const updateFrequency = game.settings.get(
-      "dimensional-weather",
-      "updateFrequency"
-    );
-    const lastUpdateTime = game.settings.get(
-      "dimensional-weather",
-      "lastUpdateTime"
-    );
-    const currentTime = SimpleCalendar.api.currentDateTime().timestamp;
-    const hoursSinceLastUpdate =
-      (currentTime - lastUpdateTime) / (1000 * 60 * 60);
+  // Wait for weather system to be initialized
+  if (!game.dimWeather?.initialized) {
+    return;
+  }
 
-    if (hoursSinceLastUpdate >= updateFrequency) {
-      console.log("Dimensional Weather | Time-based weather update triggered");
-      await game.dimWeather.updateWeather(true);
+  // Check if Simple Calendar is available and initialized
+  if (!SimpleCalendar.api.currentDateTime) {
+    console.warn(
+      "Dimensional Weather | Simple Calendar API not fully initialized"
+    );
+    return;
+  }
+
+  const autoUpdate = game.settings.get("dimensional-weather", "autoUpdate");
+  console.log("Dimensional Weather | Auto update:", autoUpdate);
+  if (!autoUpdate) return;
+
+  const updateFrequency = game.settings.get(
+    "dimensional-weather",
+    "updateFrequency"
+  );
+  console.log("Dimensional Weather | Update frequency:", updateFrequency);
+  const scene = game.scenes.viewed;
+  console.log("Dimensional Weather | Scene:", scene);
+  if (!scene?.id) return;
+
+  const savedState = scene.getFlag("dimensional-weather", "weatherState");
+  const lastUpdateTime = savedState?.lastUpdate || 0;
+  console.log("Dimensional Weather | Last update time:", lastUpdateTime);
+  const currentTime = SimpleCalendar.api.timestamp();
+  console.log("Dimensional Weather | Current time:", currentTime);
+  const hoursSinceLastUpdate = (currentTime - lastUpdateTime) / 3600;
+  console.log(
+    "Dimensional Weather | Hours since last update:",
+    hoursSinceLastUpdate
+  );
+
+  if (hoursSinceLastUpdate >= updateFrequency) {
+    console.log("Dimensional Weather | Time-based weather update triggered");
+    await game.dimWeather.updateWeather(true);
+  }
+});
+
+// Hook into scene activation to load weather state and check for updates
+Hooks.on("canvasReady", async () => {
+  // Wait for weather system to be initialized
+  if (!game.dimWeather?.initialized) {
+    return;
+  }
+
+  // Check if Simple Calendar is available and initialized
+  if (!SimpleCalendar?.api?.currentDateTime) {
+    console.warn(
+      "Dimensional Weather | Simple Calendar API not fully initialized"
+    );
+    return;
+  }
+
+  console.log(
+    "Dimensional Weather | Scene activated, checking for saved weather state"
+  );
+  await game.dimWeather.loadSceneWeather();
+
+  // Check if we need to update weather when scene is activated
+  const autoUpdate = game.settings.get("dimensional-weather", "autoUpdate");
+  if (autoUpdate) {
+    const scene = game.scenes.viewed;
+    if (scene?.id) {
+      const savedState = scene.getFlag("dimensional-weather", "weatherState");
+      const lastUpdateTime = savedState?.lastUpdate || 0;
+      const currentTime = SimpleCalendar.api.timestamp();
+      const updateFrequency = game.settings.get(
+        "dimensional-weather",
+        "updateFrequency"
+      );
+      const hoursSinceLastUpdate = (currentTime - lastUpdateTime) / 3600;
+
+      if (hoursSinceLastUpdate >= updateFrequency) {
+        console.log(
+          "Dimensional Weather | Scene activation weather update triggered"
+        );
+        await game.dimWeather.updateWeather(true);
+      }
     }
   }
 });
 
-// Hook into scene activation to load weather state
-Hooks.on("canvasReady", async () => {
-  if (game.dimWeather) {
-    console.log(
-      "Dimensional Weather | Scene activated, checking for saved weather state"
-    );
-    await game.dimWeather.loadSceneWeather();
+// Hook into game time changes
+Hooks.on("updateWorldTime", async (worldTime, dt) => {
+  // Wait for weather system to be initialized
+  if (!game.dimWeather?.initialized) {
+    return;
   }
+
+  // Check if Simple Calendar is available and initialized
+  if (!SimpleCalendar?.api?.currentDateTime) {
+    console.warn(
+      "Dimensional Weather | Simple Calendar API not fully initialized"
+    );
+    return;
+  }
+
+  const autoUpdate = game.settings.get("dimensional-weather", "autoUpdate");
+  if (!autoUpdate) return;
+
+  const updateFrequency = game.settings.get(
+    "dimensional-weather",
+    "updateFrequency"
+  );
+  const scene = game.scenes.viewed;
+  if (!scene?.id) return;
+
+  const savedState = scene.getFlag("dimensional-weather", "weatherState");
+  const lastUpdateTime = savedState?.lastUpdate || 0;
+  const currentTime = SimpleCalendar.api.timestamp();
+  const hoursSinceLastUpdate = (currentTime - lastUpdateTime) / 3600;
+
+  if (hoursSinceLastUpdate >= updateFrequency) {
+    console.log(
+      "Dimensional Weather | Game-time based weather update triggered"
+    );
+    await game.dimWeather.updateWeather(true);
+  }
+});
+
+// Add a hook to wait for Simple Calendar to be ready
+Hooks.once("simple-calendar-ready", async () => {
+  // Wait for weather system to be initialized
+  if (!game.dimWeather?.initialized) {
+    return;
+  }
+
+  console.log("Dimensional Weather | Simple Calendar is ready");
+  await game.dimWeather.loadSceneWeather();
 });
