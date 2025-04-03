@@ -476,21 +476,30 @@ class WeatherSimulator {
     const duration = parseInt(document.getElementById("duration").value) * 24; // Convert days to hours
     const timeStep = parseInt(document.getElementById("timeStep").value); // Hours
 
-    this.currentTime = 0;
     const initial = this.getInitialConditions();
     this.updateWeather(initial);
 
     document.getElementById("startSimulation").disabled = true;
     document.getElementById("stopSimulation").disabled = false;
 
-    this.simulationInterval = setInterval(() => {
-      this.currentTime += timeStep;
-      this.updateWeather();
+    // Get the current game time
+    const gameTime = game.time.worldTime;
+    this.lastUpdateTime = gameTime;
 
-      if (this.currentTime >= duration) {
+    this.simulationInterval = setInterval(() => {
+      const currentGameTime = game.time.worldTime;
+      const timeDiff = currentGameTime - this.lastUpdateTime;
+
+      // Only update if enough game time has passed
+      if (timeDiff >= timeStep) {
+        this.lastUpdateTime = currentGameTime;
+        this.updateWeather();
+      }
+
+      if (currentGameTime - gameTime >= duration) {
         this.stopSimulation();
       }
-    }, 1000); // Update every second
+    }, 1000); // Check every second
   }
 
   stopSimulation() {
