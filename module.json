@@ -16,6 +16,10 @@
     }
   ],
   "esmodules": [
+    "scripts/time-utils.js",
+    "scripts/scene-manager.js",
+    "scripts/state-manager.js",
+    "scripts/weather-calculator.js",
     "scripts/command-system.js",
     "scripts/main.js"
   ],

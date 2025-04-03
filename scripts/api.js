@@ -4,9 +4,11 @@
  */
 
 import { Settings } from "./settings.js";
-import { WeatherEngine } from "./weather-engine.js";
+import { WeatherEngine } from "./weather-engine-optimized.js";
 import { UIController } from "./ui-controller.js";
-import { SceneUtils, ErrorHandler, Cache } from "./utils.js";
+import { ErrorHandler, Cache } from "./utils.js";
+import { SceneManager } from "./scene-manager.js";
+import { StateManager } from "./state-manager.js";
 import { WeatherDescriptionService } from "./services/weather-description.js";
 
 export class DimensionalWeatherAPI {
@@ -19,6 +21,7 @@ export class DimensionalWeatherAPI {
     this.ui = null;
     this.descriptionService = null;
     this.settingsData = null;
+    this.stateManager = null;
     this.isChatCommand = false; // Flag to prevent settings onChange loops
   }
 
@@ -28,6 +31,10 @@ export class DimensionalWeatherAPI {
    */
   async initialize() {
     try {
+      // Initialize state manager
+      this.stateManager = new StateManager();
+      await this.stateManager.initialize();
+      
       // Load campaign settings
       this.settingsData = await this._loadCampaignSettings();
 
@@ -104,10 +111,10 @@ export class DimensionalWeatherAPI {
       // Update scene flags if a scene is active
       const scene = game.scenes.viewed;
       if (scene?.id) {
-        await SceneUtils.updateFlags(scene, "weatherState", {
+        await SceneManager.updateWeatherState({
           terrain: defaultTerrain,
-          season: defaultSeason,
-        });
+          season: defaultSeason
+        }, scene);
       }
 
       // Update settings
@@ -198,9 +205,7 @@ export class DimensionalWeatherAPI {
       // Update scene flags with new terrain
       const scene = game.scenes.viewed;
       if (scene?.id) {
-        await SceneUtils.updateFlags(scene, "weatherState", {
-          terrain: terrainKey,
-        });
+        await SceneManager.setWeatherAttribute("terrain", terrainKey, scene);
 
         // Update settings
         await Settings.updateSetting("terrain", terrainKey);
@@ -246,9 +251,7 @@ export class DimensionalWeatherAPI {
       // Update scene flags with new season
       const scene = game.scenes.viewed;
       if (scene?.id) {
-        await SceneUtils.updateFlags(scene, "weatherState", {
-          season: seasonKey,
-        });
+        await SceneManager.setWeatherAttribute("season", seasonKey, scene);
 
         // Update settings
         await Settings.updateSetting("season", seasonKey);
@@ -293,7 +296,7 @@ export class DimensionalWeatherAPI {
       return { initialized: false };
     }
 
-    const weatherState = SceneUtils.getWeatherState();
+    const weatherState = SceneManager.getWeatherState();
     if (!weatherState) {
       return { initialized: true, weatherAvailable: false };
     }
@@ -405,6 +408,13 @@ export class DimensionalWeatherAPI {
    */
   clearCaches() {
     Cache.clear();
+    if (this.stateManager) {
+      this.stateManager.clearCaches();
+    }
+    // Import these directly to avoid circular dependencies
+    import("./time-utils.js").then(module => {
+      module.TimeUtils.clearCache();
+    });
   }
 
   /**
