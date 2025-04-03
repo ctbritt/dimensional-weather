@@ -4,7 +4,8 @@
  */
 
 import { Settings } from "./settings.js";
-import { ErrorHandler, SceneUtils } from "./utils.js";
+import { ErrorHandler } from "./utils.js";
+import { SceneManager } from "./scene-manager.js";
 
 export class WeatherCommandSystem {
   /**
