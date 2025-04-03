@@ -18,10 +18,13 @@ export class SceneManager {
    * @returns {Object|null} Current weather state or null if not available
    */
   static getWeatherState(scene = null) {
+    // If no scene is provided and no scene is being viewed, return null
+    if (!scene && !game.scenes?.viewed) return null;
+
     const currentScene = scene || game.scenes.viewed;
     if (!currentScene?.id) return null;
-    
-    return currentScene.getFlag(this.MODULE_ID, "weatherState");
+
+    return currentScene.getFlag(this.MODULE_ID, "weatherState") || null;
   }
 
   /**
@@ -37,17 +40,17 @@ export class SceneManager {
         ErrorHandler.logAndNotify("No scene available to update", null, true);
         return false;
       }
-      
+
       // Get current state
       const currentState = this.getWeatherState(currentScene) || {};
-      
+
       // Create new state
       const newState = {
         ...currentState,
         ...updates,
-        lastUpdate: Date.now()
+        lastUpdate: Date.now(),
       };
-      
+
       // Update scene flag
       await currentScene.setFlag(this.MODULE_ID, "weatherState", newState);
       return true;
@@ -80,7 +83,7 @@ export class SceneManager {
         ErrorHandler.logAndNotify("No scene available to reset", null, true);
         return false;
       }
-      
+
       await currentScene.unsetFlag(this.MODULE_ID, "weatherState");
       return true;
     } catch (error) {
@@ -98,23 +101,27 @@ export class SceneManager {
   static async initializeWeatherState(scene, initialState) {
     try {
       if (!scene?.id) {
-        ErrorHandler.logAndNotify("No scene provided to initialize", null, true);
+        ErrorHandler.logAndNotify(
+          "No scene provided to initialize",
+          null,
+          true
+        );
         return false;
       }
-      
+
       // Check if state already exists
       const existingState = scene.getFlag(this.MODULE_ID, "weatherState");
       if (existingState) {
         console.log("Dimensional Weather | Scene already has weather state");
         return false;
       }
-      
+
       // Add timestamp to initial state
       const stateWithTimestamp = {
         ...initialState,
-        lastUpdate: Date.now()
+        lastUpdate: Date.now(),
       };
-      
+
       // Set scene flag
       await scene.setFlag(this.MODULE_ID, "weatherState", stateWithTimestamp);
       return true;
@@ -132,11 +139,13 @@ export class SceneManager {
    */
   static isUpdateNeeded(weatherState, updateFrequency) {
     if (!weatherState?.lastUpdate) return true;
-    
+
     const lastUpdateTime = weatherState.lastUpdate;
-    const currentTime = SimpleCalendar?.api ? SimpleCalendar.api.timestamp() : Date.now();
+    const currentTime = SimpleCalendar?.api
+      ? SimpleCalendar.api.timestamp()
+      : Date.now();
     const hoursSinceLastUpdate = (currentTime - lastUpdateTime) / 3600;
-    
+
     return hoursSinceLastUpdate >= updateFrequency;
   }
 }

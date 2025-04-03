@@ -51,10 +51,9 @@ export class DimensionalWeatherAPI {
       this.initialized = true;
       console.log("Dimensional Weather API | Initialized successfully");
 
-      // Initialize weather for current scene
-      const scene = game.scenes.viewed;
-      if (scene?.id) {
-        await this.engine.initializeWeather(scene);
+      // Initialize weather for current scene if it exists
+      if (game.scenes?.viewed?.id) {
+        await this.engine.initializeWeather(game.scenes.viewed);
       }
 
       return true;

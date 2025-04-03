@@ -18,7 +18,7 @@ export class StateManager {
     this.cache = {
       terrains: new Map(),
       seasons: new Map(),
-      timeModifiers: new Map()
+      timeModifiers: new Map(),
     };
   }
 
@@ -31,10 +31,10 @@ export class StateManager {
       // Load settings data
       const campaignId = Settings.getCurrentCampaign();
       this.settingsData = await Settings.loadCampaignSetting(campaignId);
-      
+
       // Cache current weather state
       this.refreshCurrentWeather();
-      
+
       return true;
     } catch (error) {
       ErrorHandler.logAndNotify("Failed to initialize state manager", error);
@@ -47,7 +47,14 @@ export class StateManager {
    * @returns {Object|null} Current weather state
    */
   refreshCurrentWeather() {
-    this.currentWeather = SceneManager.getWeatherState();
+    // If no scene is being viewed, set current weather to null
+    if (!game.scenes?.viewed) {
+      this.currentWeather = null;
+      return null;
+    }
+
+    // Get weather state, default to null if undefined or not set
+    this.currentWeather = SceneManager.getWeatherState() || null;
     return this.currentWeather;
   }
 
@@ -71,19 +78,22 @@ export class StateManager {
       if (!newSettingsData) {
         throw new Error(`Campaign setting not found: ${campaignId}`);
       }
-      
+
       // Update settings data
       this.settingsData = newSettingsData;
-      
+
       // Clear caches
       this.clearCaches();
-      
+
       // Notify listeners
-      this._notifyListeners({ type: 'campaignChange', campaignId });
-      
+      this._notifyListeners({ type: "campaignChange", campaignId });
+
       return true;
     } catch (error) {
-      ErrorHandler.logAndNotify(`Error updating campaign setting: ${campaignId}`, error);
+      ErrorHandler.logAndNotify(
+        `Error updating campaign setting: ${campaignId}`,
+        error
+      );
       return false;
     }
   }
@@ -123,13 +133,13 @@ export class StateManager {
     if (this.cache.terrains.has(key)) {
       return this.cache.terrains.get(key);
     }
-    
+
     // Get from settings data
     const terrain = this.settingsData?.terrains?.[key];
     if (terrain) {
       this.cache.terrains.set(key, terrain);
     }
-    
+
     return terrain || null;
   }
 
@@ -143,13 +153,13 @@ export class StateManager {
     if (this.cache.seasons.has(key)) {
       return this.cache.seasons.get(key);
     }
-    
+
     // Get from settings data
     const season = this.settingsData?.seasons?.[key];
     if (season) {
       this.cache.seasons.set(key, season);
     }
-    
+
     return season || null;
   }
 
@@ -163,18 +173,18 @@ export class StateManager {
     if (this.cache.timeModifiers.has(timePeriod)) {
       return this.cache.timeModifiers.get(timePeriod);
     }
-    
+
     // Get from settings data
     const modifiers = this.settingsData?.timeModifiers?.[timePeriod] || {
       temperature: 0,
       wind: 0,
       precipitation: 0,
-      humidity: 0
+      humidity: 0,
     };
-    
+
     // Cache the result
     this.cache.timeModifiers.set(timePeriod, modifiers);
-    
+
     return modifiers;
   }
 
@@ -183,7 +193,10 @@ export class StateManager {
    * @returns {string} Default terrain key
    */
   getDefaultTerrain() {
-    return this.settingsData?.defaultTerrain || Object.keys(this.settingsData?.terrains || {})[0];
+    return (
+      this.settingsData?.defaultTerrain ||
+      Object.keys(this.settingsData?.terrains || {})[0]
+    );
   }
 
   /**
