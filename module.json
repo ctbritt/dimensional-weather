@@ -2,7 +2,7 @@
   "id": "dimensional-weather",
   "title": "Dimensional Weather",
   "description": "A dynamic weather system for Foundry VTT, providing a modular system for developing your own climes, terrains, and atmospheric phenomenon.",
-  "version": "1.2.1",
+  "version": "#{VERSION}#",
   "compatibility": {
     "minimum": "12",
     "verified": "13",
@@ -52,9 +52,9 @@
       "flags": {}
     }
   ],
-  "url": "https://github.com/ctbritt/dimensional-weather",
-  "manifest": "https://github.com/ctbritt/dimensional-weather/releases/latest/download/module.json",
-  "download": "https://github.com/ctbritt/dimensional-weather/releases/download/v1.2.1/dimensional-weather.zip",
+  "url": "#{URL}#",
+  "manifest": "#{MANIFEST}#",
+  "download": "#{DOWNLOAD}#",
   "license": "MIT",
   "readme": "README.md",
   "bugs": "https://github.com/ctbritt/dimensional-weather/issues",
