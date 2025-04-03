@@ -113,7 +113,6 @@ When AI descriptions are enabled:
 Available chat commands:
 
 - `/weather` - Display current weather (available to all)
-- `/weather campaign [setting]` - Change campaign setting (GM only)
 - `/weather terrain [type]` - Change terrain type (GM only)
 - `/weather season [name]` - Change current season (GM only)
 - `/weather update` - Force weather update (GM only)

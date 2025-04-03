@@ -119,11 +119,6 @@ export class ChatCommands {
         };
       }
 
-      // Handle campaign command - available to GMs only
-      if (subcommand === "campaign") {
-        return await this._handleCampaignCommand(args);
-      }
-
       // Only allow GMs to use other subcommands
       if (!game.user.isGM) {
         ui.notifications.warn("Only the GM can modify weather conditions.");
@@ -132,103 +127,135 @@ export class ChatCommands {
       }
 
       switch (subcommand) {
+        case "update":
+          await this.api.updateWeather();
+          return {
+            content: "Weather updated.",
+            speaker: { alias: "Dimensional Weather" },
+            whisper: [game.user.id],
+          };
+
         case "terrain":
           return await this._handleTerrainCommand(args);
 
         case "season":
           return await this._handleSeasonCommand(args);
 
-        case "update":
-          await this.api.updateWeather();
-          await this.api.displayWeather();
-          break;
-
         case "random":
           return await this._handleRandomCommand(args);
 
         case "stats":
-          return await this._handleStatsCommand();
+          const scene = game.scenes.viewed;
+          if (!scene?.id) {
+            return {
+              content: "No active scene.",
+              speaker: { alias: "Dimensional Weather" },
+              whisper: ChatMessage.getWhisperRecipients("GM"),
+            };
+          }
+
+          const weatherState = scene.getFlag(
+            "dimensional-weather",
+            "weatherState"
+          );
+          if (!weatherState) {
+            return {
+              content: "No weather state found for current scene.",
+              speaker: { alias: "Dimensional Weather" },
+              whisper: ChatMessage.getWhisperRecipients("GM"),
+            };
+          }
+
+          const terrain = this.api.settingsData.terrains[weatherState.terrain];
+          const season = this.api.settingsData.seasons[weatherState.season];
+
+          return {
+            content: `<div class="weather-report"><h3>SCENE WEATHER STATS</h3><h4>Current State</h4><ul><li>Terrain: ${
+              terrain.name
+            }</li><li>Season: ${season.name}</li><li>Variability: ${
+              weatherState.variability || 0
+            }</li></ul><h4>Base Values</h4><ul><li>Temperature: ${
+              terrain.temperature
+            }</li><li>Wind: ${terrain.wind}</li><li>Precipitation: ${
+              terrain.precipitation
+            }</li><li>Humidity: ${terrain.humidity}</li></ul></div>`,
+            speaker: { alias: "Dimensional Weather" },
+            whisper: ChatMessage.getWhisperRecipients("GM"),
+          };
 
         case "forecast":
-          const forecast = await this.api.displayForecast();
+          const forecast = await this.api.generateForecast();
           return {
             content: forecast,
             speaker: { alias: "Dimensional Weather" },
+            whisper: ChatMessage.getWhisperRecipients("GM"),
           };
 
         case "calc":
-          if (!game.user.isGM) {
-            ui.notifications.warn("Only GMs can use the calc command.");
-            return;
-          }
-          const calc = this.api.engine.getLastCalculation();
+          const calc = await this.api.engine.getLastCalculation();
           if (!calc) {
-            ui.notifications.warn("No weather calculation data available.");
-            return;
+            return {
+              content: "No weather calculation data available.",
+              speaker: { alias: "Dimensional Weather" },
+              whisper: ChatMessage.getWhisperRecipients("GM"),
+            };
           }
 
-          const details = `<div class="weather-report">
-            <h3>Weather Calculation Details</h3>
-            <hr>
-            <h4>Base Values (${calc.terrain.name})</h4>
-            <ul>
-              <li>Temperature: ${calc.terrain.baseTemp}</li>
-              <li>Wind: ${calc.terrain.baseWind}</li>
-              <li>Precipitation: ${calc.terrain.basePrecip}</li>
-              <li>Humidity: ${calc.terrain.baseHumid}</li>
-            </ul>
-            ${
-              calc.previous
-                ? `
-            <h4>Previous Values</h4>
-            <ul>
-              <li>Temperature: ${calc.previous.temp}</li>
-              <li>Wind: ${calc.previous.wind}</li>
-              <li>Precipitation: ${calc.previous.precip}</li>
-              <li>Humidity: ${calc.previous.humid}</li>
-            </ul>`
-                : ""
-            }
-            <h4>Random Factors (Variability: ${calc.variability})</h4>
-            <ul>
-              <li>Temperature: ${calc.randomFactors.temp.toFixed(2)}</li>
-              <li>Wind: ${calc.randomFactors.wind.toFixed(2)}</li>
-              <li>Precipitation: ${calc.randomFactors.precip.toFixed(2)}</li>
-              <li>Humidity: ${calc.randomFactors.humid.toFixed(2)}</li>
-            </ul>
-            <h4>Time Modifiers (${calc.timePeriod})</h4>
-            <ul>
-              <li>Temperature: ${calc.timeModifiers.temperature || 0}</li>
-              <li>Wind: ${calc.timeModifiers.wind || 0}</li>
-              <li>Precipitation: ${calc.timeModifiers.precipitation || 0}</li>
-              <li>Humidity: ${calc.timeModifiers.humidity || 0}</li>
-            </ul>
-            <h4>Season Modifiers (${calc.season})</h4>
-            <ul>
-              <li>Temperature: ${calc.seasonModifiers.temperature || 0}</li>
-              <li>Wind: ${calc.seasonModifiers.wind || 0}</li>
-              <li>Precipitation: ${calc.seasonModifiers.precipitation || 0}</li>
-              <li>Humidity: ${calc.seasonModifiers.humidity || 0}</li>
-            </ul>
-            <h4>Intermediate Values (After Random)</h4>
-            <ul>
-              <li>Temperature: ${calc.intermediate.temp}</li>
-              <li>Wind: ${calc.intermediate.wind}</li>
-              <li>Precipitation: ${calc.intermediate.precip}</li>
-              <li>Humidity: ${calc.intermediate.humid}</li>
-            </ul>
-            <h4>Final Values (After Modifiers)</h4>
-            <ul>
-              <li>Temperature: ${calc.final.temp}</li>
-              <li>Wind: ${calc.final.wind}</li>
-              <li>Precipitation: ${calc.final.precip}</li>
-              <li>Humidity: ${calc.final.humid}</li>
-            </ul>
-          </div>`;
+          const details = `<div class="weather-report"><h3>WEATHER CALCULATION DETAILS</h3><h4>Base Values (${
+            calc.terrain.name
+          })</h4><ul><li>Temperature: ${calc.terrain.baseTemp}</li><li>Wind: ${
+            calc.terrain.baseWind
+          }</li><li>Precipitation: ${
+            calc.terrain.basePrecip
+          }</li><li>Humidity: ${calc.terrain.baseHumid}</li></ul>${
+            calc.previous
+              ? `<h4>Previous Values</h4><ul><li>Temperature: ${calc.previous.temp}</li><li>Wind: ${calc.previous.wind}</li><li>Precipitation: ${calc.previous.precip}</li><li>Humidity: ${calc.previous.humid}</li></ul>`
+              : ""
+          }<h4>Random Factors (Variability: ${
+            calc.variability
+          })</h4><ul><li>Temperature: ${calc.randomFactors.temp.toFixed(
+            2
+          )}</li><li>Wind: ${calc.randomFactors.wind.toFixed(
+            2
+          )}</li><li>Precipitation: ${calc.randomFactors.precip.toFixed(
+            2
+          )}</li><li>Humidity: ${calc.randomFactors.humid.toFixed(
+            2
+          )}</li></ul><h4>Time Modifiers (${
+            calc.timePeriod
+          })</h4><ul><li>Temperature: ${
+            calc.timeModifiers.temperature || 0
+          }</li><li>Wind: ${
+            calc.timeModifiers.wind || 0
+          }</li><li>Precipitation: ${
+            calc.timeModifiers.precipitation || 0
+          }</li><li>Humidity: ${
+            calc.timeModifiers.humidity || 0
+          }</li></ul><h4>Season Modifiers (${
+            calc.season
+          })</h4><ul><li>Temperature: ${
+            calc.seasonModifiers.temperature || 0
+          }</li><li>Wind: ${
+            calc.seasonModifiers.wind || 0
+          }</li><li>Precipitation: ${
+            calc.seasonModifiers.precipitation || 0
+          }</li><li>Humidity: ${
+            calc.seasonModifiers.humidity || 0
+          }</li></ul><h4>Intermediate Values (After Random)</h4><ul><li>Temperature: ${
+            calc.intermediate.temp
+          }</li><li>Wind: ${calc.intermediate.wind}</li><li>Precipitation: ${
+            calc.intermediate.precip
+          }</li><li>Humidity: ${
+            calc.intermediate.humid
+          }</li></ul><h4>Final Values (After Modifiers)</h4><ul><li>Temperature: ${
+            calc.final.temp
+          }</li><li>Wind: ${calc.final.wind}</li><li>Precipitation: ${
+            calc.final.precip
+          }</li><li>Humidity: ${calc.final.humid}</li></ul></div>`;
 
           return {
             content: details,
-            speaker: { alias: "Dimensional Weather Calculation" },
+            speaker: { alias: "Dimensional Weather" },
             whisper: ChatMessage.getWhisperRecipients("GM"),
           };
 
@@ -254,7 +281,16 @@ export class ChatCommands {
             ui.notifications.warn("Only the GM can access weather settings.");
             return;
           }
-          game.dimWeatherSettings.render(true);
+          // Open settings with module filter
+          const app = new game.settings.menus.get("core.moduleSettings");
+          if (app) {
+            const options = { filterModule: "dimensional-weather" };
+            app.render(true, options);
+          } else {
+            // Fallback to basic settings
+            const settings = new SettingsConfig();
+            settings.render(true);
+          }
           return {
             content: "Opening weather settings panel...",
             speaker: { alias: "Dimensional Weather" },
@@ -335,72 +371,6 @@ export class ChatCommands {
         speaker: { alias: "Dimensional Weather" },
         whisper: [game.user.id],
       };
-    }
-  }
-
-  /**
-   * Handle the campaign subcommand
-   * @private
-   * @param {string[]} args - Command arguments
-   * @returns {Promise<Object>} Message data
-   */
-  async _handleCampaignCommand(args) {
-    if (!game.user.isGM) {
-      ui.notifications.warn("Only the GM can change campaign settings.");
-      return;
-    }
-
-    if (args.length < 2) {
-      ui.notifications.warn(
-        "Please specify a campaign setting. Use /weather help for available options."
-      );
-      return;
-    }
-
-    const settingId = args[1].toLowerCase();
-    const settingsIndex = await Settings.loadSettingsIndex();
-
-    if (!settingsIndex) {
-      return {
-        content: "Failed to load settings index.",
-        speaker: { alias: "Dimensional Weather" },
-        whisper: [game.user.id],
-      };
-    }
-
-    const setting = settingsIndex.campaignSettings.find(
-      (s) => s.id.toLowerCase() === settingId
-    );
-
-    if (!setting) {
-      ui.notifications.warn(
-        `Invalid campaign setting: ${settingId}. Use /weather help for available options.`
-      );
-      return;
-    }
-
-    // Update the campaign setting
-    this.api.isChatCommand = true;
-    try {
-      // Update the campaign setting
-      const success = await this.api.updateCampaignSetting(setting.id);
-
-      if (!success) {
-        return {
-          content: `Failed to update campaign setting to ${setting.name}.`,
-          speaker: { alias: "Dimensional Weather" },
-          whisper: [game.user.id],
-        };
-      }
-
-      return {
-        content: `Campaign setting changed to ${setting.name}.`,
-        speaker: { alias: "Dimensional Weather" },
-        whisper: [game.user.id],
-      };
-    } finally {
-      // Always reset the chat command flag
-      this.api.isChatCommand = false;
     }
   }
 
@@ -581,25 +551,6 @@ export class ChatCommands {
   }
 
   /**
-   * Handle the stats subcommand
-   * @private
-   * @returns {Promise<Object>} Message data
-   */
-  async _handleStatsCommand() {
-    const stats = this.api.getWeatherStats();
-
-    return {
-      content: `Weather Statistics (GM Only):\n${JSON.stringify(
-        stats,
-        null,
-        2
-      )}`,
-      speaker: { alias: "Dimensional Weather" },
-      whisper: [game.user.id],
-    };
-  }
-
-  /**
    * Provide autocomplete suggestions for the /weather command
    * @private
    * @param {Object} menu - Autocomplete menu
@@ -620,7 +571,6 @@ export class ChatCommands {
       // Define available subcommands
       const subcommands = [
         { cmd: "terrain", desc: "Set the current terrain type" },
-        { cmd: "campaign", desc: "Change campaign setting" },
         { cmd: "update", desc: "Force weather update" },
         { cmd: "random", desc: "Set weather variability (0-10)" },
         { cmd: "stats", desc: "Display weather statistics" },
@@ -667,14 +617,6 @@ export class ChatCommands {
       // Handle season subcommand
       if (args[0] === "season" || (args[0] && "season".startsWith(args[0]))) {
         return this._autocompleteSeasonCommand(alias, args);
-      }
-
-      // Handle campaign subcommand
-      if (
-        args[0] === "campaign" ||
-        (args[0] && "campaign".startsWith(args[0]))
-      ) {
-        return this._autocompleteCampaignCommand(alias, args);
       }
 
       // Show matching subcommands based on partial input
@@ -780,59 +722,6 @@ export class ChatCommands {
           game.chatCommands.createCommandElement(
             `${alias} season ${name}`,
             `Set season to ${name}`
-          )
-        );
-    }
-
-    return [];
-  }
-
-  /**
-   * Provide autocomplete suggestions for the campaign subcommand
-   * @private
-   * @param {string} alias - Command alias
-   * @param {string[]} args - Command arguments
-   * @returns {Promise<Array>} Autocomplete suggestions
-   */
-  async _autocompleteCampaignCommand(alias, args) {
-    if (!game.user.isGM) {
-      return [
-        game.chatCommands.createInfoElement(
-          "Only GMs can change campaign settings."
-        ),
-      ];
-    }
-
-    // Load settings index
-    const settingsIndex = await Settings.loadSettingsIndex();
-
-    if (!settingsIndex) {
-      return [
-        game.chatCommands.createInfoElement(
-          "Failed to load campaign settings."
-        ),
-      ];
-    }
-
-    // If just "campaign" or partial match, show all settings
-    if (args.length === 1) {
-      return settingsIndex.campaignSettings.map((setting) =>
-        game.chatCommands.createCommandElement(
-          `${alias} campaign ${setting.id}`,
-          `Change to ${setting.name} campaign setting`
-        )
-      );
-    }
-
-    // If we have a partial setting name, filter matches
-    if (args.length === 2) {
-      const partial = args[1].toLowerCase();
-      return settingsIndex.campaignSettings
-        .filter((setting) => setting.id.toLowerCase().startsWith(partial))
-        .map((setting) =>
-          game.chatCommands.createCommandElement(
-            `${alias} campaign ${setting.id}`,
-            `Change to ${setting.name} campaign setting`
           )
         );
     }

@@ -326,73 +326,66 @@ export class DimensionalWeatherAPI {
    */
   getHelpText() {
     if (!this.initialized || !this.settingsData) {
-      return "<p>Weather system is still initializing...</p>";
+      return "Weather system not initialized.";
     }
 
-    // List available terrains
+    // Get lists of available options
     const terrainList = Object.entries(this.settingsData.terrains)
-      .map(([_, t]) => `<div class="list-item">• ${t.name}</div>`)
+      .map(([key, terrain]) => `<div class="list-item">${terrain.name}</div>`)
       .join("");
 
-    // List available seasons
     const seasonList = Object.entries(this.settingsData.seasons)
-      .map(([_, s]) => `<div class="list-item">• ${s.name}</div>`)
+      .map(([key, season]) => `<div class="list-item">${season.name}</div>`)
       .join("");
 
-    // List available campaign settings - safely handle non-array values
-    const campaignSettings = Settings.getSetting("campaignSettings");
-    const campaignList = Array.isArray(campaignSettings)
-      ? campaignSettings
-          .map((setting) => `<div class="list-item">• ${setting.name}</div>`)
-          .join("")
-      : "<div class='list-item'>No campaign settings available</div>";
+    return `<div class="weather-report"><h3>WEATHER SYSTEM COMMANDS</h3><div class="command"><span class="command-name">/weather</span><span class="command-desc">: Display current weather</span></div><h4>GM Commands:</h4><div class="command"><span class="command-name">/weather calc</span><span class="command-desc">: Display weather calculation details (GM only)</span></div><div class="command"><span class="command-name">/weather random [0-10]</span><span class="command-desc">: Set randomness</span></div><div class="command"><span class="command-name">/weather season [name]</span><span class="command-desc">: Change season</span></div><div class="command"><span class="command-name">/weather settings</span><span class="command-desc">: Open settings</span></div><div class="command"><span class="command-name">/weather stats</span><span class="command-desc">: Display scene base stats</span></div><div class="command"><span class="command-name">/weather terrain [name]</span><span class="command-desc">: Change terrain</span></div><div class="command"><span class="command-name">/weather update</span><span class="command-desc">: Force update</span></div><h4>Available Terrains:</h4><div class="list-section">${terrainList}</div><h4>Available Seasons:</h4><div class="list-section">${seasonList}</div></div>`;
+  }
 
-    return `<div class="weather-help">
-      <h2>Weather System Commands</h2>
-      <div class="command">
-        <span class="command-name">/weather</span>
-        <span class="command-desc">Display current weather</span>
-      </div>
-      
-      <h3>GM Commands:</h3>
-      <div class="command">
-        <span class="command-name">/weather terrain [name]</span>
-        <span class="command-desc">Change terrain</span>
-      </div>
-      <div class="command">
-        <span class="command-name">/weather season [name]</span>
-        <span class="command-desc">Change season</span>
-      </div>
-      <div class="command">
-        <span class="command-name">/weather update</span>
-        <span class="command-desc">Force update</span>
-      </div>
-      <div class="command">
-        <span class="command-name">/weather random [0-10]</span>
-        <span class="command-desc">Set variability</span>
-      </div>
-      <div class="command">
-        <span class="command-name">/weather stats</span>
-        <span class="command-desc">Show scene base stats</span>
-      </div>
-      <div class="command">
-        <span class="command-name">/weather settings</span>
-        <span class="command-desc">Open settings</span>
-      </div>
-      <div class="command">
-        <span class="command-name">/weather calc</span>
-        <span class="command-desc">Show weather calculation details (GM only)</span>
-      </div>
-      
-      <h3>Available Campaign Settings:</h3>
-      <div class="list-section">${campaignList}</div>
-      
-      <h3>Available Terrains:</h3>
-      <div class="list-section">${terrainList}</div>
-      
-      <h3>Available Seasons:</h3>
-      <div class="list-section">${seasonList}</div>
-    </div>`;
+  /**
+   * Generate a weather forecast
+   * @returns {Promise<string>} Forecast text
+   */
+  async generateForecast() {
+    try {
+      if (!this.initialized) {
+        await this.initialize();
+      }
+
+      const scene = game.scenes.viewed;
+      if (!scene?.id) {
+        return "No active scene.";
+      }
+
+      const weatherState = scene.getFlag("dimensional-weather", "weatherState");
+      if (!weatherState) {
+        return "No weather state found for current scene.";
+      }
+
+      const terrain = this.settingsData.terrains[weatherState.terrain];
+      const season = this.settingsData.seasons[weatherState.season];
+
+      let forecast = `<div class="weather-report"><h3>WEATHER FORECAST</h3><h4>Current Conditions</h4><ul><li>Terrain: ${terrain.name}</li><li>Season: ${season.name}</li><li>Temperature: ${weatherState.temperature}</li><li>Wind: ${weatherState.wind}</li><li>Precipitation: ${weatherState.precipitation}</li><li>Humidity: ${weatherState.humidity}</li></ul>`;
+
+      // Add survival rules if any apply
+      const rules = [];
+      if (weatherState.temperature >= 2)
+        rules.push("Water consumption is doubled");
+      if (weatherState.wind >= 6)
+        rules.push("Ranged attacks have disadvantage");
+      if (weatherState.precipitation >= 3) rules.push("Visibility is reduced");
+
+      if (rules.length > 0) {
+        forecast += `<h4>Survival Rules</h4><ul>${rules
+          .map((rule) => `<li>${rule}</li>`)
+          .join("")}</ul>`;
+      }
+
+      forecast += "</div>";
+      return forecast;
+    } catch (error) {
+      ErrorHandler.logAndNotify("Error generating forecast", error);
+      return "Error generating forecast.";
+    }
   }
 
   /**
@@ -433,8 +426,9 @@ export class DimensionalWeatherAPI {
         case "forecast":
           const forecast = await this.engine.generateForecast();
           await ChatMessage.create({
-            content: `<div class="weather-report"><h3>Weather Forecast</h3><pre>${forecast}</pre></div>`,
+            content: forecast,
             speaker: { alias: "Dimensional Weather" },
+            whisper: ChatMessage.getWhisperRecipients("GM"),
           });
           break;
         case "calc":
