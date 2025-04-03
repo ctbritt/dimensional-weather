@@ -136,76 +136,46 @@ export class DOMUtils {
 }
 
 /**
- * Time utilities for consistent time handling
+ * Random utility functions
  */
-export class TimeUtils {
-  static _cache = {
-    timestamp: 0,
-    period: null
-  };
-  
+export class RandomUtils {
   /**
-   * Get current time period based on hour
-   * @param {number} timestamp - Optional timestamp (uses current time if not provided)
-   * @param {boolean} useCache - Whether to use the cached value if available
-   * @returns {string} Time period name
+   * Generate a random number within a range
+   * @param {number} min - Minimum value
+   * @param {number} max - Maximum value
+   * @returns {number} Random number between min and max
    */
-  static getTimePeriod(timestamp = null, useCache = true) {
-    if (!SimpleCalendar?.api) {
-      return "Unknown Time";
-    }
-    
-    // Determine timestamp
-    const currentTimestamp = timestamp || SimpleCalendar.api.timestamp();
-    
-    // Use cache if enabled and timestamp matches
-    if (useCache && this._cache.timestamp === currentTimestamp) {
-      return this._cache.period;
-    }
-    
-    // Get current time
-    const dt = SimpleCalendar.api.currentDateTimeDisplay();
-    if (!dt?.time) {
-      return "Unknown Time";
-    }
-    
-    // Parse the time
-    const [hours] = dt.time.split(":").map(Number);
-    
-    // Determine period
-    let period;
-    if (hours >= 5 && hours < 8) {
-      period = "Early Morning";
-    } else if (hours >= 8 && hours < 12) {
-      period = "Morning";
-    } else if (hours >= 12 && hours < 14) {
-      period = "Noon";
-    } else if (hours >= 14 && hours < 18) {
-      period = "Afternoon";
-    } else if (hours >= 18 && hours < 21) {
-      period = "Evening";
-    } else if (hours >= 21 || hours < 2) {
-      period = "Night";
-    } else {
-      period = "Late Night";
-    }
-    
-    // Update cache
-    this._cache = {
-      timestamp: currentTimestamp,
-      period
-    };
-    
-    return period;
+  static getRandomRange(min, max) {
+    return Math.random() * (max - min) + min;
   }
   
   /**
-   * Clear the time period cache
+   * Generate a random integer within a range
+   * @param {number} min - Minimum value
+   * @param {number} max - Maximum value
+   * @returns {number} Random integer between min and max (inclusive)
    */
-  static clearCache() {
-    this._cache = {
-      timestamp: 0,
-      period: null
-    };
+  static getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+  
+  /**
+   * Get a random element from an array
+   * @param {Array} array - Array to pick from
+   * @returns {*} Random element from the array
+   */
+  static getRandomElement(array) {
+    return array[Math.floor(Math.random() * array.length)];
+  }
+  
+  /**
+   * Generate a random boolean with a given probability
+   * @param {number} probability - Probability of true (0-1)
+   * @returns {boolean} Random boolean
+   */
+  static getRandomBool(probability = 0.5) {
+    return Math.random() < probability;
   }
 }
