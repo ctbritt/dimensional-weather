@@ -1,10 +1,13 @@
 /**
- * Dimensional Weather - Weather Engine
- * Core weather generation logic
+ * Dimensional Weather - Weather Engine (Optimized)
+ * Core weather generation logic with improved performance
  */
 
 import { Settings } from "./settings.js";
-import { ErrorHandler, SceneUtils } from "./utils.js";
+import { ErrorHandler } from "./utils.js";
+import { TimeUtils } from "./time-utils.js";
+import { WeatherCalculator } from "./weather-calculator.js";
+import { SceneManager } from "./scene-manager.js";
 
 export class WeatherEngine {
   /**
@@ -13,12 +16,9 @@ export class WeatherEngine {
    */
   constructor(settingsData = null) {
     this.settingsData = settingsData;
-    this._timePeriodCache = {
-      timestamp: 0,
-      period: null,
-    };
-    this._lastDebugTimestamp = null;
     this._lastCalculation = null;
+    this._calculationHistoryLimit = 5;
+    this._calculationHistory = [];
   }
 
   /**
@@ -32,7 +32,7 @@ export class WeatherEngine {
   /**
    * Initialize weather state for a scene
    * @param {Scene} scene - The scene to initialize weather for
-   * @returns {Promise<void>}
+   * @returns {Promise<boolean>} Success status
    */
   async initializeWeather(scene) {
     if (!scene?.id) {
@@ -41,93 +41,82 @@ export class WeatherEngine {
         null,
         true
       );
-      return;
+      return false;
     }
 
     // Check for existing weather state
-    const existingState = scene.getFlag("dimensional-weather", "weatherState");
+    const existingState = SceneManager.getWeatherState(scene);
     if (existingState) {
       console.log(
         "Dimensional Weather | Preserving existing weather state:",
         existingState
       );
-      return;
+      return false;
     }
 
-    // Get current terrain and season from settings
-    const terrain = Settings.getSetting("terrain");
+    try {
+      // Get current terrain and season from settings
+      const terrain = Settings.getSetting("terrain");
 
-    // Try to get season from Simple Calendar first
-    let season;
-    if (Settings.isSimpleCalendarEnabled() && SimpleCalendar?.api) {
-      const currentSeason = SimpleCalendar.api.getCurrentSeason();
-      if (currentSeason?.name) {
-        // Find matching season in campaign settings
-        for (const [key, s] of Object.entries(
-          this.settingsData?.seasons || {}
-        )) {
-          if (s.name.toLowerCase() === currentSeason.name.toLowerCase()) {
-            season = key;
-            break;
-          }
-        }
+      // Determine season
+      const season = this._determineCurrentSeason() || Settings.getSetting("season");
+
+      // Validate terrain exists
+      if (!this.settingsData?.terrains?.[terrain]) {
+        ErrorHandler.logAndNotify(
+          `Invalid terrain: ${terrain}, falling back to first available terrain`,
+          null,
+          true
+        );
+        const defaultTerrain = Object.keys(this.settingsData.terrains)[0];
+        await Settings.updateSetting("terrain", defaultTerrain);
+        return false;
       }
+
+      // Validate season exists
+      if (!this.settingsData?.seasons?.[season]) {
+        ErrorHandler.logAndNotify(
+          `Invalid season: ${season}, falling back to first available season`,
+          null,
+          true
+        );
+        const defaultSeason = Object.keys(this.settingsData.seasons)[0];
+        await Settings.updateSetting("season", defaultSeason);
+        return false;
+      }
+
+      const terrainData = this.settingsData.terrains[terrain];
+
+      // Initialize weather state using terrain data
+      const initialState = {
+        temperature: terrainData.temperature,
+        wind: terrainData.wind,
+        precipitation: terrainData.precipitation,
+        humidity: terrainData.humidity,
+        terrain: terrain,
+        season: season
+      };
+
+      // Initialize weather state in scene flags
+      return await SceneManager.initializeWeatherState(scene, initialState);
+    } catch (error) {
+      ErrorHandler.logAndNotify("Failed to initialize weather for scene", error);
+      return false;
     }
-
-    // If no season found from Simple Calendar, use setting
-    if (!season) {
-      season = Settings.getSetting("season");
-    }
-
-    // Validate terrain exists
-    if (!this.settingsData?.terrains?.[terrain]) {
-      ErrorHandler.logAndNotify(
-        `Invalid terrain: ${terrain}, falling back to first available terrain`,
-        null,
-        true
-      );
-      const defaultTerrain = Object.keys(this.settingsData.terrains)[0];
-      await Settings.updateSetting("terrain", defaultTerrain);
-      return;
-    }
-
-    // Validate season exists
-    if (!this.settingsData?.seasons?.[season]) {
-      ErrorHandler.logAndNotify(
-        `Invalid season: ${season}, falling back to first available season`,
-        null,
-        true
-      );
-      const defaultSeason = Object.keys(this.settingsData.seasons)[0];
-      await Settings.updateSetting("season", defaultSeason);
-      return;
-    }
-
-    const terrainData = this.settingsData.terrains[terrain];
-
-    // Initialize weather state in scene flags
-    const weatherState = {
-      temperature: terrainData.temperature,
-      wind: terrainData.wind,
-      precipitation: terrainData.precipitation,
-      humidity: terrainData.humidity,
-      lastUpdate: this._getCurrentTimestamp(),
-      terrain: terrain,
-      season: season,
-    };
-
-    await scene.setFlag("dimensional-weather", "weatherState", weatherState);
   }
 
   /**
-   * Updates the weather based on terrain, season, and time of day
-   * @param {boolean} forced - Whether this is a forced update
-   * @returns {Promise<void>}
+   * Update weather based on terrain, season, and time of day
+   * @param {Object} options - Update options
+   * @param {boolean} options.forced - Whether this is a forced update
+   * @returns {Promise<Object|null>} New weather state or null on failure
    */
-  async updateWeather(forced = false) {
+  async updateWeather(options = {}) {
+    const { forced = false } = options;
+    
     if (!this.settingsData?.terrains) {
       ErrorHandler.logAndNotify("Settings data or terrains not loaded", null);
-      return;
+      return null;
     }
 
     const scene = game.scenes.viewed;
@@ -137,227 +126,71 @@ export class WeatherEngine {
         null,
         true
       );
-      return;
+      return null;
     }
 
-    // Get current time and data from Simple Calendar
-    const currentTime = this._getCurrentTimestamp();
-    const dateData = SimpleCalendar?.api?.timestampToDate(currentTime);
-    const currentSeason = SimpleCalendar?.api?.getCurrentSeason();
-
-    // Get current terrain from saved state or settings
-    const savedState = scene.getFlag("dimensional-weather", "weatherState");
-    const currentTerrain =
-      savedState?.terrain || Settings.getSetting("terrain");
-
-    // Find matching season in campaign settings
-    let seasonKey = null;
-    if (currentSeason?.name) {
-      // Convert Simple Calendar season name to lowercase for comparison
-      const simpleCalendarSeasonName = currentSeason.name.toLowerCase();
-
-      // Find matching season in campaign settings
-      for (const [key, s] of Object.entries(this.settingsData?.seasons || {})) {
-        const campaignSeasonName = s.name.toLowerCase();
-        // Handle both "Fall" and "Autumn" names
-        if (
-          campaignSeasonName === simpleCalendarSeasonName ||
-          (simpleCalendarSeasonName === "fall" &&
-            campaignSeasonName === "autumn") ||
-          (simpleCalendarSeasonName === "autumn" &&
-            campaignSeasonName === "fall")
-        ) {
-          seasonKey = key;
-          break;
+    try {
+      // Get current weather state
+      const weatherState = SceneManager.getWeatherState(scene);
+      
+      // If no weather state, initialize it first
+      if (!weatherState) {
+        const success = await this.initializeWeather(scene);
+        if (!success) return null;
+        return SceneManager.getWeatherState(scene);
+      }
+      
+      // Check if update is needed
+      if (!forced) {
+        const updateFrequency = Settings.getSetting("updateFrequency");
+        if (!TimeUtils.isUpdateNeeded(weatherState.lastUpdate, updateFrequency)) {
+          return weatherState;
         }
       }
+
+      // Get current terrain from saved state
+      const currentTerrain = weatherState.terrain;
+      
+      // Determine current season
+      const currentSeason = this._determineCurrentSeason(weatherState) || weatherState.season;
+      
+      // Validate terrain exists
+      const terrain = this.settingsData.terrains[currentTerrain];
+      if (!terrain) {
+        ErrorHandler.logAndNotify(
+          `Invalid terrain "${currentTerrain}", falling back to default`,
+          null,
+          true
+        );
+        const defaultTerrain = Object.keys(this.settingsData.terrains)[0];
+        await SceneManager.setWeatherAttribute("terrain", defaultTerrain, scene);
+        return null;
+      }
+
+      // Get variability setting
+      const weatherVariability = Settings.getSetting("variability");
+      
+      // Calculate new weather
+      const result = WeatherCalculator.calculateWeatherChanges({
+        terrain,
+        savedState: weatherState,
+        variability: weatherVariability,
+        currentSeason,
+        settingsData: this.settingsData
+      });
+      
+      // Store calculation details
+      this._lastCalculation = result.details;
+      this._addToCalculationHistory(result.details);
+      
+      // Update weather state
+      await SceneManager.updateWeatherState(result.weatherState, scene);
+      
+      return result.weatherState;
+    } catch (error) {
+      ErrorHandler.logAndNotify("Failed to update weather", error);
+      return null;
     }
-
-    // If no matching season found, use setting
-    if (!seasonKey) {
-      seasonKey = Settings.getSetting("season");
-    }
-
-    // Validate terrain exists
-    if (!this.settingsData?.terrains[currentTerrain]) {
-      console.warn(
-        `Invalid terrain "${currentTerrain}", falling back to default terrain`
-      );
-      currentTerrain = Object.keys(this.settingsData?.terrains)[0];
-    }
-
-    // Validate season exists
-    if (!this.settingsData?.seasons[seasonKey]) {
-      console.warn(
-        `Invalid season "${seasonKey}", falling back to default season`
-      );
-      seasonKey = Object.keys(this.settingsData?.seasons)[0];
-    }
-
-    const terrain = this.settingsData.terrains[currentTerrain];
-    const weatherVariability = Settings.getSetting("variability");
-
-    // Calculate weather changes
-    const newWeather = this._calculateWeatherChanges(
-      terrain,
-      savedState,
-      weatherVariability,
-      currentTime,
-      seasonKey
-    );
-
-    // Save the new weather state to scene flags
-    await scene.setFlag("dimensional-weather", "weatherState", newWeather);
-  }
-
-  /**
-   * Calculate weather changes based on terrain, past weather, and variability
-   * @private
-   * @param {Object} terrain - Terrain data
-   * @param {Object|null} savedState - Previous weather state
-   * @param {number} variability - Weather variability setting
-   * @param {number} currentTime - Current timestamp
-   * @param {string} currentSeason - Current season key
-   * @returns {Object} New weather state
-   */
-  _calculateWeatherChanges(
-    terrain,
-    savedState,
-    variability,
-    currentTime,
-    currentSeason
-  ) {
-    // Store calculation details
-    const details = {
-      terrain: {
-        name: terrain.name,
-        baseTemp: terrain.temperature,
-        baseWind: terrain.wind,
-        basePrecip: terrain.precipitation,
-        baseHumid: terrain.humidity,
-      },
-      previous: savedState
-        ? {
-            temp: savedState.temperature,
-            wind: savedState.wind,
-            precip: savedState.precipitation,
-            humid: savedState.humidity,
-          }
-        : null,
-      variability,
-    };
-
-    // Apply terrain baseline with random variation
-    const randTemp = ((Math.random() * 2 - 1) * variability) / 4;
-    const temperature = Math.round(terrain.temperature + randTemp);
-
-    const randWind = ((Math.random() * 2 - 1) * variability) / 2;
-    const wind = Math.round(
-      (terrain.wind + (savedState?.wind ?? terrain.wind)) / 2 + randWind
-    );
-
-    const randPrecip = ((Math.random() * 2 - 1) * variability) / 2;
-    const precipitation =
-      (terrain.precipitation +
-        (savedState?.precipitation ?? terrain.precipitation)) /
-        2 +
-      randPrecip;
-
-    const randHumid = ((Math.random() * 2 - 1) * variability) / 2;
-    const humidity = Math.round(
-      (terrain.humidity + (savedState?.humidity ?? terrain.humidity)) / 2 +
-        randHumid
-    );
-
-    details.randomFactors = {
-      temp: randTemp,
-      wind: randWind,
-      precip: randPrecip,
-      humid: randHumid,
-    };
-
-    // Get current time period
-    const dt = SimpleCalendar.api.currentDateTimeDisplay();
-    const [hours] = dt.time.split(":").map(Number);
-
-    // Define time periods based on hour ranges to match campaign settings
-    let timePeriod;
-    if (hours >= 5 && hours < 8) {
-      timePeriod = "Early Morning";
-    } else if (hours >= 8 && hours < 12) {
-      timePeriod = "Morning";
-    } else if (hours >= 12 && hours < 14) {
-      timePeriod = "Midday";
-    } else if (hours >= 14 && hours < 18) {
-      timePeriod = "Afternoon";
-    } else if (hours >= 18 && hours < 21) {
-      timePeriod = "Evening";
-    } else if (hours >= 21 || hours < 2) {
-      timePeriod = "Night";
-    } else {
-      timePeriod = "Late Night";
-    }
-
-    details.timePeriod = timePeriod;
-
-    // Apply time-of-day modifier from campaign settings
-    const timeModifiers = this.settingsData?.timeModifiers?.[timePeriod] || {};
-    details.timeModifiers = timeModifiers;
-
-    // Apply season modifiers
-    const seasonModifiers = this._getSeasonModifiers(currentSeason);
-    details.seasonModifiers = seasonModifiers;
-    details.season = currentSeason;
-
-    // Calculate final values with time and season modifiers
-    const finalTemperature =
-      temperature +
-      (timeModifiers.temperature || 0) +
-      (seasonModifiers.temperature || 0);
-
-    const finalWind =
-      wind + (timeModifiers.wind || 0) + (seasonModifiers.wind || 0);
-
-    const finalPrecipitation =
-      precipitation +
-      (timeModifiers.precipitation || 0) +
-      (seasonModifiers.precipitation || 0);
-
-    const finalHumidity =
-      humidity +
-      (timeModifiers.humidity || 0) +
-      (seasonModifiers.humidity || 0);
-
-    // Store intermediate values
-    details.intermediate = {
-      temp: temperature,
-      wind: wind,
-      precip: precipitation,
-      humid: humidity,
-    };
-
-    // Store final values
-    details.final = {
-      temp: Math.max(-10, Math.min(10, finalTemperature)),
-      wind: Math.max(-10, Math.min(10, finalWind)),
-      precip: Math.max(-10, Math.min(10, finalPrecipitation)),
-      humid: Math.max(-10, Math.min(10, finalHumidity)),
-    };
-
-    // Store the calculation details
-    this._lastCalculation = details;
-
-    // Clamp values within -10 and 10
-    return {
-      temperature: details.final.temp,
-      wind: details.final.wind,
-      precipitation: details.final.precip,
-      humidity: details.final.humid,
-      lastUpdate: currentTime,
-      terrain:
-        savedState?.terrain || terrain.name.toLowerCase().replace(/\s+/g, ""),
-      season: currentSeason,
-    };
   }
 
   /**
@@ -367,161 +200,58 @@ export class WeatherEngine {
   getLastCalculation() {
     return this._lastCalculation;
   }
-
+  
   /**
-   * Get modifiers for the current season
-   * @private
-   * @param {string} seasonKey - Season key
-   * @returns {Object} Season modifiers
+   * Get calculation history
+   * @returns {Array} Calculation history
    */
-  _getSeasonModifiers(seasonKey) {
-    const season = this.settingsData?.seasons?.[seasonKey];
-    return (
-      season?.modifiers || {
-        temperature: 0,
-        wind: 0,
-        precipitation: 0,
-        humidity: 0,
-        variability: 0,
-      }
-    );
+  getCalculationHistory() {
+    return this._calculationHistory;
+  }
+  
+  /**
+   * Add calculation to history
+   * @private
+   * @param {Object} calculation - Calculation details
+   */
+  _addToCalculationHistory(calculation) {
+    // Add timestamp if not present
+    const calculationWithTime = {
+      ...calculation,
+      timestamp: calculation.timestamp || Date.now()
+    };
+    
+    // Add to history
+    this._calculationHistory.unshift(calculationWithTime);
+    
+    // Limit history size
+    if (this._calculationHistory.length > this._calculationHistoryLimit) {
+      this._calculationHistory = this._calculationHistory.slice(0, this._calculationHistoryLimit);
+    }
   }
 
   /**
-   * Get the current time period based on Simple Calendar data
-   * @param {number} timestamp - Current timestamp
+   * Determine current season based on Simple Calendar or saved state
+   * @private
+   * @param {Object} weatherState - Current weather state
+   * @returns {string|null} Season key or null if not found
+   */
+  _determineCurrentSeason(weatherState = null) {
+    // If Simple Calendar is enabled, try to get season from it
+    if (Settings.isSimpleCalendarEnabled() && SimpleCalendar?.api) {
+      return TimeUtils.getCurrentSeason(this.settingsData);
+    }
+    
+    // Fall back to stored season
+    return weatherState?.season || null;
+  }
+
+  /**
+   * Get the current time period based on Simple Calendar
    * @returns {string} Time period name
    */
-  getTimePeriod(timestamp) {
-    if (!SimpleCalendar?.api) {
-      return "Unknown Time";
-    }
-
-    // Use cached value if timestamp hasn't changed
-    if (this._timePeriodCache.timestamp === timestamp) {
-      return this._timePeriodCache.period;
-    }
-
-    // If no timestamp provided, get current time from Simple Calendar
-    if (!timestamp) {
-      timestamp = SimpleCalendar.api.timestamp();
-    }
-
-    const dateData = SimpleCalendar.api.timestampToDate(timestamp);
-    const { sunrise, sunset, midday } = dateData;
-
-    // Validate the time values
-    if (sunrise === undefined || sunset === undefined || midday === undefined) {
-      return "Unknown Time";
-    }
-
-    // Calculate period boundaries in timestamps
-    const daylightDuration = sunset - sunrise;
-    const nightDuration = 24 - daylightDuration;
-
-    // Ensure durations are positive
-    if (daylightDuration <= 0 || nightDuration <= 0) {
-      return "Unknown Time";
-    }
-
-    const earlyMorningEnd = sunrise + daylightDuration * 0.25;
-    const noonEnd = sunrise + daylightDuration * 0.5;
-    const afternoonEnd = sunset;
-    const nightEnd = sunset + nightDuration * 0.5;
-
-    // Debug logging only if enabled and timestamp is different from last debug
-    if (
-      Settings.getSetting("debugTimePeriod") &&
-      this._lastDebugTimestamp !== timestamp
-    ) {
-      this._lastDebugTimestamp = timestamp;
-      console.log("Dimensional Weather | Time Period Debug:", {
-        currentTimestamp: timestamp,
-        sunrise,
-        sunset,
-        midday,
-        earlyMorningEnd,
-        noonEnd,
-        afternoonEnd,
-        nightEnd,
-        nightDuration,
-        normalizedTimestamp: timestamp % 24,
-      });
-    }
-
-    // Normalize timestamp to 24-hour cycle
-    const normalizedTimestamp = timestamp % 24;
-
-    // Determine current time period based on normalized timestamp
-    let period;
-    if (
-      normalizedTimestamp >= sunrise &&
-      normalizedTimestamp < earlyMorningEnd
-    ) {
-      period = "Early Morning";
-    } else if (
-      normalizedTimestamp >= earlyMorningEnd &&
-      normalizedTimestamp < noonEnd
-    ) {
-      period = "Noon";
-    } else if (
-      normalizedTimestamp >= noonEnd &&
-      normalizedTimestamp < afternoonEnd
-    ) {
-      period = "Afternoon";
-    } else if (
-      normalizedTimestamp >= afternoonEnd &&
-      normalizedTimestamp < nightEnd
-    ) {
-      period = "Night";
-    } else {
-      period = "Late Night";
-    }
-
-    // Cache the result
-    this._timePeriodCache = {
-      timestamp,
-      period,
-    };
-
-    return period;
-  }
-
-  /**
-   * Rounds a value to the next available level in the descriptions
-   * For positive numbers, rounds down. For negative numbers, rounds up.
-   * @private
-   * @param {number} value - Value to round
-   * @param {Object} descriptions - Description mapping
-   * @returns {string} Rounded value as string
-   */
-  _roundToNextLevel(value, descriptions) {
-    // Get all available levels and sort them
-    const levels = Object.keys(descriptions)
-      .map(Number)
-      .sort((a, b) => a - b);
-
-    // For negative numbers, find the next higher level
-    if (value < 0) {
-      for (let i = 0; i < levels.length; i++) {
-        if (value <= levels[i]) {
-          return levels[i].toString();
-        }
-      }
-      // If no higher level found, return the highest negative level
-      const negLevels = levels.filter((l) => l < 0);
-      return negLevels.length ? Math.max(...negLevels).toString() : "0";
-    }
-
-    // For positive numbers, find the next lower level
-    for (let i = levels.length - 1; i >= 0; i--) {
-      if (value >= levels[i]) {
-        return levels[i].toString();
-      }
-    }
-
-    // If no lower level found, return the lowest level
-    return levels[0].toString();
+  getTimePeriod() {
+    return TimeUtils.getTimePeriod();
   }
 
   /**
@@ -529,7 +259,7 @@ export class WeatherEngine {
    * @returns {string} HTML for survival rules
    */
   getSurvivalRules() {
-    const weatherState = SceneUtils.getWeatherState();
+    const weatherState = SceneManager.getWeatherState();
     if (!weatherState || !this.settingsData) {
       return "<p>No weather data available</p>";
     }
@@ -618,7 +348,7 @@ export class WeatherEngine {
    * @returns {string} Weather description
    */
   getBasicWeatherDescription() {
-    const weatherState = SceneUtils.getWeatherState();
+    const weatherState = SceneManager.getWeatherState();
     if (!weatherState || !this.settingsData) {
       return "<p>No weather data available</p>";
     }
@@ -629,37 +359,25 @@ export class WeatherEngine {
       terrain?.description || "The landscape stretches before you.";
 
     // Get weather dimension descriptions
-    const tempDesc =
-      this.settingsData.weatherDimensions.temperature.descriptions[
-        this._roundToNextLevel(
-          weatherState.temperature,
-          this.settingsData.weatherDimensions.temperature.descriptions
-        )
-      ] || "Normal temperature";
+    const tempDesc = this._getDimensionDescription(
+      "temperature",
+      weatherState.temperature
+    );
 
-    const windDesc =
-      this.settingsData.weatherDimensions.wind.descriptions[
-        this._roundToNextLevel(
-          weatherState.wind,
-          this.settingsData.weatherDimensions.wind.descriptions
-        )
-      ] || "Normal wind";
+    const windDesc = this._getDimensionDescription(
+      "wind", 
+      weatherState.wind
+    );
 
-    const precipDesc =
-      this.settingsData.weatherDimensions.precipitation.descriptions[
-        this._roundToNextLevel(
-          weatherState.precipitation,
-          this.settingsData.weatherDimensions.precipitation.descriptions
-        )
-      ] || "Clear skies";
+    const precipDesc = this._getDimensionDescription(
+      "precipitation",
+      weatherState.precipitation
+    );
 
-    const humidDesc =
-      this.settingsData.weatherDimensions.humidity.descriptions[
-        this._roundToNextLevel(
-          weatherState.humidity,
-          this.settingsData.weatherDimensions.humidity.descriptions
-        )
-      ] || "Normal humidity";
+    const humidDesc = this._getDimensionDescription(
+      "humidity", 
+      weatherState.humidity
+    );
 
     // Format the weather conditions with appropriate styling
     return `${atmosphericDesc}
@@ -678,7 +396,7 @@ export class WeatherEngine {
       return "Weather system is not initialized.";
     }
 
-    const weatherState = SceneUtils.getWeatherState();
+    const weatherState = SceneManager.getWeatherState();
     if (!weatherState) {
       return "No current weather data available.";
     }
@@ -690,57 +408,13 @@ export class WeatherEngine {
 
     const variability = Settings.getSetting("variability");
 
-    // Generate 5 days of weather
-    const forecast = [];
-    for (let i = 0; i < 5; i++) {
-      // Use the terrain as a base and add some randomness
-      const dayWeather = {
-        temperature: Math.round(
-          terrain.temperature + (Math.random() * 2 - 1) * variability
-        ),
-        wind: Math.round(terrain.wind + (Math.random() * 2 - 1) * variability),
-        precipitation: Math.round(
-          terrain.precipitation + (Math.random() * 2 - 1) * variability
-        ),
-        humidity: Math.round(
-          terrain.humidity + (Math.random() * 2 - 1) * variability
-        ),
-      };
-
-      // Clamp values within -10 and 10
-      dayWeather.temperature = Math.max(
-        -10,
-        Math.min(10, dayWeather.temperature)
-      );
-      dayWeather.wind = Math.max(-10, Math.min(10, dayWeather.wind));
-      dayWeather.precipitation = Math.max(
-        -10,
-        Math.min(10, dayWeather.precipitation)
-      );
-      dayWeather.humidity = Math.max(-10, Math.min(10, dayWeather.humidity));
-
-      forecast.push(dayWeather);
-    }
-
-    // Helper to create change indicators
-    const getChangeIndicator = (current, previous, type) => {
-      if (!previous) return "";
-      const diff = current - previous;
-      if (diff === 0) return "";
-
-      switch (type) {
-        case "temp":
-          return diff > 0 ? " (hotter)" : " (cooler)";
-        case "wind":
-          return diff > 0 ? " (more windy)" : " (less windy)";
-        case "precip":
-          return diff > 0 ? " (more precip)" : " (less precip)";
-        case "humid":
-          return diff > 0 ? " (more humid)" : " (less humid)";
-        default:
-          return "";
-      }
-    };
+    // Generate forecast using the calculator
+    const forecast = WeatherCalculator.generateForecast({
+      terrain,
+      weatherState,
+      variability,
+      days: 5
+    });
 
     // Format the forecast
     const forecastText = forecast
@@ -749,18 +423,18 @@ export class WeatherEngine {
         const prevDay = index > 0 ? forecast[index - 1] : null;
 
         return `Day ${dayNum}:
-Temperature: ${day.temperature}${getChangeIndicator(
+Temperature: ${day.temperature}${WeatherCalculator.getChangeIndicator(
           day.temperature,
           prevDay?.temperature,
           "temp"
         )}
-Wind: ${day.wind}${getChangeIndicator(day.wind, prevDay?.wind, "wind")}
-Precipitation: ${day.precipitation}${getChangeIndicator(
+Wind: ${day.wind}${WeatherCalculator.getChangeIndicator(day.wind, prevDay?.wind, "wind")}
+Precipitation: ${day.precipitation}${WeatherCalculator.getChangeIndicator(
           day.precipitation,
           prevDay?.precipitation,
           "precip"
         )}
-Humidity: ${day.humidity}${getChangeIndicator(
+Humidity: ${day.humidity}${WeatherCalculator.getChangeIndicator(
           day.humidity,
           prevDay?.humidity,
           "humid"
@@ -769,7 +443,7 @@ Humidity: ${day.humidity}${getChangeIndicator(
       .join("\n\n");
 
     // Format terrain name
-    const formattedTerrain = currentTerrain.replace(/([A-Z])/g, " $1").trim();
+    const formattedTerrain = terrain.name || currentTerrain.replace(/([A-Z])/g, " $1").trim();
 
     return `5-Day Weather Forecast
 Current Terrain: ${formattedTerrain}
@@ -778,11 +452,57 @@ ${forecastText}`;
   }
 
   /**
-   * Get current timestamp
+   * Get a formatted dimension description
    * @private
-   * @returns {number} Current timestamp
+   * @param {string} dimension - Dimension name
+   * @param {number} value - Dimension value
+   * @returns {string} Formatted description
    */
-  _getCurrentTimestamp() {
-    return SimpleCalendar?.api ? SimpleCalendar.api.timestamp() : Date.now();
+  _getDimensionDescription(dimension, value) {
+    if (!this.settingsData?.weatherDimensions?.[dimension]?.descriptions) {
+      return `Normal ${dimension}`;
+    }
+
+    const descriptions = this.settingsData.weatherDimensions[dimension].descriptions;
+    const level = this._roundToNextLevel(value, descriptions);
+
+    return descriptions[level] || `Normal ${dimension}`;
+  }
+
+  /**
+   * Rounds a value to the next available level in the descriptions
+   * For positive numbers, rounds down. For negative numbers, rounds up.
+   * @private
+   * @param {number} value - Value to round
+   * @param {Object} descriptions - Description mapping
+   * @returns {string} Rounded value as string
+   */
+  _roundToNextLevel(value, descriptions) {
+    // Get all available levels and sort them
+    const levels = Object.keys(descriptions)
+      .map(Number)
+      .sort((a, b) => a - b);
+
+    // For negative numbers, find the next higher level
+    if (value < 0) {
+      for (let i = 0; i < levels.length; i++) {
+        if (value <= levels[i]) {
+          return levels[i].toString();
+        }
+      }
+      // If no higher level found, return the highest negative level
+      const negLevels = levels.filter((l) => l < 0);
+      return negLevels.length ? Math.max(...negLevels).toString() : "0";
+    }
+
+    // For positive numbers, find the next lower level
+    for (let i = levels.length - 1; i >= 0; i--) {
+      if (value >= levels[i]) {
+        return levels[i].toString();
+      }
+    }
+
+    // If no lower level found, return the lowest level
+    return levels[0].toString();
   }
 }

@@ -4,7 +4,7 @@
  */
 
 import { Settings } from "./settings.js";
-import { WeatherEngine } from "./weather-engine-optimized.js";
+import { WeatherEngine } from "./weather-engine.js";
 import { UIController } from "./ui-controller.js";
 import { ErrorHandler, Cache } from "./utils.js";
 import { SceneManager } from "./scene-manager.js";
