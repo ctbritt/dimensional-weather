@@ -144,7 +144,8 @@ export class DimensionalWeatherAPI {
         await this.initialize();
       }
 
-      await this.engine.updateWeather(true);
+      // Pass forced: true to ensure update happens
+      await this.engine.updateWeather({ forced: true });
       return true;
     } catch (error) {
       ErrorHandler.logAndNotify("Failed to update weather", error);
@@ -211,7 +212,7 @@ export class DimensionalWeatherAPI {
         await Settings.updateSetting("terrain", terrainKey);
 
         // Force weather update
-        await this.engine.updateWeather(true);
+        await this.engine.updateWeather({ forced: true });
         return true;
       }
 
@@ -257,7 +258,7 @@ export class DimensionalWeatherAPI {
         await Settings.updateSetting("season", seasonKey);
 
         // Force weather update
-        await this.engine.updateWeather(true);
+        await this.engine.updateWeather({ forced: true });
         return true;
       }
 
@@ -430,7 +431,7 @@ export class DimensionalWeatherAPI {
           await this.displayHelp();
           break;
         case "update":
-          await this.engine.updateWeather(true);
+          await this.engine.updateWeather({ forced: true });
           await this.ui.displayWeatherReport();
           break;
         case "forecast":
