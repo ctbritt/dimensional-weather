@@ -16,6 +16,8 @@
     }
   ],
   "esmodules": [
+    "scripts/command-handler.js",
+    "scripts/weather-commands.js",
     "scripts/main.js"
   ],
   "styles": [

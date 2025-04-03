@@ -7,10 +7,14 @@ import { Settings } from "./settings.js";
 import { DimensionalWeatherAPI } from "./api.js";
 import { ChatCommands } from "./chat-commands.js";
 import { ErrorHandler } from "./utils.js";
+import { WeatherCommands } from "./weather-commands.js";
 
 // Module constants
 const MODULE_ID = "dimensional-weather";
 const MODULE_TITLE = "Dimensional Weather";
+
+// Initialize the weather commands
+let weatherCommands;
 
 /**
  * Initialize the module when Foundry is ready
@@ -24,6 +28,9 @@ Hooks.once("init", async () => {
 
     // Register global module API
     game.dimWeather = new DimensionalWeatherAPI();
+
+    // Initialize the weather commands
+    weatherCommands = new WeatherCommands(game.dimWeather);
 
     console.log(`${MODULE_TITLE} | Module settings registered`);
   } catch (error) {
@@ -114,6 +121,7 @@ Hooks.on("canvasReady", async () => {
 /**
  * Hook into Simple Calendar time changes
  */
+/* Commented out as it may be redundant with game time updates
 Hooks.on("simple-calendar-time-change", async () => {
   // Ensure weather system and Simple Calendar are initialized
   if (!game.dimWeather?.initialized || !SimpleCalendar?.api?.currentDateTime) {
@@ -135,8 +143,11 @@ Hooks.on("simple-calendar-time-change", async () => {
   if (hoursSinceLastUpdate >= updateFrequency) {
     console.log(`${MODULE_TITLE} | Time-based weather update triggered`);
     await game.dimWeather.updateWeather();
+    // Display the weather after update
+    await game.dimWeather.displayWeather();
   }
 });
+*/
 
 /**
  * Hook into world time changes
@@ -164,6 +175,8 @@ Hooks.on("updateWorldTime", async (worldTime, dt) => {
   if (hoursSinceLastUpdate >= updateFrequency) {
     console.log(`${MODULE_TITLE} | Game-time based weather update triggered`);
     await game.dimWeather.updateWeather();
+    // Display the weather after update
+    await game.dimWeather.displayWeather();
   }
 });
 
@@ -249,4 +262,16 @@ Hooks.on("simple-calendar.seasonChange", async (season) => {
     // Force a weather update to apply the new season
     await weatherEngine.updateWeather(true);
   }
+});
+
+// Handle chat messages
+Hooks.on("chatMessage", (message, options, userId) => {
+  const content = message.content || message;
+
+  if (typeof content === "string" && content.startsWith(`/weather`)) {
+    const parameters = content.slice(8).trim(); // 8 is the length of "/weather"
+    weatherCommands.processCommand(parameters);
+    return false;
+  }
+  return true;
 });

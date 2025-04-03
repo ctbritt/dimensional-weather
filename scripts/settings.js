@@ -142,6 +142,10 @@ export class Settings {
       config: true,
       type: String,
       default: "",
+      inputType: "password",
+      display: (value) => "••••••••" + (value ? value.slice(-4) : ""),
+      requiresReload: false,
+      restricted: true,
     },
     useCustomStyles: {
       name: "Use Custom Campaign Styles",
@@ -170,8 +174,35 @@ export class Settings {
     try {
       // Register all settings first
       for (const [key, config] of Object.entries(this.SETTINGS)) {
-        game.settings.register(this.NAMESPACE, key, config);
+        if (key === "apiKey") {
+          // Special handling for API key
+          const baseConfig = { ...config };
+          baseConfig.type = String;
+          baseConfig.onChange = (value) => {
+            // When the value changes, immediately mask it in the UI
+            const input = document.querySelector(
+              'input[name="dimensional-weather.apiKey"]'
+            );
+            if (input) {
+              input.type = "password";
+              input.value = value;
+            }
+          };
+          game.settings.register(this.NAMESPACE, key, baseConfig);
+        } else {
+          game.settings.register(this.NAMESPACE, key, config);
+        }
       }
+
+      // Add custom styling for API key input
+      const style = document.createElement("style");
+      style.textContent = `
+        input[name="dimensional-weather.apiKey"] {
+          -webkit-text-security: disc;
+          text-security: disc;
+        }
+      `;
+      document.head.appendChild(style);
 
       // Load campaign settings from directory
       const campaignSettings = await this.loadCampaignSettingsFromDirectory();
