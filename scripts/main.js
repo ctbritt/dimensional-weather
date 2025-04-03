@@ -5,16 +5,16 @@
 
 import { Settings } from "./settings.js";
 import { DimensionalWeatherAPI } from "./api.js";
-import { ChatCommands } from "./chat-commands.js";
 import { ErrorHandler } from "./utils.js";
-import { WeatherCommands } from "./weather-commands.js";
+import { WeatherCommandSystem } from "./command-system.js";
+import { SceneManager } from "./scene-manager.js";
 
 // Module constants
 const MODULE_ID = "dimensional-weather";
 const MODULE_TITLE = "Dimensional Weather";
 
 // Module state
-let weatherCommands;
+let commandSystem;
 let initialized = false;
 
 /**
@@ -32,12 +32,9 @@ async function initializeModule() {
     game.dimWeather = new DimensionalWeatherAPI();
     await game.dimWeather.initialize();
 
-    // Initialize weather commands
-    weatherCommands = new WeatherCommands(game.dimWeather);
-
-    // Register chat commands
-    const commands = new ChatCommands(game.dimWeather);
-    commands.register();
+    // Initialize unified command system
+    commandSystem = new WeatherCommandSystem(game.dimWeather);
+    commandSystem.register();
 
     initialized = true;
     console.log(`${MODULE_TITLE} | Module initialized successfully`);
@@ -61,8 +58,13 @@ async function handleSceneWeather(forceUpdate = false) {
   if (!scene?.id) return;
 
   try {
-    // Initialize weather for the scene if needed
-    await game.dimWeather.engine.initializeWeather(scene);
+    // Check if weather state exists for the scene
+    const weatherState = SceneManager.getWeatherState(scene);
+    
+    // Initialize weather if needed
+    if (!weatherState) {
+      await game.dimWeather.engine.initializeWeather(scene);
+    }
 
     // Update weather if auto-update is enabled or force update is requested
     if (forceUpdate || Settings.getSetting("autoUpdate")) {
@@ -88,17 +90,12 @@ async function checkTimeBasedUpdate() {
   const scene = game.scenes.viewed;
   if (!scene?.id) return;
 
-  const weatherState = scene.getFlag(MODULE_ID, "weatherState");
+  const weatherState = SceneManager.getWeatherState(scene);
   if (!weatherState) return;
 
   const updateFrequency = Settings.getSetting("updateFrequency");
-  const lastUpdateTime = weatherState.lastUpdate || 0;
-  const currentTime = SimpleCalendar?.api
-    ? SimpleCalendar.api.timestamp()
-    : Date.now();
-  const hoursSinceLastUpdate = (currentTime - lastUpdateTime) / 3600;
-
-  if (hoursSinceLastUpdate >= updateFrequency) {
+  
+  if (SceneManager.isUpdateNeeded(weatherState, updateFrequency)) {
     console.log(`${MODULE_TITLE} | Time-based weather update triggered`);
     await game.dimWeather.updateWeather();
     await game.dimWeather.displayWeather();
@@ -127,7 +124,7 @@ Hooks.on("simple-calendar.seasonChange", async (season) => {
   const scene = game.scenes.viewed;
   if (!scene?.id) return;
 
-  const weatherState = scene.getFlag(MODULE_ID, "weatherState");
+  const weatherState = SceneManager.getWeatherState(scene);
   if (!weatherState) return;
 
   // Find matching season in campaign settings
@@ -136,12 +133,7 @@ Hooks.on("simple-calendar.seasonChange", async (season) => {
   ).find(([_, s]) => s.name.toLowerCase() === season.name.toLowerCase())?.[0];
 
   if (matchingSeasonKey) {
-    await scene.setFlag(MODULE_ID, "weatherState", {
-      ...weatherState,
-      season: matchingSeasonKey,
-      lastUpdate: Date.now(),
-    });
-
+    await SceneManager.setWeatherAttribute("season", matchingSeasonKey, scene);
     await handleSceneWeather(true);
   }
 });
@@ -152,7 +144,7 @@ Hooks.on("chatMessage", (message, options, userId) => {
 
   const content = message.content || message;
   if (typeof content === "string" && content.startsWith("/weather")) {
-    weatherCommands.processCommand(content.slice(8).trim());
+    commandSystem.processCommand(content.slice(8).trim());
     return false;
   }
   return true;

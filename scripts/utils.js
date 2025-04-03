@@ -136,33 +136,76 @@ export class DOMUtils {
 }
 
 /**
- * Utilities for working with scene flags
+ * Time utilities for consistent time handling
  */
-export class SceneUtils {
+export class TimeUtils {
+  static _cache = {
+    timestamp: 0,
+    period: null
+  };
+  
   /**
-   * Update scene flags in a batch
-   * @param {Scene} scene - Scene to update
-   * @param {string} flagScope - Flag scope (e.g., "weatherState")
-   * @param {Object} updates - Object with updates to apply
-   * @returns {Promise<Scene>} - Updated scene
+   * Get current time period based on hour
+   * @param {number} timestamp - Optional timestamp (uses current time if not provided)
+   * @param {boolean} useCache - Whether to use the cached value if available
+   * @returns {string} Time period name
    */
-  static async updateFlags(scene, flagScope, updates) {
-    if (!scene?.id) return null;
-
-    const currentFlags = scene.getFlag("dimensional-weather", flagScope) || {};
-    const updatedFlags = { ...currentFlags, ...updates };
-
-    return scene.setFlag("dimensional-weather", flagScope, updatedFlags);
+  static getTimePeriod(timestamp = null, useCache = true) {
+    if (!SimpleCalendar?.api) {
+      return "Unknown Time";
+    }
+    
+    // Determine timestamp
+    const currentTimestamp = timestamp || SimpleCalendar.api.timestamp();
+    
+    // Use cache if enabled and timestamp matches
+    if (useCache && this._cache.timestamp === currentTimestamp) {
+      return this._cache.period;
+    }
+    
+    // Get current time
+    const dt = SimpleCalendar.api.currentDateTimeDisplay();
+    if (!dt?.time) {
+      return "Unknown Time";
+    }
+    
+    // Parse the time
+    const [hours] = dt.time.split(":").map(Number);
+    
+    // Determine period
+    let period;
+    if (hours >= 5 && hours < 8) {
+      period = "Early Morning";
+    } else if (hours >= 8 && hours < 12) {
+      period = "Morning";
+    } else if (hours >= 12 && hours < 14) {
+      period = "Noon";
+    } else if (hours >= 14 && hours < 18) {
+      period = "Afternoon";
+    } else if (hours >= 18 && hours < 21) {
+      period = "Evening";
+    } else if (hours >= 21 || hours < 2) {
+      period = "Night";
+    } else {
+      period = "Late Night";
+    }
+    
+    // Update cache
+    this._cache = {
+      timestamp: currentTimestamp,
+      period
+    };
+    
+    return period;
   }
-
+  
   /**
-   * Get current weather state from the active scene
-   * @returns {Object|null} - Weather state or null if not available
+   * Clear the time period cache
    */
-  static getWeatherState() {
-    const scene = game.scenes.viewed;
-    if (!scene?.id) return null;
-
-    return scene.getFlag("dimensional-weather", "weatherState");
+  static clearCache() {
+    this._cache = {
+      timestamp: 0,
+      period: null
+    };
   }
 }
