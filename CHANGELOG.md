@@ -1,5 +1,22 @@
 # Dimensional Weather Changelog
 
+## Version 1.2.0 - Advanced Optimization Update
+
+### Major Improvements
+- Consolidated command system for improved reliability and maintainability
+- Added dedicated SceneManager for centralized scene operations
+- Created StateManager for better state management and caching
+- Implemented specialized TimeUtils for consistent time handling
+- Added WeatherCalculator for modular and efficient weather generation 
+- Developed optimized weather engine with improved performance
+
+### Technical Enhancements
+- Reduced code redundancy across the module
+- Improved separation of concerns with dedicated utility classes
+- Enhanced error handling and recovery
+- Better memory usage through efficient state management
+- Streamlined initialization process
+
 ## Version 1.1.0 - Optimization Update
 
 ### Major Changes
