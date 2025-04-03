@@ -1,5 +1,12 @@
 # Dimensional Weather Changelog
 
+## Version 1.2.1 - Bugfix Update
+
+### Bug Fixes
+- Fixed error "Cannot read properties of undefined (reading 'viewed')" in SceneManager and StateManager
+- Improved null handling throughout the codebase
+- Enhanced scene initialization safety checks
+
 ## Version 1.2.0 - Advanced Optimization Update
 
 ### Major Improvements
