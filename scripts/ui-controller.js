@@ -4,7 +4,8 @@
  */
 
 import { Settings } from "./settings.js";
-import { DOMUtils, SceneUtils, ErrorHandler } from "./utils.js";
+import { DOMUtils, ErrorHandler } from "./utils.js";
+import { SceneManager } from "./scene-manager.js";
 import { WeatherDescriptionService } from "./services/weather-description.js";
 
 export class UIController {
@@ -216,7 +217,7 @@ export class UIController {
         return false;
       }
 
-      const weatherState = SceneUtils.getWeatherState();
+      const weatherState = SceneManager.getWeatherState();
       if (!weatherState) {
         ErrorHandler.logAndNotify(
           "No weather state found for scene",
@@ -521,7 +522,7 @@ export class UIController {
    */
   _getSurvivalRules(weatherState = null) {
     if (!weatherState) {
-      weatherState = SceneUtils.getWeatherState();
+      weatherState = SceneManager.getWeatherState();
     }
 
     if (!weatherState || !this.settingsData) {

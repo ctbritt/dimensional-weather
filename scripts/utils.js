@@ -136,33 +136,46 @@ export class DOMUtils {
 }
 
 /**
- * Utilities for working with scene flags
+ * Random utility functions
  */
-export class SceneUtils {
+export class RandomUtils {
   /**
-   * Update scene flags in a batch
-   * @param {Scene} scene - Scene to update
-   * @param {string} flagScope - Flag scope (e.g., "weatherState")
-   * @param {Object} updates - Object with updates to apply
-   * @returns {Promise<Scene>} - Updated scene
+   * Generate a random number within a range
+   * @param {number} min - Minimum value
+   * @param {number} max - Maximum value
+   * @returns {number} Random number between min and max
    */
-  static async updateFlags(scene, flagScope, updates) {
-    if (!scene?.id) return null;
-
-    const currentFlags = scene.getFlag("dimensional-weather", flagScope) || {};
-    const updatedFlags = { ...currentFlags, ...updates };
-
-    return scene.setFlag("dimensional-weather", flagScope, updatedFlags);
+  static getRandomRange(min, max) {
+    return Math.random() * (max - min) + min;
   }
-
+  
   /**
-   * Get current weather state from the active scene
-   * @returns {Object|null} - Weather state or null if not available
+   * Generate a random integer within a range
+   * @param {number} min - Minimum value
+   * @param {number} max - Maximum value
+   * @returns {number} Random integer between min and max (inclusive)
    */
-  static getWeatherState() {
-    const scene = game.scenes.viewed;
-    if (!scene?.id) return null;
-
-    return scene.getFlag("dimensional-weather", "weatherState");
+  static getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+  
+  /**
+   * Get a random element from an array
+   * @param {Array} array - Array to pick from
+   * @returns {*} Random element from the array
+   */
+  static getRandomElement(array) {
+    return array[Math.floor(Math.random() * array.length)];
+  }
+  
+  /**
+   * Generate a random boolean with a given probability
+   * @param {number} probability - Probability of true (0-1)
+   * @returns {boolean} Random boolean
+   */
+  static getRandomBool(probability = 0.5) {
+    return Math.random() < probability;
   }
 }
