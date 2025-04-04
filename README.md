@@ -299,11 +299,11 @@ Create a new JSON file in the `campaign_settings` directory with the following s
 4. Paste the manifest URL and click Install
 
 ## To Do:
-- [ ] Enable custom styles for each campaign setting. In theory, Greyhawk current weather should not look the same as Athas current weather. 
+- [x] Enable custom styles for each campaign setting. In theory, Greyhawk current weather should not look the same as Athas current weather. 
 - [ ] Create interface for building and editing custom json climate files.
 - [ ] Make sure Simple Calendar updates weather on schedule.
-- [ ] Mask OpenAI key
-- [ ] Develop API for other module developers
+- [x] Mask OpenAI key
+- [x] Develop API for other module developers
 
 
 
