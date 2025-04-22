@@ -103,7 +103,8 @@ export class Settings {
     },
     manualOnly: {
       name: "Manual Weather Updates Only",
-      hint: "When enabled, weather will only initialize or update when you explicitly use '/weather update'",
+      hint:
+        "When enabled, weather will only initialize or update when you explicitly use '/weather update'",
       scope: "world",
       config: true,
       type: Boolean,
@@ -190,7 +191,10 @@ export class Settings {
           this.SETTINGS.campaign.onChange = onCampaignChange;
         }
       } catch (err) {
-        ErrorHandler.logAndNotify("Failed to load campaign settings for dropdown", err);
+        ErrorHandler.logAndNotify(
+          "Failed to load campaign settings for dropdown",
+          err
+        );
       }
       // Register all settings
       for (const [key, config] of Object.entries(this.SETTINGS)) {
@@ -222,7 +226,6 @@ export class Settings {
       `;
       document.head.appendChild(style);
 
-
       console.log("Dimensional Weather | Settings registered successfully");
     } catch (error) {
       ErrorHandler.logAndNotify("Failed to register settings", error);
@@ -238,15 +241,12 @@ export class Settings {
     try {
       // index.json should list all available campaign setting files
       const indexPath = `${this.SETTINGS_PATH}/index.json`;
-      const indexData = await Cache.getOrFetch(
-        "settings_index",
-        async () => {
-          return await ErrorHandler.handleFetch(
-            indexPath,
-            "Failed to load campaign settings index"
-          );
-        }
-      );
+      const indexData = await Cache.getOrFetch("settings_index", async () => {
+        return await ErrorHandler.handleFetch(
+          indexPath,
+          "Failed to load campaign settings index"
+        );
+      });
       return Array.isArray(indexData?.campaignSettings)
         ? indexData.campaignSettings
         : [];
@@ -258,7 +258,6 @@ export class Settings {
       return [];
     }
   }
-
 
   /**
    * Load a specific campaign setting
@@ -282,7 +281,6 @@ export class Settings {
       return null;
     }
   }
-
 
   /**
    * Get current campaign setting ID
@@ -320,7 +318,7 @@ export class Settings {
   static isSimpleCalendarEnabled() {
     return (
       game.modules.get("simple-calendar")?.active &&
-      this.getSetting("useSimpleCalendar")
+      Settings.getSetting("useSimpleCalendar")
     );
   }
 }
