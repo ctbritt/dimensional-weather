@@ -53,6 +53,8 @@ async function initializeModule() {
  */
 async function handleSceneWeather(forceUpdate = false) {
   if (!initialized) return;
+  // Skip automatic scene handling in manual-only mode
+  if (Settings.getSetting("manualOnly")) return;
 
   const scene = game.scenes.viewed;
   if (!scene?.id) return;
@@ -86,6 +88,8 @@ async function handleSceneWeather(forceUpdate = false) {
  */
 async function checkTimeBasedUpdate() {
   try {
+    // Skip automatic time-based updates in manual-only mode
+    if (Settings.getSetting("manualOnly")) return;
     if (!initialized) {
       console.warn(
         `${MODULE_TITLE} | Module not initialized, skipping time-based update`

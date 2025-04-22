@@ -51,8 +51,8 @@ export class DimensionalWeatherAPI {
       this.initialized = true;
       console.log("Dimensional Weather API | Initialized successfully");
 
-      // Initialize weather for current scene if it exists
-      if (game.scenes?.viewed?.id) {
+      // Initialize weather for current scene if it exists (skip in manual-only mode)
+      if (!Settings.getSetting("manualOnly") && game.scenes?.viewed?.id) {
         await this.engine.initializeWeather(game.scenes.viewed);
       }
 

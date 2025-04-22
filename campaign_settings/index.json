@@ -1,14 +1,14 @@
 {
     "campaignSettings": [
         {
-            "id": "earth",
-            "name": "Earth",
-            "path": "earth.json"
-        },
-        {
             "id": "athas",
             "name": "Athas",
             "path": "athas.json"
+        },
+        {
+            "id": "earth",
+            "name": "Earth",
+            "path": "earth.json"
         },
         {
             "id": "greyhawk",

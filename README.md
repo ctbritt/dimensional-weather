@@ -287,9 +287,17 @@ Create a new JSON file in the `campaign_settings` directory with the following s
 ```
 
 ### Adding Your Setting
-1. Place your JSON file in the `campaign_settings` directory. There are already two files there. One for Athas and one for a default, earth-like world.
-2. The module will automatically detect and load your setting
-3. Select your setting from the module settings or using the chat command
+1. Place your JSON file (e.g. `mySetting.json`) into the `campaign_settings` directory.
+2. In `campaign_settings/index.json`, add an entry to the `campaignSettings` array:
+   ```json
+   {
+     "id": "mySetting",
+     "name": "My Custom Setting",
+     "path": "mySetting.json"
+   }
+   ```
+3. Restart Foundry; the module reads `index.json` on load and will detect your new setting.
+4. Select your custom setting in the module settings or via `/weather terrain ...`.
 
 ## Installation
 
