@@ -75,7 +75,7 @@
                 {
                     "extremeHeat": 2,
                     "description": "Extreme Heat",
-                    "effect": "A creature exposed to the extreme heat and without access to drinkable water must succeed on a Constitution saving throw at the end of each hour or gain 1 Exhaustion level; the DC is 5 for the first hour and increases by 1 for each additional hour. Creatures wearing Medium or Heavy armor have Disadvantage on the save. Creatures that have Resistance or Immunity to Fire damage automatically succeed on the save.."
+                    "effect": "A creature exposed to the extreme heat and without access to drinkable water must succeed on a [[/save con format=long]] at the end of each hour or gain 1 Exhaustion level; the DC is 5 for the first hour and increases by 1 for each additional hour. Creatures wearing Medium or Heavy armor have Disadvantage on the save. Creatures that have Resistance or Immunity to Fire damage automatically succeed on the save.."
                 }
             ]
         },
@@ -194,7 +194,7 @@
                 }
             },
             "rules": [
-                "Creatures can become trapped in deep dust (DC 15 Strength check to escape)"
+                "Creatures can become trapped in deep dust ([[/check str 15]] to escape)"
             ]
         },
         "forestRidge": {
@@ -378,8 +378,8 @@
             "rules": [
                 "Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)",
                 "Creatures without eye protection have Disadvantage on Perception checks during the day",
-                "Creatures can become trapped in the silt if they fail a DC 12 Strength (Athletics) check",
-                "Swimming creatures must make a DC 15 Constitution save each hour or gain 1 Exhaustion level from breathing in silt particles"
+                "Creatures can become trapped in the silt if they fail a [[/check ath 12]] check",
+                "Swimming creatures must make a [[/save con 15 format=long]] each hour or gain 1 Exhaustion level from breathing in silt particles"
             ]
         },
         "stonyBarrens": {

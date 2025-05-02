@@ -65,12 +65,12 @@
                 {
                     "extremeHeat": 10,
                     "description": "Extreme Heat",
-                    "effect": "DC 5 Constitution save each hour (increases by 1 per hour) or gain 1 Exhaustion level. Creatures wearing Medium/Heavy armor have Disadvantage. Creatures with Fire Resistance/Immunity automatically succeed."
+                    "effect": "[[/save con format=long]] each hour (DC starts at 5 and increases by 1 per hour) or gain 1 Exhaustion level. Creatures wearing Medium/Heavy armor have Disadvantage. Creatures with Fire Resistance/Immunity automatically succeed."
                 },
                 {
                     "extremeCold": -10,
                     "description": "Extreme Cold",
-                    "effect": "DC 10 Constitution save each hour or gain 1 Exhaustion level. Creatures with Cold Resistance/Immunity automatically succeed."
+                    "effect": "[[/save con 10 format=long]] each hour or gain 1 Exhaustion level. Creatures with Cold Resistance/Immunity automatically succeed."
                 }
             ]
         },
