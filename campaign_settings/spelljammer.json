@@ -60,7 +60,7 @@
                 {
                     "extremeCold": -10,
                     "description": "Arctic Cold",
-                    "effect": "Creatures exposed to arctic cold must succeed on a [[/save con format=long dc=10]] at the end of each hour or gain 1 level of exhaustion. The DC is 10 for the first hour and increases by 5 for each additional hour."
+                    "effect": "Creatures exposed to arctic cold must succeed on a [[/save con dc=10 format=long]] at the end of each hour or gain 1 level of exhaustion. The DC is 10 for the first hour and increases by 5 for each additional hour."
                 }
             ]
         },
@@ -76,7 +76,7 @@
                 {
                     "strongWind": 5,
                     "description": "Strong Flow",
-                    "effect": "A strong Flow current imposes disadvantage on piloting checks and can cause ships to drift off course. Spelljamming vessels must make a [[/check tool=navg int dc=15 format=long]] each hour or take [[/r 1d6]] damage from collisions with debris."
+                    "effect": "A strong Flow current imposes disadvantage on piloting checks and can cause ships to drift off course. Spelljamming vessels must make a [[/check tool=navg int dc=15]] each hour or take [[/damage 1d6 bludgeoning average]] damage from collisions with debris."
                 }
             ]
         },
@@ -92,7 +92,7 @@
                 {
                     "heavyPrecipitation": 10,
                     "description": "Phlogiston Storm",
-                    "effect": "Everything within a phlogiston storm is heavily obscured. Creatures have disadvantage on Wisdom (Perception) checks. Ships must make a [[/save con DC=15 format=long]] each hour or take [[/r 2d6]] fire damage from phlogiston exposure."
+                    "effect": "Everything within a phlogiston storm is heavily obscured. Creatures have disadvantage on Wisdom (Perception) checks. Ships must make a [[/save con DC=15]] each hour or take [[/damage 2d6 fire average]] damage from phlogiston exposure."
                 }
             ]
         },
@@ -150,8 +150,7 @@
             "humidity": 0,
             "variability": 3,
             "rules": [
-                "Difficult terrain for spelljamming vessels",
-                "DC 15 Dexterity (Piloting) check to avoid collisions",
+                "[[/check tool=navg dex dc=15]] to avoid collisions",
                 "Provides cover for ambushes"
             ]
         },
@@ -178,7 +177,6 @@
             "humidity": 0,
             "variability": 7,
             "rules": [
-                "Difficult terrain",
                 "[[/save con DC=12 format=long]] each hour or gain 1 level of exhaustion",
                 "May contain valuable minerals"
             ]
