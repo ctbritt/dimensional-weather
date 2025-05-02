@@ -14,6 +14,11 @@
             "id": "greyhawk",
             "name": "Greyhawk",
             "path": "greyhawk.json"
+        },
+        {
+            "id": "spelljammer",
+            "name": "Spelljammer",
+            "path": "spelljammer.json"
         }
     ]
 }

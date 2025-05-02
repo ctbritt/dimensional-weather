@@ -12,31 +12,6 @@ export class Settings {
 
   // Settings definitions with default values
   static SETTINGS = {
-    campaignSettingsIndex: {
-      name: "Campaign Settings Index",
-      scope: "world",
-      config: false,
-      type: Object,
-      default: {
-        campaignSettings: [
-          {
-            id: "earth",
-            name: "Earth",
-            path: "earth.json",
-          },
-          {
-            id: "athas",
-            name: "Dark Sun: Athas",
-            path: "athas.json",
-          },
-          {
-            id: "greyhawk",
-            name: "Greyhawk",
-            path: "greyhawk.json",
-          },
-        ],
-      },
-    },
     campaign: {
       name: "Campaign Setting",
       hint:

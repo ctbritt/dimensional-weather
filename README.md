@@ -299,6 +299,29 @@ Create a new JSON file in the `campaign_settings` directory with the following s
 3. Restart Foundry; the module reads `index.json` on load and will detect your new setting.
 4. Select your custom setting in the module settings or via `/weather terrain ...`.
 
+### Updating the Campaign Index
+
+If you add new campaign setting JSON files to the `campaign_settings` directory or modify the `name` in existing ones, you need to update the `campaign_settings/index.json` file. This index file is used to populate the campaign selection dropdown in the module settings.
+
+There's a helpful Node.js script to automate this process:
+
+**Steps:**
+
+1.  **Navigate to the Module Directory:** Open your terminal or command prompt and change the directory to the root of the `dimensional-weather` module:
+    ```bash
+    cd /path/to/your/foundryuserdata/Data/modules/dimensional-weather
+    ```
+    *(Replace `/path/to/your/foundryuserdata` with the actual path on your system)*
+
+2.  **Run the Indexing Script:** Execute the following command:
+    ```bash
+    node scripts/generate-campaign-settings-index.js
+    ```
+
+3.  **Verification:** The script will scan the `campaign_settings` directory, read the `id` and `name` from each valid JSON file (excluding `index.json`), sort them alphabetically by name, and overwrite `campaign_settings/index.json` with the updated list. You should see a confirmation message in the terminal indicating how many entries were added.
+
+That's it! The module settings will now reflect any changes you've made to the available campaign settings.
+
 ## Installation
 
 1. Copy this URL: `[your manifest URL]`

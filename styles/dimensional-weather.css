@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Orbitron&family=Space+Grotesk&display=swap");
+
 /* Dimensional Weather CSS
  * Optimized version with CSS variables and reduced redundancy
  */
@@ -28,6 +30,15 @@
   --dw-border-width: 1px;
   --dw-border-accent-width: 1px;
   --dw-box-shadow: 0 2px 4px var(--dw-color-shadow);
+
+  /* Campaign Style Variables (with fallbacks to theme) */
+  --dw-campaign-heading-font: var(--dw-font-heading);
+  --dw-campaign-text-font: var(--dw-font-text);
+  --dw-campaign-bg-color: var(--dw-color-bg);
+  --dw-campaign-text-color: var(--dw-color-text);
+  --dw-campaign-heading-color: var(--dw-color-heading);
+  --dw-campaign-accent-color: var(--dw-color-accent);
+  --dw-campaign-border-color: var(--dw-color-border);
 }
 
 /* Dark Mode Overrides */
@@ -131,36 +142,36 @@
 
 /* Weather Report Styling */
 #chat-log .chat-message .message-content .weather-report {
-  background: var(--dw-color-bg);
-  border: var(--dw-border-width) solid var(--dw-color-border);
+  background: var(--dw-campaign-bg-color);
+  border: var(--dw-border-width) solid var(--dw-campaign-border-color);
   border-radius: var(--dw-border-radius);
   padding: var(--dw-spacing-md);
   margin: var(--dw-spacing-sm) 0;
-  color: var(--dw-color-text);
-  font-family: var(--dw-font-text);
+  color: var(--dw-campaign-text-color);
+  font-family: var(--dw-campaign-text-font);
   box-shadow: var(--dw-box-shadow);
 }
 
 #chat-log .chat-message .message-content .weather-report h3 {
-  font-family: var(--dw-font-heading);
+  font-family: var(--dw-campaign-heading-font);
   font-size: 1.2em;
   font-weight: 600;
-  color: var(--dw-color-accent);
+  color: var(--dw-campaign-heading-color);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin: 0 0 0.5em 0;
-  border-bottom: var(--dw-border-width) solid var(--dw-color-border);
+  border-bottom: var(--dw-border-width) solid var(--dw-campaign-border-color);
   padding-bottom: var(--dw-spacing-sm);
   text-shadow: none;
 }
 
 #chat-log .chat-message .message-content .weather-report h4 {
-  font-family: var(--dw-font-heading);
+  font-family: var(--dw-campaign-heading-font);
   font-size: 1.1em;
   font-weight: 500;
-  color: var(--dw-color-accent);
+  color: var(--dw-campaign-accent-color);
   margin: 1em 0 0.5em 0;
-  border-bottom: var(--dw-border-width) solid var(--dw-color-border);
+  border-bottom: var(--dw-border-width) solid var(--dw-campaign-border-color);
   padding-bottom: var(--dw-spacing-xs);
   text-shadow: none;
 }
@@ -173,7 +184,7 @@
 
 #chat-log .chat-message .message-content .weather-report hr {
   border: none;
-  border-top: var(--dw-border-width) solid var(--dw-color-border);
+  border-top: var(--dw-border-width) solid var(--dw-campaign-border-color);
   margin: 0.5em 0;
 }
 
@@ -190,14 +201,14 @@
 }
 
 #chat-log .chat-message .message-content .weather-report li:before {
-  color: var(--dw-color-accent);
+  color: var(--dw-campaign-accent-color);
   position: absolute;
   left: 0.5em;
 }
 
 #chat-log .chat-message .message-content .weather-report .terrain-type {
   font-size: 0.9em;
-  color: var(--dw-color-accent);
+  color: var(--dw-campaign-accent-color);
   font-weight: 500;
   margin: 0.2em 0 0.5em 0;
   text-transform: uppercase;
@@ -205,7 +216,7 @@
 }
 
 #chat-log .chat-message .message-content .weather-report strong {
-  color: var(--dw-color-accent);
+  color: var(--dw-campaign-accent-color);
   font-weight: 600;
 }
 

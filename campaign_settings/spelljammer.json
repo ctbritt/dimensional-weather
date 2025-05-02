@@ -1,0 +1,187 @@
+{
+    "id": "spelljammer",
+    "name": "Spelljammer",
+    "description": "A vast expanse of wildspace and the mysterious Flow, where ships sail between crystal spheres and through the phlogiston. The environment is harsh and unforgiving, with unique challenges for spacefaring adventurers.",
+    "defaultTerrain": "wildspace",
+    "styles": {
+        "headingFont": "Orbitron, Space Grotesk, fantasy",
+        "textFont": "Arial, Helvetica, sans-serif",
+        "backgroundColor": "#1a1a1a",
+        "headingColor": "#FFD700",
+        "textColor": "#E0E0E0",
+        "accentColor": "#40E0D0",
+        "borderColor": "#FFD700"
+    },
+    "seasons": {
+        "flowCurrent": {
+            "name": "Flow Current",
+            "description": "The Flow is particularly active, creating strong currents and unusual phenomena.",
+            "modifiers": {
+                "temperature": 1,
+                "wind": 2,
+                "precipitation": 0,
+                "humidity": 0,
+                "variability": 2
+            }
+        },
+        "calmFlow": {
+            "name": "Calm Flow",
+            "description": "The Flow is relatively calm, making travel between spheres easier.",
+            "modifiers": {
+                "temperature": -1,
+                "wind": -1,
+                "precipitation": 0,
+                "humidity": 0,
+                "variability": -1
+            }
+        },
+        "stormFlow": {
+            "name": "Storm Flow",
+            "description": "Dangerous storms rage through the Flow, creating hazardous conditions for spelljamming vessels.",
+            "modifiers": {
+                "temperature": 0,
+                "wind": 3,
+                "precipitation": 0,
+                "humidity": 0,
+                "variability": 3
+            }
+        }
+    },
+    "weatherDimensions": {
+        "temperature": {
+            "descriptions": {
+                "-10": "Arctic Cold — The bitter cold of deep space threatens unprotected creatures, requiring immediate shelter or magical protection.",
+                "-5": "Extreme Cold — A biting chill that numbs exposed extremities and requires significant protection.",
+                "0": "Cool — Brisk and cool, like an autumn morning.",
+                "5": "Mild — Pleasant and comfortable, like a mild spring day.",
+                "10": "Warm — Noticeably warm, like a summer afternoon."
+            },
+            "rules": [
+                {
+                    "extremeCold": -10,
+                    "description": "Arctic Cold",
+                    "effect": "Creatures exposed to arctic cold must succeed on a [[/save con format=long dc=10]] at the end of each hour or gain 1 level of exhaustion. The DC is 10 for the first hour and increases by 5 for each additional hour."
+                }
+            ]
+        },
+        "wind": {
+            "descriptions": {
+                "-10": "Dead Space — Complete stillness, no movement in the void.",
+                "-5": "Calm Space — Minimal movement in the Flow.",
+                "0": "Normal Flow — Standard conditions for spelljamming travel.",
+                "5": "Strong Flow — Noticeable currents affecting ship movement.",
+                "10": "Turbulent Flow — Dangerous currents that can damage ships."
+            },
+            "rules": [
+                {
+                    "strongWind": 5,
+                    "description": "Strong Flow",
+                    "effect": "A strong Flow current imposes disadvantage on piloting checks and can cause ships to drift off course. Spelljamming vessels must make a [[/check tool=navg int dc=15 format=long]] each hour or take [[/r 1d6]] damage from collisions with debris."
+                }
+            ]
+        },
+        "precipitation": {
+            "descriptions": {
+                "-10": "Void — Complete absence of matter.",
+                "-5": "Trace Elements — Microscopic particles in the Flow.",
+                "0": "Standard Flow — Normal phlogiston density.",
+                "5": "Dense Flow — Thick phlogiston affecting visibility.",
+                "10": "Phlogiston Storm — Dangerous concentrations of the Flow."
+            },
+            "rules": [
+                {
+                    "heavyPrecipitation": 10,
+                    "description": "Phlogiston Storm",
+                    "effect": "Everything within a phlogiston storm is heavily obscured. Creatures have disadvantage on Wisdom (Perception) checks. Ships must make a [[/save con DC=15 format=long]] each hour or take [[/r 2d6]] fire damage from phlogiston exposure."
+                }
+            ]
+        },
+        "humidity": {
+            "descriptions": {
+                "-10": "Complete Void — No moisture whatsoever.",
+                "-5": "Trace Moisture — Almost no humidity.",
+                "0": "Standard Space — Typical wildspace conditions.",
+                "5": "Moist Flow — Noticeable moisture in the air.",
+                "10": "Humid Flow — Thick moisture affecting visibility and comfort."
+            }
+        }
+    },
+    "timeModifiers": {
+        "Dawn": {
+            "temperature": 1
+        },
+        "Day": {
+            "temperature": 2
+        },
+        "Dusk": {
+            "temperature": 0
+        },
+        "Night": {
+            "temperature": -1
+        }
+    },
+    "terrains": {
+        "wildspace": {
+            "name": "Wildspace",
+            "description": "The vacuum within a crystal sphere, surrounding planets, stars, and other celestial bodies. Typically feels like a mild spring day within a ship's air envelope.",
+            "temperature": 5,
+            "wind": 0,
+            "precipitation": 0,
+            "humidity": 0,
+            "variability": 0,
+            "rules": []
+        },
+        "flow": {
+            "name": "The Flow",
+            "description": "The turbulent, flammable, rainbow-colored Phlogiston river filling the space between crystal spheres, used for interstellar travel. Temperatures are generally comfortable but variable.",
+            "temperature": 3,
+            "wind": 2,
+            "precipitation": 0,
+            "humidity": 0,
+            "variability": 0,
+            "rules": []
+        },
+        "asteroidField": {
+            "name": "Asteroid Field",
+            "description": "A dangerous region filled with floating rocks and debris.",
+            "temperature": 0,
+            "wind": 1,
+            "precipitation": 0,
+            "humidity": 0,
+            "variability": 3,
+            "rules": [
+                "Difficult terrain for spelljamming vessels",
+                "DC 15 Dexterity (Piloting) check to avoid collisions",
+                "Provides cover for ambushes"
+            ]
+        },
+        "nebula": {
+            "name": "Nebula",
+            "description": "A colorful cloud of gas and dust in wildspace.",
+            "temperature": 0,
+            "wind": 1,
+            "precipitation": 5,
+            "humidity": 5,
+            "variability": 6,
+            "rules": [
+                "Heavily obscured area",
+                "Disadvantage on Wisdom (Perception) checks",
+                "May contain valuable minerals or dangerous creatures"
+            ]
+        },
+        "cometTail": {
+            "name": "Comet Tail",
+            "description": "The trailing debris and gases of a passing comet.",
+            "temperature": -2,
+            "wind": 3,
+            "precipitation": 5,
+            "humidity": 0,
+            "variability": 7,
+            "rules": [
+                "Difficult terrain",
+                "[[/save con DC=12 format=long]] each hour or gain 1 level of exhaustion",
+                "May contain valuable minerals"
+            ]
+        }
+    }
+}

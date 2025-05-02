@@ -240,7 +240,27 @@ export class UIController {
       const timeDisplay = this._getTimePeriod();
 
       // Build chat card
-      const chatCardText = `<div class="weather-report">
+      const campaignStyles = this.settingsData?.styles || {}; // Get styles from loaded settings
+      let styleString = "";
+
+      // Build inline style string from campaign styles
+      if (campaignStyles.headingFont)
+        styleString += `--dw-campaign-heading-font: ${campaignStyles.headingFont};`;
+      if (campaignStyles.textFont)
+        styleString += `--dw-campaign-text-font: ${campaignStyles.textFont};`;
+      if (campaignStyles.backgroundColor)
+        styleString += `--dw-campaign-bg-color: ${campaignStyles.backgroundColor};`;
+      if (campaignStyles.headingColor)
+        styleString += `--dw-campaign-heading-color: ${campaignStyles.headingColor};`;
+      if (campaignStyles.textColor)
+        styleString += `--dw-campaign-text-color: ${campaignStyles.textColor};`;
+      if (campaignStyles.accentColor)
+        styleString += `--dw-campaign-accent-color: ${campaignStyles.accentColor};`;
+      if (campaignStyles.borderColor)
+        styleString += `--dw-campaign-border-color: ${campaignStyles.borderColor};`;
+
+      // Build chat card with inline style
+      const chatCardText = `<div class="weather-report" style="${styleString}">
         <h3>Current Weather</h3>
         <p class="terrain-type">${terrainDisplay} - ${timeDisplay} - ${seasonDisplay}</p>
         <hr>
