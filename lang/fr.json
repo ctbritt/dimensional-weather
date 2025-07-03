@@ -1,0 +1,106 @@
+{
+    "dimensional-weather": {
+        "settings": {
+            "worldType": {
+                "name": "Type de Monde",
+                "hint": "Choisissez entre Fantasy Traditionnelle ou Dark Sun (Athas)."
+            },
+            "climateType": {
+                "name": "Type de Climat",
+                "hint": "Sélectionnez le climat prédominant de la région."
+            },
+            "season": {
+                "name": "Saison",
+                "hint": "Sélectionnez la saison actuelle."
+            },
+            "timeOfDay": {
+                "name": "Moment de la Journée",
+                "hint": "Sélectionnez le moment actuel de la journée."
+            },
+            "updateInterval": {
+                "name": "Intervalle de Mise à Jour Météo",
+                "hint": "Définissez combien d'heures de jeu doivent s'écouler entre les mises à jour automatiques de la météo."
+            },
+            "useSimpleCalendar": {
+                "name": "Utiliser l'Intégration Simple Calendar",
+                "hint": "Synchronisez automatiquement les saisons et le moment de la journée avec le module Simple Calendar."
+            },
+            "useHexMap": {
+                "name": "Utiliser la Météo Hexagonale",
+                "hint": "Activez le système météorologique hexagonal pour les campagnes Dark Sun."
+            }
+        },
+        "dimensions": {
+            "temperature": "Température",
+            "wind": "Vent",
+            "precipitation": "Précipitation",
+            "humidity": "Humidité",
+            "variability": "Variabilité"
+        },
+        "climates": {
+            "traditional": {
+                "temperate": "Tempéré",
+                "desert": "Désert",
+                "tundra": "Toundra",
+                "tropical": "Tropical",
+                "coastal": "Côtier",
+                "mountain": "Montagne",
+                "swamp": "Marécage"
+            },
+            "darkSun": {
+                "boulderFields": "Champs de Rochers",
+                "dustSinks": "Creux de Poussière",
+                "forestRidge": "Crête Forestière",
+                "mountains": "Montagnes",
+                "mudflats": "Vasières",
+                "ringingMountains": "Montagnes Sonores",
+                "rockyBadlands": "Terres Stériles Rocheuses",
+                "saltFlats": "Plaines Salées",
+                "saltMarshes": "Marais Salants",
+                "sandyWastes": "Déserts de Sable",
+                "scrubPlains": "Plaines de Broussailles",
+                "seaOfSilt": "Mer de Limon",
+                "stonyBarrens": "Terres Stériles Pierreuses",
+                "verdantBelt": "Ceinture Verdoyante"
+            }
+        },
+        "seasons": {
+            "traditional": {
+                "spring": "Printemps",
+                "summer": "Été",
+                "fall": "Automne",
+                "winter": "Hiver"
+            },
+            "darkSun": {
+                "highSun": "Soleil Haut",
+                "sunDescending": "Soleil Descendant",
+                "sunAscending": "Soleil Ascendant"
+            }
+        },
+        "timeOfDay": {
+            "earlyMorning": "Petit Matin",
+            "midMorning": "Milieu de Matinée",
+            "noon": "Midi",
+            "afternoon": "Après-midi",
+            "evening": "Soirée",
+            "night": "Nuit",
+            "lateNight": "Nuit Profonde"
+        },
+        "ui": {
+            "checkWeather": "Vérifier la Météo",
+            "updateWeather": "Mettre à Jour la Météo",
+            "currentWeather": "Météo Actuelle",
+            "effects": "Effets",
+            "hexMapControls": "Contrôles de la Carte Hexagonale"
+        },
+        "commands": {
+            "weather": "Afficher la météo actuelle",
+            "weatherUpdate": "Forcer la mise à jour de la météo",
+            "weatherSet": "Définir une dimension météorologique spécifique",
+            "weatherClimate": "Définir le climat",
+            "weatherSeason": "Définir la saison",
+            "weatherTime": "Définir le moment de la journée",
+            "weatherHex": "Déplacer la météo sur la carte hexagonale"
+        }
+    }
+}

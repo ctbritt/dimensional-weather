@@ -1,0 +1,260 @@
+@import url("https://fonts.googleapis.com/css2?family=Orbitron&family=Space+Grotesk&display=swap");
+
+/* Dimensional Weather CSS
+ * Optimized version with CSS variables and reduced redundancy
+ */
+
+/* Global Variables */
+:root {
+  /* Default Theme Colors - Light Mode */
+  /*  --dw-color-bg: #ecf0f1;
+  --dw-color-text: #34495e;
+  --dw-color-heading: #bb6f1e; */
+  --dw-color-accent: #d86717;
+  --dw-color-border: #232526;
+  --dw-color-bg-alt: rgba(0, 0, 0, 0.05);
+  --dw-color-bg-alt-dark: rgba(0, 0, 0, 0.1);
+  --dw-color-shadow: rgba(0, 0, 0, 0.1);
+
+  /* Fonts - Using Foundry's Default Fonts */
+  --dw-font-heading: "Signika", sans-serif;
+  --dw-font-text: "Signika", sans-serif;
+  --dw-font-fantasy: "Signika", sans-serif;
+
+  /* UI Measurements */
+  --dw-spacing-xs: 4px;
+  --dw-spacing-sm: 8px;
+  --dw-spacing-md: 12px;
+  --dw-spacing-lg: 16px;
+  --dw-border-radius: 3px;
+  --dw-border-width: 1px;
+  --dw-border-accent-width: 1px;
+  --dw-box-shadow: 0 2px 4px var(--dw-color-shadow);
+
+  /* Campaign Style Variables (with fallbacks to theme) */
+  --dw-campaign-heading-font: var(--dw-font-heading);
+  --dw-campaign-text-font: var(--dw-font-text);
+  --dw-campaign-bg-color: var(--dw-color-bg);
+  --dw-campaign-text-color: var(--dw-color-text);
+  --dw-campaign-heading-color: var(--dw-color-heading);
+  --dw-campaign-accent-color: var(--dw-color-accent);
+  --dw-campaign-border-color: var(--dw-color-border);
+}
+
+/* Dark Mode Overrides */
+.theme-dark {
+  --dw-color-bg: rgba(0, 0, 0, 0.8);
+  --dw-color-text: #ffffff;
+  --dw-color-heading: #ffffff;
+  --dw-color-border: rgba(255, 255, 255, 0.1);
+  --dw-color-bg-alt: rgba(255, 255, 255, 0.05);
+  --dw-color-bg-alt-dark: rgba(0, 0, 0, 0.2);
+  --dw-color-shadow: rgba(0, 0, 0, 0.5);
+}
+
+/* Base Styles */
+.dimensional-weather-panel {
+  padding: var(--dw-spacing-md);
+  margin-bottom: var(--dw-spacing-md);
+  border: var(--dw-border-width) solid var(--dw-color-border);
+  border-radius: var(--dw-border-radius);
+  background-color: var(--dw-color-bg);
+  color: var(--dw-color-text);
+  box-shadow: var(--dw-box-shadow);
+}
+
+.dimensional-weather-title {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: var(--dw-spacing-sm);
+  border-bottom: var(--dw-border-width) solid var(--dw-color-border);
+  padding-bottom: var(--dw-spacing-sm);
+  color: var(--dw-color-heading);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dimensional-weather-dimension {
+  display: flex;
+  justify-content: space-between;
+  margin: var(--dw-spacing-sm) 0;
+}
+
+.dimensional-weather-dimension-name {
+  font-weight: bold;
+}
+
+.dimensional-weather-dimension-value {
+  text-align: right;
+}
+
+.dimensional-weather-description,
+.dimensional-weather-effects {
+  margin-top: var(--dw-spacing-md);
+  padding-top: var(--dw-spacing-sm);
+  border-top: var(--dw-border-width) solid var(--dw-color-border);
+}
+
+/* Weather Help Styling */
+.weather-help {
+  font-family: var(--dw-font-text);
+  color: var(--dw-color-text);
+  background: var(--dw-color-bg-alt);
+  padding: var(--dw-spacing-md);
+  border-radius: var(--dw-border-radius);
+  border: var(--dw-border-width) solid var(--dw-color-border);
+}
+
+.weather-help h2,
+.weather-help h3 {
+  font-family: var(--dw-font-heading);
+  color: var(--dw-color-heading);
+  margin: var(--dw-spacing-sm) 0;
+  border-bottom: var(--dw-border-accent-width) solid var(--dw-color-accent);
+  padding-bottom: var(--dw-spacing-xs);
+}
+
+.weather-help .command {
+  margin: var(--dw-spacing-sm) 0;
+}
+
+.weather-help .command-name {
+  color: var(--dw-color-accent);
+  font-weight: bold;
+  margin-right: var(--dw-spacing-md);
+}
+
+.weather-help .command-desc {
+  color: var(--dw-color-text);
+  font-style: italic;
+}
+
+.weather-help .list-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--dw-spacing-sm);
+}
+
+.weather-help .list-item {
+  color: var(--dw-color-text);
+  padding: var(--dw-spacing-xs) var(--dw-spacing-sm);
+}
+
+/* Weather Report Styling */
+#chat-log .chat-message .message-content .weather-report {
+  background: var(--dw-campaign-bg-color);
+  border: var(--dw-border-width) solid var(--dw-campaign-border-color);
+  border-radius: var(--dw-border-radius);
+  padding: var(--dw-spacing-md);
+  margin: var(--dw-spacing-sm) 0;
+  color: var(--dw-campaign-text-color);
+  font-family: var(--dw-campaign-text-font);
+  box-shadow: var(--dw-box-shadow);
+}
+
+#chat-log .chat-message .message-content .weather-report h3 {
+  font-family: var(--dw-campaign-heading-font);
+  font-size: 1.2em;
+  font-weight: 600;
+  color: var(--dw-campaign-heading-color);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 0.5em 0;
+  border-bottom: var(--dw-border-width) solid var(--dw-campaign-border-color);
+  padding-bottom: var(--dw-spacing-sm);
+  text-shadow: none;
+}
+
+#chat-log .chat-message .message-content .weather-report h4 {
+  font-family: var(--dw-campaign-heading-font);
+  font-size: 1.1em;
+  font-weight: 500;
+  color: var(--dw-campaign-accent-color);
+  margin: 1em 0 0.5em 0;
+  border-bottom: var(--dw-border-width) solid var(--dw-campaign-border-color);
+  padding-bottom: var(--dw-spacing-xs);
+  text-shadow: none;
+}
+
+#chat-log .chat-message .message-content .weather-report p {
+  margin: 0.5em 0;
+  text-shadow: none;
+  opacity: 1;
+}
+
+#chat-log .chat-message .message-content .weather-report hr {
+  border: none;
+  border-top: var(--dw-border-width) solid var(--dw-campaign-border-color);
+  margin: 0.5em 0;
+}
+
+#chat-log .chat-message .message-content .weather-report ul {
+  list-style-type: none;
+  padding-left: 0;
+  margin: 0.5em 0;
+}
+
+#chat-log .chat-message .message-content .weather-report li {
+  margin: 0.3em 0;
+  position: relative;
+  opacity: 1;
+}
+
+#chat-log .chat-message .message-content .weather-report li:before {
+  color: var(--dw-campaign-accent-color);
+  position: absolute;
+  left: 0.5em;
+}
+
+#chat-log .chat-message .message-content .weather-report .terrain-type {
+  font-size: 0.9em;
+  color: var(--dw-campaign-accent-color);
+  font-weight: 500;
+  margin: 0.2em 0 0.5em 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#chat-log .chat-message .message-content .weather-report strong {
+  color: var(--dw-campaign-accent-color);
+  font-weight: 600;
+}
+
+/* Calendar Info Styling */
+.weather-calendar {
+  background: var(--dw-color-bg);
+  border: var(--dw-border-width) solid var(--dw-color-border);
+  border-radius: var(--dw-border-radius);
+  padding: var(--dw-spacing-md);
+  margin: var(--dw-spacing-sm) 0;
+  color: var(--dw-color-text);
+  font-family: var(--dw-font-text);
+  font-size: 14px;
+  line-height: 1.4;
+  box-shadow: var(--dw-box-shadow);
+}
+
+.weather-calendar h3 {
+  font-family: var(--dw-font-heading);
+  font-size: 1.2em;
+  font-weight: 600;
+  color: var(--dw-color-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 0.5em 0;
+  border-bottom: var(--dw-border-width) solid var(--dw-color-border);
+  padding-bottom: var(--dw-spacing-sm);
+  text-shadow: none;
+}
+
+.weather-calendar p {
+  margin: 0.5em 0;
+  opacity: 1;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .weather-help .list-section {
+    grid-template-columns: 1fr;
+  }
+}

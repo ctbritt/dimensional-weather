@@ -1,0 +1,24 @@
+{
+    "campaignSettings": [
+        {
+            "id": "athas",
+            "name": "Athas",
+            "path": "athas.json"
+        },
+        {
+            "id": "earth",
+            "name": "Earth",
+            "path": "earth.json"
+        },
+        {
+            "id": "greyhawk",
+            "name": "Greyhawk",
+            "path": "greyhawk.json"
+        },
+        {
+            "id": "spelljammer",
+            "name": "Spelljammer",
+            "path": "spelljammer.json"
+        }
+    ]
+}
