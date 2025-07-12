@@ -2,11 +2,7 @@
   "id": "dimensional-weather",
   "title": "Dimensional Weather",
   "description": "A dynamic weather system for Foundry VTT, providing a modular system for developing your own climes, terrains, and atmospheric phenomenon.",
-<<<<<<< HEAD
-  "version": "2.0",
-=======
   "version": "#{VERSION}#",
->>>>>>> 18bac4accfe1fcb828ae2c790651e8fcd93016d8
   "compatibility": {
     "minimum": "12",
     "verified": "13",
@@ -56,15 +52,9 @@
       "flags": {}
     }
   ],
-<<<<<<< HEAD
-  "url": "https://github.com/ctbritt/dimensional-weather",
-  "manifest": "https://github.com/ctbritt/dimensional-weather/releases/latest/download/module.json",
-  "download": "https://github.com/ctbritt/dimensional-weather/releases/download/2.0/module.zip",
-=======
   "url": "#{URL}#",
   "manifest": "#{MANIFEST}#",
   "download": "#{DOWNLOAD}#",
->>>>>>> 18bac4accfe1fcb828ae2c790651e8fcd93016d8
   "license": "MIT",
   "readme": "README.md",
   "bugs": "https://github.com/ctbritt/dimensional-weather/issues",
@@ -88,14 +78,12 @@
         }
       },
       {
-        "id": "about-time",
+        "id": "seasons-and-stars",
         "type": "module",
-        "compatibility": {}
-      },
-      {
-        "id": "foundryvtt-simple-calendar",
-        "type": "module",
-        "compatibility": {}
+        "manifest": "https://github.com/rayners/fvtt-seasons-and-stars/releases/download/v0.7.0/module.json",
+        "compatibility": {
+          "verified": "0.7.0"
+        }
       },
       {
         "id": "lib-wrapper",
