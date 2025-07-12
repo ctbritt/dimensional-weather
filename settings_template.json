@@ -1,0 +1,152 @@
+{
+    "name": "Template Climate System",
+    "description": "A template for creating custom climate systems",
+    "seasons": {
+        "spring": {
+            "name": "Spring",
+            "description": "A season of renewal and moderate weather.",
+            "modifiers": {
+                "temperature": 1,
+                "wind": 1,
+                "precipitation": 2,
+                "humidity": 1,
+                "variability": 2
+            }
+        },
+        "summer": {
+            "name": "Summer",
+            "description": "The hottest season with increased humidity and potential for storms.",
+            "modifiers": {
+                "temperature": 3,
+                "wind": 0,
+                "precipitation": 1,
+                "humidity": 2,
+                "variability": 1
+            }
+        },
+        "autumn": {
+            "name": "Autumn",
+            "description": "Cooling temperatures and increased wind bring changing weather patterns.",
+            "modifiers": {
+                "temperature": -1,
+                "wind": 2,
+                "precipitation": 1,
+                "humidity": 0,
+                "variability": 3
+            }
+        },
+        "winter": {
+            "name": "Winter",
+            "description": "Cold temperatures and potential for snow and ice.",
+            "modifiers": {
+                "temperature": -3,
+                "wind": 1,
+                "precipitation": 0,
+                "humidity": -1,
+                "variability": 2
+            }
+        }
+    },
+    "weatherDimensions": {
+        "temperature": {
+            "descriptions": {
+                "-10": "Extreme cold (0°F or lower)",
+                "-5": "Very cold (20°F)",
+                "-2": "Cold (35°F)",
+                "0": "Cool (50°F)",
+                "2": "Warm (70°F)",
+                "5": "Hot (85°F)",
+                "8": "Very hot (95°F)",
+                "10": "Extreme heat (100°F or higher)"
+            },
+            "rules": {
+                "-10": {
+                    "description": "Extreme Cold",
+                    "effect": "DC 10 Constitution save each hour or gain 1 Exhaustion level",
+                    "immunity": "Creatures with Cold Resistance/Immunity automatically succeed"
+                },
+                "10": {
+                    "description": "Extreme Heat",
+                    "effect": "DC 5 Constitution save each hour (increases by 1 per hour) or gain 1 Exhaustion level",
+                    "disadvantage": "Creatures wearing Medium/Heavy armor have Disadvantage",
+                    "immunity": "Creatures with Fire Resistance/Immunity automatically succeed"
+                }
+            }
+        },
+        "wind": {
+            "descriptions": {
+                "-10": "Dead calm",
+                "-5": "Very light breeze",
+                "-2": "Light breeze",
+                "0": "Moderate breeze",
+                "2": "Strong breeze",
+                "5": "Strong wind",
+                "8": "Gale force winds",
+                "10": "Hurricane force winds"
+            }
+        },
+        "precipitation": {
+            "descriptions": {
+                "-10": "Clear skies",
+                "-5": "Partly cloudy",
+                "-2": "Mostly cloudy",
+                "0": "Light rain/snow",
+                "2": "Moderate rain/snow",
+                "5": "Heavy rain/snow",
+                "8": "Torrential downpour",
+                "10": "Severe storm"
+            },
+            "rules": {
+                "5": {
+                    "description": "Heavy Precipitation",
+                    "effect": "Area is Lightly Obscured",
+                    "disadvantage": "Disadvantage on Wisdom (Perception) checks"
+                }
+            }
+        },
+        "humidity": {
+            "descriptions": {
+                "-10": "Extremely dry",
+                "-5": "Very dry",
+                "-2": "Dry",
+                "0": "Normal humidity",
+                "2": "Humid",
+                "5": "Very humid",
+                "8": "Oppressively humid",
+                "10": "Saturated air"
+            }
+        }
+    },
+    "timeModifiers": {
+        "Early Morning": {
+            "temperature": -2
+        },
+        "Noon": {
+            "temperature": 2
+        },
+        "Afternoon": {
+            "temperature": 1
+        },
+        "Night": {
+            "temperature": -1
+        },
+        "Late Night": {
+            "temperature": -2
+        }
+    },
+    "terrains": {
+        "template_terrain": {
+            "name": "Template Terrain",
+            "description": "A template for creating custom terrain types",
+            "temperature": 0,
+            "wind": 0,
+            "precipitation": 0,
+            "humidity": 0,
+            "variability": 5,
+            "rules": [
+                "Example rule: Movement is Difficult terrain",
+                "Example rule: Creatures without eye protection have Disadvantage on Perception checks"
+            ]
+        }
+    }
+}
