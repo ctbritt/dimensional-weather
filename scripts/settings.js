@@ -247,9 +247,8 @@ export class Settings {
    */
   static async loadCampaignSettingsFromDirectory() {
     try {
-      // Construct the correct URL for the index.json file
-      const moduleBaseUrl = this.getModuleBaseUrl();
-      const indexPath = `${moduleBaseUrl}/campaign_settings/index.json`;
+      // Use relative path instead of constructing URL
+      const indexPath = "./campaign_settings/index.json";
       console.log(
         "Dimensional Weather | Attempting to load index from:",
         indexPath
@@ -268,7 +267,9 @@ export class Settings {
               `Failed with status ${response.status}: ${response.statusText}`
             );
           }
-          return await response.json();
+          const data = await response.json();
+          console.log("Dimensional Weather | Successfully loaded index data:", data);
+          return data;
         } catch (error) {
           console.warn(
             "Dimensional Weather | Failed to load index from file, using fallback"
@@ -309,8 +310,8 @@ export class Settings {
    */
   static async loadCampaignSetting(settingId) {
     try {
-      const moduleBaseUrl = this.getModuleBaseUrl();
-      const settingPath = `${moduleBaseUrl}/campaign_settings/${settingId}.json`;
+      // Use relative path instead of constructing URL
+      const settingPath = `./campaign_settings/${settingId}.json`;
       console.log(
         "Dimensional Weather | Attempting to load setting from:",
         settingPath
@@ -332,7 +333,9 @@ export class Settings {
               `Failed with status ${response.status}: ${response.statusText}`
             );
           }
-          return await response.json();
+          const data = await response.json();
+          console.log(`Dimensional Weather | Successfully loaded setting: ${settingId}`, data);
+          return data;
         } catch (error) {
           console.warn(
             `Dimensional Weather | Failed to load ${settingId} from file, trying fallback`

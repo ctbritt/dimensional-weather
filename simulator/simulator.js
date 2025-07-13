@@ -19,17 +19,40 @@ class WeatherSimulator {
 
   async loadCampaignSettings() {
     try {
-      const response = await fetch(
-        "http://localhost:8000/campaign_settings/index.json"
-      );
+      console.log("Dimensional Weather Simulator | Attempting to load campaign settings index...");
+      
+      // Use relative path instead of hardcoded localhost URL
+      const indexPath = "./campaign_settings/index.json";
+      console.log("Dimensional Weather Simulator | Loading index from:", indexPath);
+      
+      const response = await fetch(indexPath);
+      console.log("Dimensional Weather Simulator | Index response status:", response.status);
+      
+      if (!response.ok) {
+        throw new Error(`Failed to load index.json: ${response.status} ${response.statusText}`);
+      }
+      
       const { campaignSettings } = await response.json();
+      console.log("Dimensional Weather Simulator | Loaded campaign settings:", campaignSettings);
 
       for (const campaign of campaignSettings) {
-        const campaignResponse = await fetch(
-          `http://localhost:8000/campaign_settings/${campaign.path}`
-        );
+        console.log(`Dimensional Weather Simulator | Loading campaign: ${campaign.id} from ${campaign.path}`);
+        
+        // Use relative path instead of hardcoded localhost URL
+        const campaignPath = `./campaign_settings/${campaign.path}`;
+        console.log(`Dimensional Weather Simulator | Loading campaign file from: ${campaignPath}`);
+        
+        const campaignResponse = await fetch(campaignPath);
+        console.log(`Dimensional Weather Simulator | Campaign ${campaign.id} response status:`, campaignResponse.status);
+        
+        if (!campaignResponse.ok) {
+          console.warn(`Dimensional Weather Simulator | Failed to load campaign ${campaign.id}: ${campaignResponse.status} ${campaignResponse.statusText}`);
+          continue;
+        }
+        
         const campaignData = await campaignResponse.json();
         this.campaignSettings[campaign.id] = campaignData;
+        console.log(`Dimensional Weather Simulator | Successfully loaded campaign: ${campaign.id}`);
       }
 
       // Update campaign select options
@@ -44,10 +67,12 @@ class WeatherSimulator {
       // Update options in the correct order
       this.updateSeasonOptions();
       this.updateTerrainOptions();
+      
+      console.log("Dimensional Weather Simulator | Campaign settings loading completed successfully");
     } catch (error) {
-      console.error("Error loading campaign settings:", error);
+      console.error("Dimensional Weather Simulator | Error loading campaign settings:", error);
       alert(
-        "Failed to load campaign settings. Please make sure the local server is running on port 8000."
+        "Failed to load campaign settings. Please check the browser console for details."
       );
     }
   }
