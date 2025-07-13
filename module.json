@@ -18,6 +18,7 @@
     }
   ],
   "esmodules": [
+    "scripts/services/weather-description.js",
     "scripts/api.js",
     "scripts/command-system.js",
     "scripts/main.js",
