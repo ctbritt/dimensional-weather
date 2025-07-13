@@ -141,8 +141,8 @@ export class SceneManager {
     if (!weatherState?.lastUpdate) return true;
 
     const lastUpdateTime = weatherState.lastUpdate;
-    const currentTime = SimpleCalendar?.api
-      ? SimpleCalendar.api.timestamp()
+    const currentTime = window.DSC
+      ? new Date().getTime()
       : Date.now();
     const hoursSinceLastUpdate = (currentTime - lastUpdateTime) / 3600;
 

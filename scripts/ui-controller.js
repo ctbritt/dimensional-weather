@@ -444,15 +444,18 @@ export class UIController {
    * @returns {string} Season name
    */
   _getSeasonName(seasonKey) {
-    // Try to get season from Simple Calendar first
-    if (Settings.isSimpleCalendarEnabled() && SimpleCalendar?.api) {
-      const currentSeason = SimpleCalendar.api.getCurrentSeason();
-      if (currentSeason?.name) {
-        return currentSeason.name;
+    // Try to get season from Dark Sun Calendar first
+    if (Settings.isDarkSunCalendarEnabled() && window.DSC) {
+      const currentDate = window.DSC.getCurrentDate();
+      if (currentDate) {
+        const seasonInfo = window.DSC.getSeasonInfo(currentDate);
+        if (seasonInfo?.name) {
+          return seasonInfo.name;
+        }
       }
     }
 
-    // Fall back to settings if Simple Calendar is not available or has no season
+    // Fall back to settings if Dark Sun Calendar is not available or has no season
     const season = this.settingsData?.seasons?.[seasonKey];
     if (season?.name) {
       return season.name;
@@ -473,18 +476,18 @@ export class UIController {
    * @returns {string} Time period name
    */
   _getTimePeriod() {
-    if (!SimpleCalendar?.api) {
+    if (!window.DSC) {
       return "Unknown Time";
     }
 
-    // Get current time display which includes formatted time
-    const dt = SimpleCalendar.api.currentDateTimeDisplay();
-    if (!dt?.time) {
+    // Get current date from Dark Sun Calendar
+    const currentDate = window.DSC.getCurrentDate();
+    if (!currentDate?.time) {
       return "Unknown Time";
     }
 
-    // Parse the time string (e.g. "10:10:50")
-    const [hours] = dt.time.split(":").map(Number);
+    // Extract hour from the time object
+    const hours = currentDate.time.hour;
 
     // Define time periods based on hour ranges to match campaign settings
     if (hours >= 5 && hours < 8) {
@@ -628,16 +631,22 @@ export class UIController {
    * @returns {string} Calendar info HTML
    */
   getCalendarInfo() {
-    if (!SimpleCalendar?.api) {
-      return "Simple Calendar is not active.";
+    if (!window.DSC) {
+      return "Dark Sun Calendar is not active.";
     }
 
-    const dt = SimpleCalendar.api.currentDateTimeDisplay();
+    const currentDate = window.DSC.getCurrentDate();
+    if (!currentDate) {
+      return "Dark Sun Calendar date not available.";
+    }
+
+    const formattedDate = window.DSC.formatDarkSunDate(currentDate);
+    const timeString = currentDate.time ? currentDate.getTimeString() : "00:00:00";
 
     return `<div class="weather-calendar">
       <h3>Calendar Information</h3>
-      <p>Date: ${dt.day}${dt.daySuffix} ${dt.monthName}</p>
-      <p>Time: ${dt.time}</p>
+      <p>Date: ${formattedDate}</p>
+      <p>Time: ${timeString}</p>
     </div>`;
   }
 }

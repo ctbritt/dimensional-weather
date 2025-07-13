@@ -256,18 +256,18 @@ export class WeatherEngine {
       { weatherState }
     ); // Log entry
     // Direct checks
-    const isSCActive = game.modules.get("simple-calendar")?.active; // Keep for logging
-    const useSimpleCalendarSetting = Settings.getSetting("useSimpleCalendar");
-    const scAPI = SimpleCalendar?.api;
+    const isDSCActive = game.modules.get("dark-sun-calendar")?.active; // Keep for logging
+    const useDarkSunCalendarSetting = Settings.getSetting("useDarkSunCalendar");
+    const dscAPI = window.DSC;
     console.log(
       "DimensionalWeather | WeatherEngine._determineCurrentSeason: Direct check results.",
-      { isSCActive, useSimpleCalendarSetting, scAPIAvailable: !!scAPI }
+      { isDSCActive, useDarkSunCalendarSetting, dscAPIAvailable: !!dscAPI }
     ); // Log direct checks
 
-    // If the setting is enabled AND the Simple Calendar API exists
-    if (useSimpleCalendarSetting && scAPI) {
+    // If the setting is enabled AND the Dark Sun Calendar API exists
+    if (useDarkSunCalendarSetting && dscAPI) {
       console.log(
-        "DimensionalWeather | WeatherEngine._determineCurrentSeason: Using Simple Calendar (checked API exists). Calling TimeUtils.getCurrentSeason..."
+        "DimensionalWeather | WeatherEngine._determineCurrentSeason: Using Dark Sun Calendar (checked API exists). Calling TimeUtils.getCurrentSeason..."
       ); // Log decision
       return TimeUtils.getCurrentSeason(this.settingsData);
     }
