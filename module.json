@@ -20,7 +20,6 @@
   "esmodules": [
     "scripts/api.js",
     "scripts/command-system.js",
-    "scripts/generate-campaign-settings-index.js",
     "scripts/main.js",
     "scripts/scene-manager.js",
     "scripts/settings.js",
