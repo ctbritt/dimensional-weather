@@ -10,6 +10,16 @@ export class Settings {
   static SETTINGS_PATH = "modules/dimensional-weather/campaign_settings";
   static DEFAULT_CAMPAIGN = "earth";
 
+  /**
+   * Get the base URL for the module
+   * @returns {string} Base URL for the module
+   */
+  static getModuleBaseUrl() {
+    // In Foundry VTT, module files are served from the modules directory
+    // We need to construct the URL relative to the Foundry server
+    return `${window.location.origin}/modules/${this.NAMESPACE}`;
+  }
+
   // Settings definitions with default values
   static SETTINGS = {
     campaign: {
@@ -214,14 +224,28 @@ export class Settings {
    */
   static async loadCampaignSettingsFromDirectory() {
     try {
-      // index.json should list all available campaign setting files
-      const indexPath = `${this.SETTINGS_PATH}/index.json`;
+      // Construct the correct URL for the index.json file
+      const moduleBaseUrl = this.getModuleBaseUrl();
+      const indexPath = `${moduleBaseUrl}/campaign_settings/index.json`;
+
       const indexData = await Cache.getOrFetch("settings_index", async () => {
-        return await ErrorHandler.handleFetch(
-          indexPath,
-          "Failed to load campaign settings index"
-        );
+        try {
+          const response = await fetch(indexPath);
+          if (!response.ok) {
+            throw new Error(
+              `Failed with status ${response.status}: ${response.statusText}`
+            );
+          }
+          return await response.json();
+        } catch (error) {
+          ErrorHandler.logAndNotify(
+            "Failed to load campaign settings index",
+            error
+          );
+          return null;
+        }
       });
+
       return Array.isArray(indexData?.campaignSettings)
         ? indexData.campaignSettings
         : [];
@@ -241,12 +265,25 @@ export class Settings {
    */
   static async loadCampaignSetting(settingId) {
     try {
-      const settingPath = `${this.SETTINGS_PATH}/${settingId}.json`;
+      const moduleBaseUrl = this.getModuleBaseUrl();
+      const settingPath = `${moduleBaseUrl}/campaign_settings/${settingId}.json`;
+
       return await Cache.getOrFetch(`campaign_${settingId}`, async () => {
-        return await ErrorHandler.handleFetch(
-          settingPath,
-          `Failed to load campaign setting: ${settingId}`
-        );
+        try {
+          const response = await fetch(settingPath);
+          if (!response.ok) {
+            throw new Error(
+              `Failed with status ${response.status}: ${response.statusText}`
+            );
+          }
+          return await response.json();
+        } catch (error) {
+          ErrorHandler.logAndNotify(
+            `Failed to load campaign setting: ${settingId}`,
+            error
+          );
+          return null;
+        }
       });
     } catch (error) {
       ErrorHandler.logAndNotify(
