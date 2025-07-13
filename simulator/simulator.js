@@ -17,12 +17,48 @@ class WeatherSimulator {
     this.loadCampaignSettings();
   }
 
+  /**
+   * Get the base URL for the module
+   * @returns {string} Base URL for the module
+   */
+  getModuleBaseUrl() {
+    const moduleName = "dimensional-weather";
+    
+    // Try multiple approaches to get the correct module URL
+    const module = game.modules.get(moduleName);
+
+    // Method 1: Try module.data.path
+    if (module && module.data && module.data.path) {
+      console.log(
+        "Dimensional Weather Simulator | Using module data path:",
+        module.data.path
+      );
+      return module.data.path;
+    }
+
+    // Method 2: Try constructing from current location
+    const baseUrl = `${window.location.origin}/modules/${moduleName}`;
+    console.log("Dimensional Weather Simulator | Using constructed base URL:", baseUrl);
+
+    // Method 3: Try using the module's URL property if available
+    if (module && module.data && module.data.url) {
+      console.log(
+        "Dimensional Weather Simulator | Using module data URL:",
+        module.data.url
+      );
+      return module.data.url;
+    }
+
+    return baseUrl;
+  }
+
   async loadCampaignSettings() {
     try {
       console.log("Dimensional Weather Simulator | Attempting to load campaign settings index...");
       
-      // Use relative path instead of hardcoded localhost URL
-      const indexPath = "./campaign_settings/index.json";
+      // Use absolute URL constructed from module base URL
+      const baseUrl = this.getModuleBaseUrl();
+      const indexPath = `${baseUrl}/campaign_settings/index.json`;
       console.log("Dimensional Weather Simulator | Loading index from:", indexPath);
       
       const response = await fetch(indexPath);
@@ -38,8 +74,8 @@ class WeatherSimulator {
       for (const campaign of campaignSettings) {
         console.log(`Dimensional Weather Simulator | Loading campaign: ${campaign.id} from ${campaign.path}`);
         
-        // Use relative path instead of hardcoded localhost URL
-        const campaignPath = `./campaign_settings/${campaign.path}`;
+        // Use absolute URL constructed from module base URL
+        const campaignPath = `${baseUrl}/campaign_settings/${campaign.path}`;
         console.log(`Dimensional Weather Simulator | Loading campaign file from: ${campaignPath}`);
         
         const campaignResponse = await fetch(campaignPath);

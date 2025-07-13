@@ -247,8 +247,9 @@ export class Settings {
    */
   static async loadCampaignSettingsFromDirectory() {
     try {
-      // Use relative path instead of constructing URL
-      const indexPath = "./campaign_settings/index.json";
+      // Use absolute URL constructed from module base URL
+      const baseUrl = this.getModuleBaseUrl();
+      const indexPath = `${baseUrl}/campaign_settings/index.json`;
       console.log(
         "Dimensional Weather | Attempting to load index from:",
         indexPath
@@ -310,8 +311,9 @@ export class Settings {
    */
   static async loadCampaignSetting(settingId) {
     try {
-      // Use relative path instead of constructing URL
-      const settingPath = `./campaign_settings/${settingId}.json`;
+      // Use absolute URL constructed from module base URL
+      const baseUrl = this.getModuleBaseUrl();
+      const settingPath = `${baseUrl}/campaign_settings/${settingId}.json`;
       console.log(
         "Dimensional Weather | Attempting to load setting from:",
         settingPath
