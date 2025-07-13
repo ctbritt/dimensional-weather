@@ -10,6 +10,9 @@ This module adds a comprehensive weather system to your campaign, featuring:
 - Survival rules based on conditions
 - Private GM commands for weather management
 - Optional AI-powered weather descriptions
+- API for other module developers
+- Advanced scene and state management
+- Performance-optimized weather calculations
 
 ## How the Weather System Works
 The Dimensional Weather system was inspired by the hex flower power described at [Goblin's Henchman](https://goblinshenchman.wordpress.com/hex-power-flower/). It uses a dynamic, multi-dimensional approach to weather generation that combines:
@@ -44,7 +47,7 @@ Each terrain has four primary dimensions that determine its weather, with -10 be
 
 ### Example: Weather Generation
 
-Let's see how weather is generated for a Scrub Plains terrain (from my Dark Sun Camapign), which corresponds roughly to savannah:
+Let's see how weather is generated for a Scrub Plains terrain (from my Dark Sun Campaign), which corresponds roughly to savannah:
 
 1. **Base Conditions**
    ```json
@@ -69,7 +72,7 @@ Let's see how weather is generated for a Scrub Plains terrain (from my Dark Sun 
    - Clamps final values between -10 and +10
 
 4. **Survival Rules**
-   These are determined by your camapign. I'm using the [extreme heat](https://www.dndbeyond.com/sources/dnd/dmg-2024/dms-toolbox#ExtremeHeat), [extreme cold](https://www.dndbeyond.com/sources/dnd/dmg-2024/dms-toolbox#ExtremeCold), [strong winds](https://www.dndbeyond.com/sources/dnd/dmg-2024/dms-toolbox#ExtremeHeat), and [heavy precipitation](https://www.dndbeyond.com/sources/dnd/dmg-2024/dms-toolbox#HeavyPrecipitation) from the Dungeon's Masters Guide, but you can use whatever rules you want. 
+   These are determined by your campaign. I'm using the [extreme heat](https://www.dndbeyond.com/sources/dnd/dmg-2024/dms-toolbox#ExtremeHeat), [extreme cold](https://www.dndbeyond.com/sources/dnd/dmg-2024/dms-toolbox#ExtremeCold), [strong winds](https://www.dndbeyond.com/sources/dnd/dmg-2024/dms-toolbox#ExtremeHeat), and [heavy precipitation](https://www.dndbeyond.com/sources/dnd/dmg-2024/dms-toolbox#HeavyPrecipitation) from the Dungeon's Masters Guide, but you can use whatever rules you want. 
 
    For example:
    - Temperature ≥ 2: Double water consumption
@@ -127,7 +130,7 @@ Doesn't Simple Weather do this much more simply? Good point! And it does, yes. B
 So, I started looking around for solutions, found [this weather system](https://arena.athas.org/t/athasian-6-dimensional-weather-chart/2640) and then went down a rabbit hole. Full disclosure: I made **heavy** use of AI in developing this, so if that's not your jam, I totally get it. 
 
 ## Makin' it Rain
-If you'd like to create your own weather effects -- maybe you're not on a post-apocalyptic desert world -- You should look over the `settings-template.json` file. It is a template for describing the terrains and four dimensions of the weather on scales of -10 to 10. 
+If you'd like to create your own weather effects -- maybe you're not on a post-apocalyptic desert world -- You should look over the `templates/settings_template.json` file. It is a template for describing the terrains and four dimensions of the weather on scales of -10 to 10. 
 
 ## Tips for Creating Settings
 
@@ -322,9 +325,34 @@ There's a helpful Node.js script to automate this process:
 
 That's it! The module settings will now reflect any changes you've made to the available campaign settings.
 
+## API for Module Developers
+
+The module provides a comprehensive API for other modules to integrate with the weather system:
+
+### Basic Usage
+```javascript
+// Get current weather data
+const weather = game.modules.get('dimensional-weather').api.getCurrentWeather();
+
+// Subscribe to weather changes
+game.modules.get('dimensional-weather').api.onWeatherChange((weather) => {
+    console.log('Weather changed:', weather);
+});
+
+// Get weather for a specific scene
+const sceneWeather = game.modules.get('dimensional-weather').api.getWeatherForScene(sceneId);
+```
+
+### Available API Methods
+- `getCurrentWeather()` - Returns current weather data
+- `getWeatherForScene(sceneId)` - Get weather for specific scene
+- `onWeatherChange(callback)` - Subscribe to weather updates
+- `getCampaignSettings()` - Get available campaign settings
+- `setWeatherVariability(value)` - Set weather randomness (0-10)
+
 ## Installation
 
-1. Copy this URL: `[your manifest URL]`
+1. Copy this URL: `https://github.com/ctbritt/dimensional-weather/releases/latest/download/module.json`
 2. In Foundry VTT, go to Add-on Modules
 3. Click "Install Module"
 4. Paste the manifest URL and click Install
@@ -335,15 +363,13 @@ That's it! The module settings will now reflect any changes you've made to the a
 - [ ] Make sure Simple Calendar updates weather on schedule.
 - [x] Mask OpenAI key
 - [x] Develop API for other module developers
-
-
+- [x] Implement advanced scene and state management
+- [x] Add performance optimizations and caching
 
 ## Dependencies
 - [Chat Commands Library](https://gitlab.com/woodentavern/foundryvtt-chat-command-lib)
-- [About Time](https://github.com/LeafWulf/about-time)
-- [Simple Calendar](https://github.com/vigoren/foundryvtt-simple-calendar)
+- [Seasons and Stars](https://github.com/rayners/fvtt-seasons-and-stars)
 - [libWrapper](https://github.com/ruipin/fvtt-lib-wrapper)
-
 
 ## License
 
