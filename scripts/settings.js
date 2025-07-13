@@ -15,9 +15,32 @@ export class Settings {
    * @returns {string} Base URL for the module
    */
   static getModuleBaseUrl() {
-    // In Foundry VTT, module files are served from the modules directory
-    // We need to construct the URL relative to the Foundry server
-    return `${window.location.origin}/modules/${this.NAMESPACE}`;
+    // Try multiple approaches to get the correct module URL
+    const module = game.modules.get(this.NAMESPACE);
+
+    // Method 1: Try module.data.path
+    if (module && module.data && module.data.path) {
+      console.log(
+        "Dimensional Weather | Using module data path:",
+        module.data.path
+      );
+      return module.data.path;
+    }
+
+    // Method 2: Try constructing from current location
+    const baseUrl = `${window.location.origin}/modules/${this.NAMESPACE}`;
+    console.log("Dimensional Weather | Using constructed base URL:", baseUrl);
+
+    // Method 3: Try using the module's URL property if available
+    if (module && module.data && module.data.url) {
+      console.log(
+        "Dimensional Weather | Using module data URL:",
+        module.data.url
+      );
+      return module.data.url;
+    }
+
+    return baseUrl;
   }
 
   // Settings definitions with default values
@@ -227,10 +250,19 @@ export class Settings {
       // Construct the correct URL for the index.json file
       const moduleBaseUrl = this.getModuleBaseUrl();
       const indexPath = `${moduleBaseUrl}/campaign_settings/index.json`;
+      console.log(
+        "Dimensional Weather | Attempting to load index from:",
+        indexPath
+      );
 
       const indexData = await Cache.getOrFetch("settings_index", async () => {
         try {
+          console.log("Dimensional Weather | Fetching index from:", indexPath);
           const response = await fetch(indexPath);
+          console.log(
+            "Dimensional Weather | Index response status:",
+            response.status
+          );
           if (!response.ok) {
             throw new Error(
               `Failed with status ${response.status}: ${response.statusText}`
@@ -238,24 +270,36 @@ export class Settings {
           }
           return await response.json();
         } catch (error) {
-          ErrorHandler.logAndNotify(
-            "Failed to load campaign settings index",
-            error
+          console.warn(
+            "Dimensional Weather | Failed to load index from file, using fallback"
           );
-          return null;
+          return this.getFallbackCampaignSettingsIndex();
         }
       });
 
       return Array.isArray(indexData?.campaignSettings)
         ? indexData.campaignSettings
-        : [];
+        : this.getFallbackCampaignSettingsIndex();
     } catch (error) {
       ErrorHandler.logAndNotify(
         "Failed to load campaign settings index",
         error
       );
-      return [];
+      return this.getFallbackCampaignSettingsIndex();
     }
+  }
+
+  /**
+   * Get fallback campaign settings index for when file loading fails
+   * @returns {Array} Array of campaign setting entries
+   */
+  static getFallbackCampaignSettingsIndex() {
+    return [
+      { id: "earth", name: "Earth", path: "earth.json" },
+      { id: "athas", name: "Athas", path: "athas.json" },
+      { id: "greyhawk", name: "Greyhawk", path: "greyhawk.json" },
+      { id: "spelljammer", name: "Spelljammer", path: "spelljammer.json" },
+    ];
   }
 
   /**
@@ -267,10 +311,22 @@ export class Settings {
     try {
       const moduleBaseUrl = this.getModuleBaseUrl();
       const settingPath = `${moduleBaseUrl}/campaign_settings/${settingId}.json`;
+      console.log(
+        "Dimensional Weather | Attempting to load setting from:",
+        settingPath
+      );
 
       return await Cache.getOrFetch(`campaign_${settingId}`, async () => {
         try {
+          console.log(
+            "Dimensional Weather | Fetching setting from:",
+            settingPath
+          );
           const response = await fetch(settingPath);
+          console.log(
+            "Dimensional Weather | Setting response status:",
+            response.status
+          );
           if (!response.ok) {
             throw new Error(
               `Failed with status ${response.status}: ${response.statusText}`
@@ -278,11 +334,11 @@ export class Settings {
           }
           return await response.json();
         } catch (error) {
-          ErrorHandler.logAndNotify(
-            `Failed to load campaign setting: ${settingId}`,
-            error
+          console.warn(
+            `Dimensional Weather | Failed to load ${settingId} from file, trying fallback`
           );
-          return null;
+          // Fallback to embedded data for common settings
+          return this.getFallbackCampaignSetting(settingId);
         }
       });
     } catch (error) {
@@ -290,8 +346,59 @@ export class Settings {
         `Failed to load campaign setting: ${settingId}`,
         error
       );
-      return null;
+      return this.getFallbackCampaignSetting(settingId);
     }
+  }
+
+  /**
+   * Get fallback campaign setting data for when file loading fails
+   * @param {string} settingId - ID of the campaign setting
+   * @returns {Object|null} Campaign setting data or null
+   */
+  static getFallbackCampaignSetting(settingId) {
+    // Provide basic fallback data for common settings
+    const fallbackSettings = {
+      earth: {
+        id: "earth",
+        name: "Earth",
+        description: "A balanced weather system correspondent to Earth.",
+        defaultTerrain: "temperate",
+        seasons: {
+          spring: {
+            name: "Spring",
+            description: "A season of renewal and moderate weather.",
+          },
+          summer: {
+            name: "Summer",
+            description: "The hottest season with increased humidity.",
+          },
+          fall: {
+            name: "Autumn",
+            description: "Cooling temperatures and increased wind.",
+          },
+          winter: {
+            name: "Winter",
+            description: "Cold temperatures and potential for snow.",
+          },
+        },
+        terrains: {
+          temperate: {
+            name: "Temperate Forest",
+            description: "Mild climate with distinct seasons.",
+          },
+          desert: {
+            name: "Desert",
+            description: "Arid region with extreme temperature variations.",
+          },
+          arctic: {
+            name: "Arctic Tundra",
+            description: "Frozen wasteland with permafrost.",
+          },
+        },
+      },
+    };
+
+    return fallbackSettings[settingId] || null;
   }
 
   /**
