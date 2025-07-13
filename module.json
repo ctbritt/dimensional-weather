@@ -85,11 +85,11 @@
         }
       },
       {
-        "id": "seasons-and-stars",
+        "id": "dark-sun-calendar",
         "type": "module",
-        "manifest": "https://github.com/rayners/fvtt-seasons-and-stars/releases/download/v0.7.0/module.json",
+        "manifest": "https://github.com/ctbritt/dark-sun-calendar/releases/latest/download/module.json",
         "compatibility": {
-          "verified": "0.7.0"
+          "verified": "1.0.0"
         }
       },
       {

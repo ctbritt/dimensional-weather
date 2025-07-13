@@ -233,10 +233,10 @@ export class DimensionalWeatherAPI {
         await this.initialize();
       }
 
-      // Check if using Simple Calendar integration
-      if (Settings.isSimpleCalendarEnabled()) {
+      // Check if using Dark Sun Calendar integration
+      if (Settings.isDarkSunCalendarEnabled()) {
         ErrorHandler.logAndNotify(
-          "Cannot manually set season when Simple Calendar integration is enabled",
+          "Cannot manually set season when Dark Sun Calendar integration is enabled",
           null,
           true
         );

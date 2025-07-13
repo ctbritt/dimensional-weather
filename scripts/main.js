@@ -123,8 +123,8 @@ async function checkTimeBasedUpdate() {
 
     const updateFrequency = Settings.getSetting("updateFrequency");
     const lastUpdate = weatherState.lastUpdate || 0;
-    const currentTime = SimpleCalendar?.api
-      ? SimpleCalendar.api.timestamp()
+    const currentTime = window.DSC
+      ? new Date().getTime()
       : Date.now();
     const hoursSinceLastUpdate = (currentTime - lastUpdate) / (1000 * 60 * 60);
 
@@ -179,37 +179,37 @@ Hooks.once("simple-calendar-ready", async () => {
   await handleSceneWeather(true);
 });
 
-// Handle Simple Calendar time changes
-Hooks.on("simple-calendar.dateTimeChange", async (dateTime) => {
-  if (!initialized || !Settings.getSetting("useSimpleCalendar")) return;
+// Handle Dark Sun Calendar time changes
+Hooks.on("darkSunCalendar.dateTimeChange", async (dateTime) => {
+  if (!initialized || !Settings.getSetting("useDarkSunCalendar")) return;
 
   try {
     console.log(
-      `${MODULE_TITLE} | Simple Calendar time change detected:`,
+      `${MODULE_TITLE} | Dark Sun Calendar time change detected:`,
       dateTime
     );
     await checkTimeBasedUpdate();
   } catch (error) {
     console.error(
-      `${MODULE_TITLE} | Error handling Simple Calendar time change:`,
+      `${MODULE_TITLE} | Error handling Dark Sun Calendar time change:`,
       error
     );
   }
 });
 
-// Handle Simple Calendar season changes
-Hooks.on("simple-calendar.seasonChange", async (season) => {
-  if (!initialized || !Settings.getSetting("useSimpleCalendar")) return;
+// Handle Dark Sun Calendar season changes
+Hooks.on("darkSunCalendar.seasonChange", async (season) => {
+  if (!initialized || !Settings.getSetting("useDarkSunCalendar")) return;
 
   try {
     console.log(
-      `${MODULE_TITLE} | Simple Calendar season change detected:`,
+      `${MODULE_TITLE} | Dark Sun Calendar season change detected:`,
       season
     );
     await handleSceneWeather(true);
   } catch (error) {
     console.error(
-      `${MODULE_TITLE} | Error handling Simple Calendar season change:`,
+      `${MODULE_TITLE} | Error handling Dark Sun Calendar season change:`,
       error
     );
   }

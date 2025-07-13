@@ -671,10 +671,10 @@ export class WeatherCommandSystem {
    * @returns {Promise<Object>} Command result
    */
   async _handleSeasonCommand(args) {
-    // Check if Simple Calendar integration is enabled
-    if (Settings.isSimpleCalendarEnabled()) {
+    // Check if Dark Sun Calendar integration is enabled
+    if (Settings.isDarkSunCalendarEnabled()) {
       return this._createErrorResponse(
-        "Turn off Simple Calendar integration to manually change seasons.",
+        "Turn off Dark Sun Calendar integration to manually change seasons.",
         { whisper: [game.user.id] }
       );
     }

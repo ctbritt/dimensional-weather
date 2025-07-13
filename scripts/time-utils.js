@@ -19,9 +19,9 @@ export class TimeUtils {
    * @returns {string} Time period name
    */
   static getTimePeriod(timestamp = null, useCache = true) {
-    if (!SimpleCalendar?.api) {
+    if (!window.DSC) {
       console.log(
-        "DimensionalWeather | TimeUtils.getTimePeriod: SimpleCalendar API not available."
+        "DimensionalWeather | TimeUtils.getTimePeriod: Dark Sun Calendar API not available."
       );
       return "Unknown Time";
     }
@@ -35,21 +35,29 @@ export class TimeUtils {
       return this._cache.period;
     }
 
-    // Get current time
-    const dt = SimpleCalendar.api.currentDateTimeDisplay();
+    // Get current date from Dark Sun Calendar
+    const currentDate = window.DSC.getCurrentDate();
     console.log(
-      "DimensionalWeather | TimeUtils.getTimePeriod: SimpleCalendar dt:",
-      dt
-    ); // Log Simple Calendar data
-    if (!dt?.time) {
+      "DimensionalWeather | TimeUtils.getTimePeriod: Dark Sun Calendar currentDate:",
+      currentDate
+    ); // Log Dark Sun Calendar data
+    
+    if (!currentDate?.time) {
       console.log(
-        "DimensionalWeather | TimeUtils.getTimePeriod: SimpleCalendar dt.time not available."
+        "DimensionalWeather | TimeUtils.getTimePeriod: Dark Sun Calendar time not available."
       );
       return "Unknown Time";
     }
 
-    // Parse the time
-    const [hours] = dt.time.split(":").map(Number);
+    // Extract hour from the time object
+    const hours = currentDate.time.hour;
+    if (hours === undefined || hours === null) {
+      console.log(
+        "DimensionalWeather | TimeUtils.getTimePeriod: Could not parse hours from Dark Sun Calendar data."
+      );
+      return "Unknown Time";
+    }
+
     console.log(
       "DimensionalWeather | TimeUtils.getTimePeriod: Parsed hours:",
       hours
@@ -92,7 +100,13 @@ export class TimeUtils {
    * @returns {number} Current timestamp
    */
   static getCurrentTimestamp() {
-    return SimpleCalendar?.api ? SimpleCalendar.api.timestamp() : Date.now();
+    if (window.DSC) {
+      const currentDate = window.DSC.getCurrentDate();
+      // Convert Dark Sun Calendar date to timestamp
+      // This is a basic conversion - you may need to adjust based on your calendar system
+      return currentDate ? new Date().getTime() : Date.now();
+    }
+    return Date.now();
   }
 
   /**
@@ -100,7 +114,7 @@ export class TimeUtils {
    * @returns {Object} Date display object
    */
   static getCurrentDateDisplay() {
-    if (!SimpleCalendar?.api) {
+    if (!window.DSC) {
       return {
         date: new Date().toLocaleDateString(),
         time: new Date().toLocaleTimeString(),
@@ -108,7 +122,23 @@ export class TimeUtils {
       };
     }
 
-    return SimpleCalendar.api.currentDateTimeDisplay();
+    const currentDate = window.DSC.getCurrentDate();
+    if (!currentDate) {
+      return {
+        date: new Date().toLocaleDateString(),
+        time: new Date().toLocaleTimeString(),
+        display: new Date().toLocaleString(),
+      };
+    }
+
+    const formattedDate = window.DSC.formatDarkSunDate(currentDate);
+    const timeString = currentDate.time ? currentDate.getTimeString() : "00:00:00";
+    
+    return {
+      date: formattedDate,
+      time: timeString,
+      display: `${formattedDate} ${timeString}`,
+    };
   }
 
   /**
@@ -131,7 +161,7 @@ export class TimeUtils {
   }
 
   /**
-   * Get current season from Simple Calendar
+   * Get current season from Dark Sun Calendar
    * @param {Object} settingsData - Campaign settings data
    * @returns {string|null} Season key or null if not found
    */
@@ -139,9 +169,9 @@ export class TimeUtils {
     console.log(
       "DimensionalWeather | TimeUtils.getCurrentSeason: Attempting to get season."
     ); // Log entry
-    if (!SimpleCalendar?.api) {
+    if (!window.DSC) {
       console.log(
-        "DimensionalWeather | TimeUtils.getCurrentSeason: SimpleCalendar API not available."
+        "DimensionalWeather | TimeUtils.getCurrentSeason: Dark Sun Calendar API not available."
       );
       return null;
     }
@@ -152,22 +182,31 @@ export class TimeUtils {
       return null;
     }
 
-    const scSeason = SimpleCalendar.api.getCurrentSeason();
-    console.log(
-      "DimensionalWeather | TimeUtils.getCurrentSeason: SimpleCalendar season object:",
-      scSeason
-    ); // Log SC season object
-    if (!scSeason?.name) {
+    const currentDate = window.DSC.getCurrentDate();
+    if (!currentDate) {
       console.log(
-        "DimensionalWeather | TimeUtils.getCurrentSeason: SimpleCalendar season name not found."
+        "DimensionalWeather | TimeUtils.getCurrentSeason: Dark Sun Calendar date not available."
       );
       return null;
     }
 
-    // Convert Simple Calendar season name to lowercase for comparison
-    const scSeasonName = scSeason.name.toLowerCase();
+    const seasonInfo = window.DSC.getSeasonInfo(currentDate);
     console.log(
-      `DimensionalWeather | TimeUtils.getCurrentSeason: Comparing SC season "${scSeasonName}" to module settings.`
+      "DimensionalWeather | TimeUtils.getCurrentSeason: Dark Sun Calendar season info:",
+      seasonInfo
+    ); // Log DSC season info
+    
+    if (!seasonInfo?.name) {
+      console.log(
+        "DimensionalWeather | TimeUtils.getCurrentSeason: Dark Sun Calendar season name not found."
+      );
+      return null;
+    }
+
+    // Convert Dark Sun Calendar season name to lowercase for comparison
+    const dscSeasonName = seasonInfo.name.toLowerCase();
+    console.log(
+      `DimensionalWeather | TimeUtils.getCurrentSeason: Comparing DSC season "${dscSeasonName}" to module settings.`
     );
 
     // Find matching season in campaign settings
@@ -179,9 +218,9 @@ export class TimeUtils {
 
       // Handle both "Fall" and "Autumn" names
       if (
-        campaignSeasonName === scSeasonName ||
-        (scSeasonName === "fall" && campaignSeasonName === "autumn") ||
-        (scSeasonName === "autumn" && campaignSeasonName === "fall")
+        campaignSeasonName === dscSeasonName ||
+        (dscSeasonName === "fall" && campaignSeasonName === "autumn") ||
+        (dscSeasonName === "autumn" && campaignSeasonName === "fall")
       ) {
         console.log(
           `DimensionalWeather | TimeUtils.getCurrentSeason: Match found! Returning key: ${key}`
@@ -244,13 +283,20 @@ export class TimeUtils {
    * @returns {string} Formatted timestamp
    */
   static formatTimestamp(timestamp) {
-    if (!SimpleCalendar?.api) {
+    if (!window.DSC) {
       return new Date(timestamp).toLocaleString();
     }
 
     try {
-      const dt = SimpleCalendar.api.timestampToDate(timestamp);
-      return `${dt.display.date} ${dt.display.time}`;
+      // For Dark Sun Calendar, we'll use the current date format
+      // This is a simple implementation - you may want to enhance it
+      const currentDate = window.DSC.getCurrentDate();
+      if (currentDate) {
+        const formattedDate = window.DSC.formatDarkSunDate(currentDate);
+        const timeString = currentDate.time ? currentDate.getTimeString() : "00:00:00";
+        return `${formattedDate} ${timeString}`;
+      }
+      return new Date(timestamp).toLocaleString();
     } catch (error) {
       ErrorHandler.logAndNotify("Failed to format timestamp", error, true);
       return new Date(timestamp).toLocaleString();

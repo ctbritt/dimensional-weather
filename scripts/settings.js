@@ -59,10 +59,10 @@ export class Settings {
       type: Boolean,
       default: false,
     },
-    useSimpleCalendar: {
-      name: "Use Simple Calendar",
+    useDarkSunCalendar: {
+      name: "Use Dark Sun Calendar",
       hint:
-        "Integrate with Simple Calendar for automatic season changes and time-based updates",
+        "Integrate with Dark Sun Calendar for automatic season changes and time-based updates",
       scope: "world",
       config: true,
       type: Boolean,
@@ -287,13 +287,13 @@ export class Settings {
   }
 
   /**
-   * Check if Simple Calendar is available and enabled
-   * @returns {boolean} True if Simple Calendar is available
+   * Check if Dark Sun Calendar is available and enabled
+   * @returns {boolean} True if Dark Sun Calendar is available
    */
-  static isSimpleCalendarEnabled() {
+  static isDarkSunCalendarEnabled() {
     return (
-      game.modules.get("simple-calendar")?.active &&
-      Settings.getSetting("useSimpleCalendar")
+      game.modules.get("dark-sun-calendar")?.active &&
+      Settings.getSetting("useDarkSunCalendar")
     );
   }
 }
