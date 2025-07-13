@@ -3,6 +3,8 @@
   "title": "Dimensional Weather",
   "description": "A dynamic weather system for Foundry VTT, providing a modular system for developing your own climes, terrains, and atmospheric phenomenon.",
   "version": "#{VERSION}#",
+  "library": "false",
+  "manifestPlusVersion": "1.2.0",
   "compatibility": {
     "minimum": "12",
     "verified": "13",
@@ -10,18 +12,24 @@
   },
   "authors": [
     {
-      "name": "Christopher Allbritton",
-      "discord": "callbritton",
-      "flags": {}
+      "name": "Chris Allbritton",
+      "email": "callbritton@mac.com",
+      "url": "https://github.com/ctbritt"
     }
   ],
   "esmodules": [
-    "scripts/time-utils.js",
-    "scripts/scene-manager.js",
-    "scripts/state-manager.js",
-    "scripts/weather-calculator.js",
+    "scripts/api.js",
     "scripts/command-system.js",
-    "scripts/main.js"
+    "scripts/generate-campaign-settings-index.js",
+    "scripts/main.js",
+    "scripts/scene-manager.js",
+    "scripts/settings.js",
+    "scripts/state-manager.js",
+    "scripts/time-utils.js",
+    "scripts/ui-controller.js",
+    "scripts/utils.js",
+    "scripts/weather-calculator.js",
+    "scripts/weather-engine.js"
   ],
   "styles": [
     "styles/dimensional-weather.css"
@@ -55,19 +63,18 @@
   "url": "#{URL}#",
   "manifest": "#{MANIFEST}#",
   "download": "#{DOWNLOAD}#",
-  "license": "MIT",
+  "license": "LICENSE",
   "readme": "README.md",
   "bugs": "https://github.com/ctbritt/dimensional-weather/issues",
+  "media": [
+    {
+      "type": "icon",
+      "url": "https://avatars2.githubusercontent.com/u/71292812?s=400&u=ccdb4eeb7abf551ca8f314e5a9bfd0479a4d3d41&v=4"
+    }
+  ],
   "changelog": "CHANGELOG.md",
   "socket": false,
   "relationships": {
-    "systems": [
-      {
-        "id": "dnd5e",
-        "type": "system",
-        "compatibility": {}
-      }
-    ],
     "requires": [
       {
         "id": "_chatcommands",
