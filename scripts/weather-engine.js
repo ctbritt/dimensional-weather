@@ -4,7 +4,7 @@
  */
 
 import { Settings } from "./settings.js";
-import { ErrorHandler } from "./utils.js";
+import { ErrorHandler, DebugLogger } from "./utils.js";
 import { TimeUtils } from "./time-utils.js";
 import { WeatherCalculator } from "./weather-calculator.js";
 import { SceneManager } from "./scene-manager.js";
@@ -47,10 +47,6 @@ export class WeatherEngine {
     // Check for existing weather state
     const existingState = SceneManager.getWeatherState(scene);
     if (existingState) {
-      console.log(
-        "Dimensional Weather | Preserving existing weather state:",
-        existingState
-      );
       return false;
     }
 
@@ -255,18 +251,14 @@ export class WeatherEngine {
     if (Settings.getSetting("useDarkSunCalendar") && window.DSC) {
       const dscSeason = TimeUtils.getCurrentSeason();
       if (dscSeason) {
-        console.log(
-          `DimensionalWeather | WeatherEngine._determineCurrentSeason: Using DSC season: ${dscSeason}`
-        );
+        DebugLogger.log("weather", `Using DSC season: ${dscSeason}`);
         return dscSeason;
       }
     }
 
     // Fall back to stored season
     const storedSeason = weatherState?.season || Settings.getSetting("season");
-    console.log(
-      `DimensionalWeather | WeatherEngine._determineCurrentSeason: Using stored season: ${storedSeason}`
-    );
+    DebugLogger.log("weather", `Using stored season: ${storedSeason}`);
     return storedSeason;
   }
 

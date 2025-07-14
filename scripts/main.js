@@ -5,7 +5,7 @@
 
 import { Settings } from "./settings.js";
 import { DimensionalWeatherAPI } from "./api.js";
-import { ErrorHandler } from "./utils.js";
+import { ErrorHandler, DebugLogger } from "./utils.js";
 import { WeatherCommandSystem } from "./command-system.js";
 import { SceneManager } from "./scene-manager.js";
 
@@ -37,7 +37,7 @@ async function initializeModule() {
     commandSystem.register();
 
     initialized = true;
-    console.log(`${MODULE_TITLE} | Module initialized successfully`);
+    DebugLogger.info("Module initialized successfully");
   } catch (error) {
     ErrorHandler.logAndNotify(
       `Failed to initialize ${MODULE_TITLE} module`,
@@ -98,9 +98,7 @@ async function checkTimeBasedUpdate() {
     }
 
     if (!Settings.getSetting("autoUpdate")) {
-      console.log(
-        `${MODULE_TITLE} | Auto-update disabled, skipping time-based update`
-      );
+      DebugLogger.log("weather", "Auto-update disabled, skipping time-based update");
       return;
     }
 
@@ -129,7 +127,7 @@ async function checkTimeBasedUpdate() {
     const hoursSinceLastUpdate = (currentTime - lastUpdate) / (1000 * 60 * 60);
 
     if (Settings.getSetting("debugTimePeriod")) {
-      console.log(`${MODULE_TITLE} | Time check:`, {
+      DebugLogger.log("weather", "Time check", {
         lastUpdate: new Date(lastUpdate).toLocaleString(),
         currentTime: new Date(currentTime).toLocaleString(),
         hoursSinceLastUpdate,
@@ -139,16 +137,12 @@ async function checkTimeBasedUpdate() {
     }
 
     if (hoursSinceLastUpdate >= updateFrequency) {
-      console.log(
-        `${MODULE_TITLE} | Time-based weather update triggered (${hoursSinceLastUpdate.toFixed(
-          1
-        )} hours since last update)`
-      );
+      DebugLogger.log("weather", `Time-based weather update triggered (${hoursSinceLastUpdate.toFixed(1)} hours since last update)`);
       await game.dimWeather.updateWeather();
       await game.dimWeather.displayWeather();
     }
   } catch (error) {
-    console.error(`${MODULE_TITLE} | Error in time-based update:`, error);
+    ErrorHandler.logAndNotify("Error in time-based update", error);
   }
 }
 
@@ -178,16 +172,10 @@ Hooks.on("darkSunCalendar.dateTimeChange", async (dateTime) => {
   if (!initialized || !Settings.getSetting("useDarkSunCalendar")) return;
 
   try {
-    console.log(
-      `${MODULE_TITLE} | Dark Sun Calendar time change detected:`,
-      dateTime
-    );
+    DebugLogger.log("weather", "Dark Sun Calendar time change detected", dateTime);
     await checkTimeBasedUpdate();
   } catch (error) {
-    console.error(
-      `${MODULE_TITLE} | Error handling Dark Sun Calendar time change:`,
-      error
-    );
+    ErrorHandler.logAndNotify("Error handling Dark Sun Calendar time change", error);
   }
 });
 
@@ -196,16 +184,10 @@ Hooks.on("darkSunCalendar.seasonChange", async (season) => {
   if (!initialized || !Settings.getSetting("useDarkSunCalendar")) return;
 
   try {
-    console.log(
-      `${MODULE_TITLE} | Dark Sun Calendar season change detected:`,
-      season
-    );
+    DebugLogger.log("weather", "Dark Sun Calendar season change detected", season);
     await handleSceneWeather(true);
   } catch (error) {
-    console.error(
-      `${MODULE_TITLE} | Error handling Dark Sun Calendar season change:`,
-      error
-    );
+    ErrorHandler.logAndNotify("Error handling Dark Sun Calendar season change", error);
   }
 });
 

@@ -112,7 +112,6 @@ export class SceneManager {
       // Check if state already exists
       const existingState = scene.getFlag(this.MODULE_ID, "weatherState");
       if (existingState) {
-        console.log("Dimensional Weather | Scene already has weather state");
         return false;
       }
 

@@ -138,6 +138,64 @@ export class DOMUtils {
 /**
  * Random utility functions
  */
+/**
+ * Centralized debug logging utility
+ */
+export class DebugLogger {
+  /**
+   * Log a debug message if the corresponding debug setting is enabled
+   * @param {string} category - Debug category (e.g., 'time', 'settings', 'weather')
+   * @param {string} message - Message to log
+   * @param {any} data - Optional data to log
+   */
+  static log(category, message, data = null) {
+    // Import Settings dynamically to avoid circular dependency
+    const settingKey = `debug${category.charAt(0).toUpperCase() + category.slice(1)}`;
+    
+    try {
+      // Check if we have access to settings
+      if (game?.settings && game.modules.get("dimensional-weather")?.active) {
+        const debugEnabled = game.settings.get("dimensional-weather", settingKey);
+        if (debugEnabled) {
+          if (data) {
+            console.log(`Dimensional Weather | ${category}: ${message}`, data);
+          } else {
+            console.log(`Dimensional Weather | ${category}: ${message}`);
+          }
+        }
+      }
+    } catch (error) {
+      // Silently skip debug logging if settings aren't available yet
+    }
+  }
+
+  /**
+   * Log a warning message (always shown)
+   * @param {string} message - Warning message
+   * @param {any} data - Optional data to log
+   */
+  static warn(message, data = null) {
+    if (data) {
+      console.warn(`Dimensional Weather | ${message}`, data);
+    } else {
+      console.warn(`Dimensional Weather | ${message}`);
+    }
+  }
+
+  /**
+   * Log an info message (always shown)
+   * @param {string} message - Info message
+   * @param {any} data - Optional data to log
+   */
+  static info(message, data = null) {
+    if (data) {
+      console.log(`Dimensional Weather | ${message}`, data);
+    } else {
+      console.log(`Dimensional Weather | ${message}`);
+    }
+  }
+}
+
 export class RandomUtils {
   /**
    * Generate a random number within a range

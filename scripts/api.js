@@ -6,7 +6,7 @@
 import { Settings } from "./settings.js";
 import { WeatherEngine } from "./weather-engine.js";
 import { UIController } from "./ui-controller.js";
-import { ErrorHandler, Cache } from "./utils.js";
+import { ErrorHandler, Cache, DebugLogger } from "./utils.js";
 import { SceneManager } from "./scene-manager.js";
 import { StateManager } from "./state-manager.js";
 import { WeatherDescriptionService } from "./services/weather-description.js";
@@ -49,7 +49,7 @@ export class DimensionalWeatherAPI {
       }
 
       this.initialized = true;
-      console.log("Dimensional Weather API | Initialized successfully");
+      DebugLogger.info("API initialized successfully");
 
       // Initialize weather for current scene if it exists (skip in manual-only mode)
       if (!Settings.getSetting("manualOnly") && game.scenes?.viewed?.id) {

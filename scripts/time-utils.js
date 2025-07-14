@@ -3,7 +3,7 @@
  * Centralized time handling and calculations
  */
 
-import { ErrorHandler } from "./utils.js";
+import { ErrorHandler, DebugLogger } from "./utils.js";
 
 export class TimeUtils {
   static _cache = {
@@ -19,9 +19,7 @@ export class TimeUtils {
    */
   static getTimePeriod(useCache = true) {
     if (!window.DSC) {
-      console.log(
-        "DimensionalWeather | TimeUtils.getTimePeriod: Dark Sun Calendar API not available."
-      );
+      DebugLogger.log("time", "Dark Sun Calendar API not available in getTimePeriod");
       return "Unknown Time";
     }
 
@@ -29,9 +27,7 @@ export class TimeUtils {
       // Get current date from Dark Sun Calendar
       const currentDate = window.DSC.getCurrentDate();
       if (!currentDate?.time) {
-        console.log(
-          "DimensionalWeather | TimeUtils.getTimePeriod: Dark Sun Calendar time not available."
-        );
+        DebugLogger.log("time", "Dark Sun Calendar time not available in getTimePeriod");
         return "Unknown Time";
       }
 
@@ -46,9 +42,7 @@ export class TimeUtils {
       // Extract hour from the time object
       const hours = currentDate.time.hour;
       if (hours === undefined || hours === null) {
-        console.log(
-          "DimensionalWeather | TimeUtils.getTimePeriod: Could not parse hours from Dark Sun Calendar data."
-        );
+        DebugLogger.log("time", "Could not parse hours from Dark Sun Calendar data in getTimePeriod");
         return "Unknown Time";
       }
 
@@ -77,15 +71,10 @@ export class TimeUtils {
         period,
       };
 
-      console.log(
-        `DimensionalWeather | TimeUtils.getTimePeriod: Time ${hours}:${currentDate.time.minute || 0} -> ${period}`
-      );
+      DebugLogger.log("time", `Time ${hours}:${currentDate.time.minute || 0} -> ${period}`);
       return period;
     } catch (error) {
-      console.error(
-        "DimensionalWeather | TimeUtils.getTimePeriod: Error getting time period:",
-        error
-      );
+      ErrorHandler.logAndNotify("Error getting time period", error);
       return "Unknown Time";
     }
   }
@@ -103,7 +92,7 @@ export class TimeUtils {
           return currentDate.timestamp || Date.now();
         }
       } catch (error) {
-        console.error("DimensionalWeather | Error getting DSC timestamp:", error);
+        DebugLogger.warn("Error getting DSC timestamp", error);
       }
     }
     return Date.now();
@@ -148,7 +137,7 @@ export class TimeUtils {
         display: `${formattedDate} ${timeString}`,
       };
     } catch (error) {
-      console.error("DimensionalWeather | Error getting date display:", error);
+      DebugLogger.warn("Error getting date display", error);
       const now = new Date();
       return {
         date: now.toLocaleDateString(),
@@ -183,27 +172,21 @@ export class TimeUtils {
    */
   static getCurrentSeason() {
     if (!window.DSC) {
-      console.log(
-        "DimensionalWeather | TimeUtils.getCurrentSeason: Dark Sun Calendar API not available."
-      );
+      DebugLogger.log("time", "Dark Sun Calendar API not available in getCurrentSeason");
       return null;
     }
 
     try {
       const currentDate = window.DSC.getCurrentDate();
       if (!currentDate?.season) {
-        console.log(
-          "DimensionalWeather | TimeUtils.getCurrentSeason: No season data in current date."
-        );
+        DebugLogger.log("time", "No season data in current date");
         return null;
       }
 
       // Get the season key directly from the DSC season object
       const seasonKey = currentDate.season.key || currentDate.season.id;
       if (seasonKey) {
-        console.log(
-          `DimensionalWeather | TimeUtils.getCurrentSeason: Found season key: ${seasonKey}`
-        );
+        DebugLogger.log("time", `Found season key: ${seasonKey}`);
         return seasonKey;
       }
 
@@ -212,21 +195,14 @@ export class TimeUtils {
       if (seasonName) {
         // Convert name to lowercase key format
         const seasonKey = seasonName.toLowerCase();
-        console.log(
-          `DimensionalWeather | TimeUtils.getCurrentSeason: Using season name as key: ${seasonKey}`
-        );
+        DebugLogger.log("time", `Using season name as key: ${seasonKey}`);
         return seasonKey;
       }
 
-      console.log(
-        "DimensionalWeather | TimeUtils.getCurrentSeason: No season key or name found."
-      );
+      DebugLogger.log("time", "No season key or name found");
       return null;
     } catch (error) {
-      console.error(
-        "DimensionalWeather | TimeUtils.getCurrentSeason: Error getting season:",
-        error
-      );
+      ErrorHandler.logAndNotify("Error getting season", error);
       return null;
     }
   }
@@ -288,7 +264,7 @@ export class TimeUtils {
       const dateDisplay = this.getCurrentDateDisplay();
       return dateDisplay.display;
     } catch (error) {
-      console.error("DimensionalWeather | Error formatting timestamp:", error);
+      DebugLogger.warn("Error formatting timestamp", error);
       return new Date(timestamp).toLocaleString();
     }
   }

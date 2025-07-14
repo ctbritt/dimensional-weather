@@ -3,7 +3,7 @@
  * Handles registration and management of module settings
  */
 
-import { ErrorHandler, Cache } from "./utils.js";
+import { ErrorHandler, Cache, DebugLogger } from "./utils.js";
 
 export class Settings {
   static NAMESPACE = "dimensional-weather";
@@ -20,23 +20,17 @@ export class Settings {
 
     // Method 1: Try module.data.path
     if (module && module.data && module.data.path) {
-      console.log(
-        "Dimensional Weather | Using module data path:",
-        module.data.path
-      );
+      DebugLogger.log("settings", "Using module data path", module.data.path);
       return module.data.path;
     }
 
     // Method 2: Try constructing from current location
     const baseUrl = `${window.location.origin}/modules/${this.NAMESPACE}`;
-    console.log("Dimensional Weather | Using constructed base URL:", baseUrl);
+    DebugLogger.log("settings", "Using constructed base URL", baseUrl);
 
     // Method 3: Try using the module's URL property if available
     if (module && module.data && module.data.url) {
-      console.log(
-        "Dimensional Weather | Using module data URL:",
-        module.data.url
-      );
+      DebugLogger.log("settings", "Using module data URL", module.data.url);
       return module.data.url;
     }
 
@@ -87,6 +81,30 @@ export class Settings {
     debugTimePeriod: {
       name: "Debug Time Period",
       hint: "Enable debug logging for time period calculations",
+      scope: "world",
+      config: true,
+      type: Boolean,
+      default: false,
+    },
+    debugTime: {
+      name: "Debug Time Utils",
+      hint: "Enable debug logging for time utility functions",
+      scope: "world",
+      config: true,
+      type: Boolean,
+      default: false,
+    },
+    debugSettings: {
+      name: "Debug Settings",
+      hint: "Enable debug logging for settings operations",
+      scope: "world",
+      config: true,
+      type: Boolean,
+      default: false,
+    },
+    debugWeather: {
+      name: "Debug Weather",
+      hint: "Enable debug logging for weather calculations",
       scope: "world",
       config: true,
       type: Boolean,
@@ -235,7 +253,7 @@ export class Settings {
       `;
       document.head.appendChild(style);
 
-      console.log("Dimensional Weather | Settings registered successfully");
+      DebugLogger.info("Settings registered successfully");
     } catch (error) {
       ErrorHandler.logAndNotify("Failed to register settings", error);
     }
@@ -251,31 +269,23 @@ export class Settings {
       // Use absolute URL constructed from module base URL
       const baseUrl = this.getModuleBaseUrl();
       const indexPath = `${baseUrl}/campaign_settings/index.json`;
-      console.log(
-        "Dimensional Weather | Attempting to load index from:",
-        indexPath
-      );
+      DebugLogger.log("settings", "Attempting to load index from", indexPath);
 
       const indexData = await Cache.getOrFetch("settings_index", async () => {
         try {
-          console.log("Dimensional Weather | Fetching index from:", indexPath);
+          DebugLogger.log("settings", "Fetching index from", indexPath);
           const response = await fetch(indexPath);
-          console.log(
-            "Dimensional Weather | Index response status:",
-            response.status
-          );
+          DebugLogger.log("settings", "Index response status", response.status);
           if (!response.ok) {
             throw new Error(
               `Failed with status ${response.status}: ${response.statusText}`
             );
           }
           const data = await response.json();
-          console.log("Dimensional Weather | Successfully loaded index data:", data);
+          DebugLogger.log("settings", "Successfully loaded index data", data);
           return data;
         } catch (error) {
-          console.warn(
-            "Dimensional Weather | Failed to load index from file, using fallback"
-          );
+          DebugLogger.warn("Failed to load index from file, using fallback");
           return this.getFallbackCampaignSettingsIndex();
         }
       });
@@ -315,34 +325,23 @@ export class Settings {
       // Use absolute URL constructed from module base URL
       const baseUrl = this.getModuleBaseUrl();
       const settingPath = `${baseUrl}/campaign_settings/${settingId}.json`;
-      console.log(
-        "Dimensional Weather | Attempting to load setting from:",
-        settingPath
-      );
+      DebugLogger.log("settings", "Attempting to load setting from", settingPath);
 
       return await Cache.getOrFetch(`campaign_${settingId}`, async () => {
         try {
-          console.log(
-            "Dimensional Weather | Fetching setting from:",
-            settingPath
-          );
+          DebugLogger.log("settings", "Fetching setting from", settingPath);
           const response = await fetch(settingPath);
-          console.log(
-            "Dimensional Weather | Setting response status:",
-            response.status
-          );
+          DebugLogger.log("settings", "Setting response status", response.status);
           if (!response.ok) {
             throw new Error(
               `Failed with status ${response.status}: ${response.statusText}`
             );
           }
           const data = await response.json();
-          console.log(`Dimensional Weather | Successfully loaded setting: ${settingId}`, data);
+          DebugLogger.log("settings", `Successfully loaded setting: ${settingId}`, data);
           return data;
         } catch (error) {
-          console.warn(
-            `Dimensional Weather | Failed to load ${settingId} from file, trying fallback`
-          );
+          DebugLogger.warn(`Failed to load ${settingId} from file, trying fallback`);
           // Fallback to embedded data for common settings
           return this.getFallbackCampaignSetting(settingId);
         }

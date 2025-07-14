@@ -4,7 +4,7 @@
  */
 
 import { Settings } from "./settings.js";
-import { ErrorHandler } from "./utils.js";
+import { ErrorHandler, DebugLogger } from "./utils.js";
 import { SceneManager } from "./scene-manager.js";
 
 export class WeatherCommandSystem {
@@ -35,7 +35,7 @@ export class WeatherCommandSystem {
    */
   _registerWithChatCommandLib() {
     if (!game.chatCommands) {
-      console.warn("Dimensional Weather | Chat Commands module not found, only slash commands will be available");
+      DebugLogger.warn("Chat Commands module not found, only slash commands will be available");
       return;
     }
 
@@ -74,7 +74,7 @@ export class WeatherCommandSystem {
       closeOnComplete: true,
     });
 
-    console.log("Dimensional Weather | Chat commands registered");
+    DebugLogger.info("Chat commands registered");
   }
 
   /**
@@ -182,7 +182,7 @@ export class WeatherCommandSystem {
       description: "List available terrains",
     });
 
-    console.log("Dimensional Weather | Internal commands registered");
+    DebugLogger.info("Internal commands registered");
   }
 
   /**
