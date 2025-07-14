@@ -45,7 +45,7 @@
 - Centralized error handling
 - Reduced DOM operations for better performance
 - Added batch updates to avoid unnecessary rendering
-- Better integration with Simple Calendar
+
 - Improved API for other modules to use
 
 ### Bug Fixes

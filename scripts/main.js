@@ -173,12 +173,6 @@ Hooks.on("canvasReady", () => handleSceneWeather());
 // Handle world time changes
 Hooks.on("updateWorldTime", checkTimeBasedUpdate);
 
-// Handle Simple Calendar ready
-Hooks.once("simple-calendar-ready", async () => {
-  console.log(`${MODULE_TITLE} | Simple Calendar integration initialized`);
-  await handleSceneWeather(true);
-});
-
 // Handle Dark Sun Calendar time changes
 Hooks.on("darkSunCalendar.dateTimeChange", async (dateTime) => {
   if (!initialized || !Settings.getSetting("useDarkSunCalendar")) return;

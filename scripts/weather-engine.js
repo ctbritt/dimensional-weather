@@ -245,42 +245,33 @@ export class WeatherEngine {
   }
 
   /**
-   * Determine current season based on Simple Calendar or saved state
+   * Determine current season based on Dark Sun Calendar or saved state
    * @private
    * @param {Object} weatherState - Current weather state
    * @returns {string|null} Season key or null if not found
    */
   _determineCurrentSeason(weatherState = null) {
-    console.log(
-      "DimensionalWeather | WeatherEngine._determineCurrentSeason: Called.",
-      { weatherState }
-    ); // Log entry
-    // Direct checks
-    const isDSCActive = game.modules.get("dark-sun-calendar")?.active; // Keep for logging
-    const useDarkSunCalendarSetting = Settings.getSetting("useDarkSunCalendar");
-    const dscAPI = window.DSC;
-    console.log(
-      "DimensionalWeather | WeatherEngine._determineCurrentSeason: Direct check results.",
-      { isDSCActive, useDarkSunCalendarSetting, dscAPIAvailable: !!dscAPI }
-    ); // Log direct checks
-
-    // If the setting is enabled AND the Dark Sun Calendar API exists
-    if (useDarkSunCalendarSetting && dscAPI) {
-      console.log(
-        "DimensionalWeather | WeatherEngine._determineCurrentSeason: Using Dark Sun Calendar (checked API exists). Calling TimeUtils.getCurrentSeason..."
-      ); // Log decision
-      return TimeUtils.getCurrentSeason(this.settingsData);
+    // If Dark Sun Calendar integration is enabled and API is available
+    if (Settings.getSetting("useDarkSunCalendar") && window.DSC) {
+      const dscSeason = TimeUtils.getCurrentSeason();
+      if (dscSeason) {
+        console.log(
+          `DimensionalWeather | WeatherEngine._determineCurrentSeason: Using DSC season: ${dscSeason}`
+        );
+        return dscSeason;
+      }
     }
 
-    console.log(
-      "DimensionalWeather | WeatherEngine._determineCurrentSeason: Falling back to stored season."
-    ); // Log fallback
     // Fall back to stored season
-    return weatherState?.season || null;
+    const storedSeason = weatherState?.season || Settings.getSetting("season");
+    console.log(
+      `DimensionalWeather | WeatherEngine._determineCurrentSeason: Using stored season: ${storedSeason}`
+    );
+    return storedSeason;
   }
 
   /**
-   * Get the current time period based on Simple Calendar
+   * Get the current time period based on Dark Sun Calendar
    * @returns {string} Time period name
    */
   getTimePeriod() {

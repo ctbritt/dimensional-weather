@@ -148,10 +148,10 @@
             "temperature": -1
         },
         "Night": {
-            "temperature": -3
+            "temperature": -4
         },
         "Late Night": {
-            "temperature": -6
+            "temperature": -5
         }
     },
     "terrains": {
@@ -163,6 +163,14 @@
             "precipitation": -10,
             "humidity": -10,
             "variability": 6,
+            "timeModifiers": {
+                "Night": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                }
+            },
             "rules": []
         },
         "dustSinks": {
@@ -181,13 +189,13 @@
                     "humidity": 1
                 },
                 "Night": {
-                    "temperature": -5,
+                    "temperature": -6,
                     "wind": 0,
                     "precipitation": 0,
                     "humidity": 2
                 },
                 "Late Night": {
-                    "temperature": -6,
+                    "temperature": -7,
                     "wind": 0,
                     "precipitation": 0,
                     "humidity": 2
@@ -217,6 +225,14 @@
             "precipitation": -10,
             "humidity": -5,
             "variability": 9,
+            "timeModifiers": {
+                "Night": {
+                    "temperature": -10,
+                    "wind": 1,
+                    "precipitation": 0,
+                    "humidity": 3
+                }
+            },
             "rules": [
                 "Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)",
                 "If above 10,000 feet, each hour of travel counts as 2 hours due to high altitude effects",
@@ -243,6 +259,14 @@
             "precipitation": -10,
             "humidity": -5,
             "variability": 9,
+            "timeModifiers": {
+                "Night": {
+                    "temperature": -10,
+                    "wind": 1,
+                    "precipitation": 0,
+                    "humidity": 3
+                }
+            },
             "rules": [
                 "Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)",
                 "If above 10,000 feet, each hour of travel counts as 2 hours due to high altitude effects",
@@ -257,6 +281,14 @@
             "precipitation": -10,
             "humidity": -10,
             "variability": 6,
+            "timeModifiers": {
+                "Night": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                }
+            },
             "rules": [
                 "Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)"
             ]
@@ -277,13 +309,13 @@
                     "humidity": 1
                 },
                 "Night": {
-                    "temperature": -5,
+                    "temperature": -6,
                     "wind": 0,
                     "precipitation": 0,
                     "humidity": 2
                 },
                 "Late Night": {
-                    "temperature": -6,
+                    "temperature": -7,
                     "wind": 0,
                     "precipitation": 0,
                     "humidity": 2
@@ -321,13 +353,13 @@
                     "humidity": 1
                 },
                 "Night": {
-                    "temperature": -5,
+                    "temperature": -6,
                     "wind": 0,
                     "precipitation": 0,
                     "humidity": 2
                 },
                 "Late Night": {
-                    "temperature": -6,
+                    "temperature": -7,
                     "wind": 0,
                     "precipitation": 0,
                     "humidity": 2
@@ -345,6 +377,14 @@
             "precipitation": -5,
             "humidity": -5,
             "variability": 4,
+            "timeModifiers": {
+                "Night": {
+                    "temperature": -7,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                }
+            },
             "rules": []
         },
         "seaOfSilt": {
@@ -363,13 +403,13 @@
                     "humidity": 1
                 },
                 "Night": {
-                    "temperature": -5,
+                    "temperature": -6,
                     "wind": 0,
                     "precipitation": 0,
                     "humidity": 2
                 },
                 "Late Night": {
-                    "temperature": -6,
+                    "temperature": -7,
                     "wind": 0,
                     "precipitation": 0,
                     "humidity": 2
@@ -390,6 +430,14 @@
             "precipitation": -10,
             "humidity": -5,
             "variability": 5,
+            "timeModifiers": {
+                "Night": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                }
+            },
             "rules": [
                 "Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)"
             ]

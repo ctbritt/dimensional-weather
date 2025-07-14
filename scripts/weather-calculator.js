@@ -40,8 +40,20 @@ export class WeatherCalculator {
     details.timePeriod = timePeriod;
     
     // Get modifiers
-    const timeModifiers = TimeUtils.getTimeModifiers(timePeriod, settingsData);
+    const globalTimeModifiers = TimeUtils.getTimeModifiers(timePeriod, settingsData);
+    const terrainTimeModifiers = this._getTerrainTimeModifiers(timePeriod, terrain);
+    
+    // Combine global and terrain-specific time modifiers
+    const timeModifiers = {
+      temperature: (globalTimeModifiers.temperature || 0) + (terrainTimeModifiers.temperature || 0),
+      wind: (globalTimeModifiers.wind || 0) + (terrainTimeModifiers.wind || 0),
+      precipitation: (globalTimeModifiers.precipitation || 0) + (terrainTimeModifiers.precipitation || 0),
+      humidity: (globalTimeModifiers.humidity || 0) + (terrainTimeModifiers.humidity || 0)
+    };
+    
     details.timeModifiers = timeModifiers;
+    details.globalTimeModifiers = globalTimeModifiers;
+    details.terrainTimeModifiers = terrainTimeModifiers;
     
     const seasonModifiers = this._getSeasonModifiers(currentSeason, settingsData);
     details.seasonModifiers = seasonModifiers;
@@ -216,6 +228,26 @@ export class WeatherCalculator {
       precip: Math.max(-10, Math.min(10, finalPrecip)),
       humid: Math.max(-10, Math.min(10, finalHumid)),
     };
+  }
+  
+  /**
+   * Get terrain-specific time modifiers
+   * @private
+   * @param {string} timePeriod - Time period name
+   * @param {Object} terrain - Terrain data
+   * @returns {Object} Terrain time modifiers
+   */
+  static _getTerrainTimeModifiers(timePeriod, terrain) {
+    if (!terrain?.timeModifiers?.[timePeriod]) {
+      return {
+        temperature: 0,
+        wind: 0,
+        precipitation: 0,
+        humidity: 0
+      };
+    }
+    
+    return terrain.timeModifiers[timePeriod];
   }
   
   /**

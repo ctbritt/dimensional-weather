@@ -21,10 +21,6 @@
                 "name": "Intervalo de Actualización del Clima",
                 "hint": "Establezca cuántas horas de juego deben pasar entre actualizaciones automáticas del clima."
             },
-            "useSimpleCalendar": {
-                "name": "Usar Integración con Simple Calendar",
-                "hint": "Sincronice automáticamente las estaciones y la hora del día con el módulo Simple Calendar."
-            },
             "useHexMap": {
                 "name": "Usar Clima de Mapa Hexagonal",
                 "hint": "Habilite el sistema de clima hexagonal para campañas de Sol Oscuro."

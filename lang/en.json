@@ -20,10 +20,6 @@
             "updateInterval": {
                 "name": "Weather Update Interval",
                 "hint": "Set how many in-game hours should pass between automatic weather updates."
-            },
-            "useSimpleCalendar": {
-                "name": "Use Simple Calendar Integration",
-                "hint": "Automatically sync seasons and time of day with the Simple Calendar module."
             }
         },
         "dimensions": {

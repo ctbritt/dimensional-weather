@@ -21,10 +21,6 @@
                 "name": "Intervalle de Mise à Jour Météo",
                 "hint": "Définissez combien d'heures de jeu doivent s'écouler entre les mises à jour automatiques de la météo."
             },
-            "useSimpleCalendar": {
-                "name": "Utiliser l'Intégration Simple Calendar",
-                "hint": "Synchronisez automatiquement les saisons et le moment de la journée avec le module Simple Calendar."
-            },
             "useHexMap": {
                 "name": "Utiliser la Météo Hexagonale",
                 "hint": "Activez le système météorologique hexagonal pour les campagnes Dark Sun."

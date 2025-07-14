@@ -360,7 +360,7 @@ const sceneWeather = game.modules.get('dimensional-weather').api.getWeatherForSc
 ## To Do:
 - [x] Enable custom styles for each campaign setting. In theory, Greyhawk current weather should not look the same as Athas current weather. 
 - [ ] Create interface for building and editing custom json climate files.
-- [ ] Make sure Simple Calendar updates weather on schedule.
+
 - [x] Mask OpenAI key
 - [x] Develop API for other module developers
 - [x] Implement advanced scene and state management
