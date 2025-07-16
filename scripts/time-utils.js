@@ -19,7 +19,10 @@ export class TimeUtils {
    */
   static getTimePeriod(useCache = true) {
     if (!window.DSC) {
-      DebugLogger.log("time", "Dark Sun Calendar API not available in getTimePeriod");
+      DebugLogger.log(
+        "time",
+        "Dark Sun Calendar API not available in getTimePeriod"
+      );
       return "Unknown Time";
     }
 
@@ -27,41 +30,53 @@ export class TimeUtils {
       // Get current date from Dark Sun Calendar
       const currentDate = window.DSC.getCurrentDate();
       if (!currentDate?.time) {
-        DebugLogger.log("time", "Dark Sun Calendar time not available in getTimePeriod");
+        DebugLogger.log(
+          "time",
+          "Dark Sun Calendar time not available in getTimePeriod"
+        );
         return "Unknown Time";
       }
 
       // Create a simple cache key based on the time
-      const cacheKey = `${currentDate.time.hour}:${currentDate.time.minute || 0}`;
-      
+      const cacheKey = `${currentDate.time.hour}:${
+        currentDate.time.minute || 0
+      }`;
+
       // Use cache if enabled and time hasn't changed
-      if (useCache && this._cache.timestamp === cacheKey && this._cache.period) {
+      if (
+        useCache &&
+        this._cache.timestamp === cacheKey &&
+        this._cache.period
+      ) {
         return this._cache.period;
       }
 
       // Extract hour from the time object
       const hours = currentDate.time.hour;
       if (hours === undefined || hours === null) {
-        DebugLogger.log("time", "Could not parse hours from Dark Sun Calendar data in getTimePeriod");
+        DebugLogger.log(
+          "time",
+          "Could not parse hours from Dark Sun Calendar data in getTimePeriod"
+        );
         return "Unknown Time";
       }
 
       // Determine period based on hour
       let period;
-      if (hours >= 5 && hours < 8) {
-        period = "Early Morning";
+      if (hours >= 0 && hours < 4) {
+        return "2nd Watch";
+      } else if (hours >= 4 && hours < 8) {
+        return "3rd Watch";
       } else if (hours >= 8 && hours < 12) {
-        period = "Morning";
-      } else if (hours >= 12 && hours < 14) {
-        period = "Noon";
-      } else if (hours >= 14 && hours < 18) {
-        period = "Afternoon";
-      } else if (hours >= 18 && hours < 21) {
-        period = "Evening";
-      } else if (hours >= 21 || hours < 2) {
-        period = "Night";
+        return "Morning";
+      } else if (hours >= 12 && hours < 16) {
+        return "Noon";
+      } else if (hours >= 16 && hours < 20) {
+        return "Evening";
+      } else if (hours >= 20 && hours < 24) {
+        return "1st Watch";
       } else {
-        period = "Late Night";
+        return "Unknown Time";
       }
 
       // Update cache
@@ -71,7 +86,10 @@ export class TimeUtils {
         period,
       };
 
-      DebugLogger.log("time", `Time ${hours}:${currentDate.time.minute || 0} -> ${period}`);
+      DebugLogger.log(
+        "time",
+        `Time ${hours}:${currentDate.time.minute || 0} -> ${period}`
+      );
       return period;
     } catch (error) {
       ErrorHandler.logAndNotify("Error getting time period", error);
@@ -123,14 +141,19 @@ export class TimeUtils {
         };
       }
 
-      const formattedDate = window.DSC.formatDarkSunDate ? 
-        window.DSC.formatDarkSunDate(currentDate) : 
-        currentDate.dateString || "Unknown Date";
-      
-      const timeString = currentDate.time && currentDate.time.getTimeString ? 
-        currentDate.time.getTimeString() : 
-        `${currentDate.time?.hour || 0}:${String(currentDate.time?.minute || 0).padStart(2, '0')}:${String(currentDate.time?.second || 0).padStart(2, '0')}`;
-      
+      const formattedDate = window.DSC.formatDarkSunDate
+        ? window.DSC.formatDarkSunDate(currentDate)
+        : currentDate.dateString || "Unknown Date";
+
+      const timeString =
+        currentDate.time && currentDate.time.getTimeString
+          ? currentDate.time.getTimeString()
+          : `${currentDate.time?.hour || 0}:${String(
+              currentDate.time?.minute || 0
+            ).padStart(2, "0")}:${String(
+              currentDate.time?.second || 0
+            ).padStart(2, "0")}`;
+
       return {
         date: formattedDate,
         time: timeString,
@@ -172,7 +195,10 @@ export class TimeUtils {
    */
   static getCurrentSeason() {
     if (!window.DSC) {
-      DebugLogger.log("time", "Dark Sun Calendar API not available in getCurrentSeason");
+      DebugLogger.log(
+        "time",
+        "Dark Sun Calendar API not available in getCurrentSeason"
+      );
       return null;
     }
 

@@ -49,27 +49,27 @@
     "weatherDimensions": {
         "temperature": {
             "descriptions": {
-                "-10": "Freezing (40° F) — Nightfall brings piercing cold, numbing exposed skin and turning breath into icy vapor, a stark contrast to the relentless daytime heat.",
-                "-9": "Very Cold (45° F) — The air is sharply cold, chilling but refreshing, a rare and cherished respite from Athas's harsh sun.",
-                "-8": "Cold (50° F) — A crisp wind chills the skin, a welcome relief from the oppressive heat that usually dominates the desert.",
-                "-7": "Cool (55° F) — The air feels surprisingly fresh and cool, an uncommon luxury in this sun-scorched world.",
-                "-6": "Mildly Cool (60° F) — Pleasantly mild by Athasian standards, the coolness offers comfort and temporary ease.",
-                "-5": "Brisk (65° F) — The refreshing coolness invigorates travelers, a fleeting comfort against the desert's constant warmth.",
-                "-4": "Comfortable (70° F) — Ideal traveling conditions, the air neither too hot nor too cold, a rare equilibrium in Athas.",
-                "-3": "Mild (75° F) — The heat is bearable, offering favorable conditions for those accustomed to the harsh climate.",
-                "-2": "Temperate (80° F) — Warm, yet manageable, a moderate day in Athas's relentless climate.",
-                "-1": "Warm (85° F) — Heat begins to seep in, signaling the return of the sun's harsh dominion.",
-                "0": "Hot (90° F) — The sun's intensity is noticeable, sweat beads forming as the heat starts to reclaim the desert.",
-                "1": "Very Warm (95° F) — The air becomes heavy, oppressive, signaling danger for those unaccustomed to Athasian extremes.",
-                "2": "Hot (100° F) — The blistering rays burn exposed flesh, testing endurance and resilience.",
-                "3": "Very Hot (105° F) — Heat radiates mercilessly, sapping strength and presenting real danger to the unprepared.",
-                "4": "Extremely Hot (110° F) — The horizon shimmers, heat waves dance visibly, distorting vision and draining stamina.",
+                "-10": "Freezing (34° F) — Nightfall brings piercing cold, numbing exposed skin and turning breath into icy vapor, a stark contrast to the relentless daytime heat.",
+                "-9": "Very Cold (39° F) — The air is sharply cold, chilling but refreshing, a rare and cherished respite from Athas's harsh sun.",
+                "-8": "Cold (45° F) — A crisp wind chills the skin, a welcome relief from the oppressive heat that usually dominates the desert.",
+                "-7": "Cool (50° F) — The air feels surprisingly fresh and cool, an uncommon luxury in this sun-scorched world.",
+                "-6": "Mildly Cool (55° F) — Pleasantly mild by Athasian standards, the coolness offers comfort and temporary ease.",
+                "-5": "Brisk (61° F) — The refreshing coolness invigorates travelers, a fleeting comfort against the desert's constant warmth.",
+                "-4": "Comfortable (66° F) — Ideal traveling conditions, the air neither too hot nor too cold, a rare equilibrium in Athas.",
+                "-3": "Mild (72° F) — The heat is bearable, offering favorable conditions for those accustomed to the harsh climate.",
+                "-2": "Temperate (77° F) — Warm, yet manageable, a moderate day in Athas's relentless climate.",
+                "-1": "Warm (82° F) — Heat begins to seep in, signaling the return of the sun's harsh dominion.",
+                "0": "Hot (88° F) — The sun's intensity is noticeable, sweat beads forming as the heat starts to reclaim the desert.",
+                "1": "Very Warm (93° F) — The air becomes heavy, oppressive, signaling danger for those unaccustomed to Athasian extremes.",
+                "2": "Hot (99° F) — The blistering rays burn exposed flesh, testing endurance and resilience.",
+                "3": "Very Hot (104° F) — Heat radiates mercilessly, sapping strength and presenting real danger to the unprepared.",
+                "4": "Extremely Hot (109° F) — The horizon shimmers, heat waves dance visibly, distorting vision and draining stamina.",
                 "5": "Sweltering (115° F) — Each breath feels searing; the oppressive air threatens exhaustion and collapse.",
                 "6": "Blistering (120° F) — The atmosphere resembles an open furnace, punishing flesh and will alike.",
                 "7": "Oppressive (125° F) — The heat suffocates, relentless and brutal, pushing survival instincts to their limits.",
-                "8": "Scorching (130° F) — A deadly, relentless inferno, lethal for the unprepared, where water and shade mean life or death.",
-                "9": "Deadly (135° F) — The desert's wrath reaches lethal intensity; heatstroke and death loom imminent without shelter.",
-                "10": "Unbearable (140° F+) — A catastrophic inferno, instantly life-threatening; survival demands immediate refuge from the merciless sun."
+                "8": "Scorching (131° F) — A deadly, relentless inferno, lethal for the unprepared, where water and shade mean life or death.",
+                "9": "Deadly (136° F) — The desert's wrath reaches lethal intensity; heatstroke and death loom imminent without shelter.",
+                "10": "Hellish (140° F) — A catastrophic inferno, instantly life-threatening; survival demands immediate refuge from the merciless sun."
             },
             "rules": [
                 {
@@ -132,39 +132,138 @@
         }
     },
     "timeModifiers": {
-        "Early Morning": {
-            "temperature": -5
+        "1": {
+            "temperature": -2
         },
-        "Morning": {
-            "temperature": 1
+        "2": {
+            "temperature": -2
         },
-        "Midday": {
-            "temperature": 2
+        "3": {
+            "temperature": -3
         },
-        "Afternoon": {
-            "temperature": 3
+        "4": {
+            "temperature": -3
         },
-        "Evening": {
-            "temperature": -1
-        },
-        "Night": {
+        "5": {
             "temperature": -4
         },
-        "Late Night": {
+        "6": {
             "temperature": -5
+        },
+        "7": {
+            "temperature": -4
+        },
+        "8": {
+            "temperature": -3
+        },
+        "9": {
+            "temperature": -2
+        },
+        "10": {
+            "temperature": 0
+        },
+        "11": {
+            "temperature": 2
+        },
+        "12": {
+            "temperature": 4
+        },
+        "13": {
+            "temperature": 6
+        },
+        "14": {
+            "temperature": 8
+        },
+        "15": {
+            "temperature": 8
+        },
+        "16": {
+            "temperature": 6
+        },
+        "17": {
+            "temperature": 4
+        },
+        "18": {
+            "temperature": 4
+        },
+        "19": {
+            "temperature": 2
+        },
+        "20": {
+            "temperature": 2
+        },
+        "21": {
+            "temperature": 0
+        },
+        "22": {
+            "temperature": 0
+        },
+        "23": {
+            "temperature": -1
+        },
+        "24": {
+            "temperature": -1
         }
     },
     "terrains": {
         "boulderFields": {
             "name": "Boulder Fields",
             "description": "Jagged rocks and broken terrain stretch endlessly. Some are old lava flows long since cooled, while others are valleys choked with rockslides. Deep gulches and crevices crisscross the landscape, offering plenty of hiding places.",
-            "temperature": 5,
+            "temperature": 3,
             "wind": 0,
             "precipitation": -10,
             "humidity": -10,
             "variability": 6,
             "timeModifiers": {
-                "Night": {
+                "1": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "2": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "3": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "4": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "5": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "6": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "22": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "23": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "24": {
                     "temperature": -6,
                     "wind": 0,
                     "precipitation": 0,
@@ -182,19 +281,85 @@
             "humidity": -5,
             "variability": 8,
             "timeModifiers": {
-                "Early Morning": {
+                "6": {
                     "temperature": -2,
                     "wind": 0,
                     "precipitation": 0,
                     "humidity": 1
                 },
-                "Night": {
+                "7": {
+                    "temperature": -2,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 1
+                },
+                "8": {
+                    "temperature": -2,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 1
+                },
+                "9": {
+                    "temperature": -2,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 1
+                },
+                "10": {
+                    "temperature": -2,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 1
+                },
+                "1": {
                     "temperature": -6,
                     "wind": 0,
                     "precipitation": 0,
                     "humidity": 2
                 },
-                "Late Night": {
+                "2": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "3": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "4": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "5": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "6": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "22": {
+                    "temperature": -7,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "23": {
+                    "temperature": -7,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "24": {
                     "temperature": -7,
                     "wind": 0,
                     "precipitation": 0,
@@ -208,7 +373,7 @@
         "forestRidge": {
             "name": "Forest Ridge",
             "description": "A dense, dark forest provides rare relief from the sun. The air is thick with the scent of pine and the sound of wind through branches. Ancient trees rise from rocky ridges.",
-            "temperature": 2,
+            "temperature": -2,
             "wind": -6,
             "precipitation": 5,
             "humidity": 10,
@@ -220,13 +385,61 @@
         "mountains": {
             "name": "Mountains",
             "description": "Bare, rocky peaks rise dramatically, offering little water or shelter. The exposed rock crumbles under the twin hammers of heat and cold, creating treacherous slopes of broken rock.",
-            "temperature": 2,
+            "temperature": -2,
             "wind": 2,
             "precipitation": -10,
             "humidity": -5,
             "variability": 9,
             "timeModifiers": {
-                "Night": {
+                "1": {
+                    "temperature": -10,
+                    "wind": 1,
+                    "precipitation": 0,
+                    "humidity": 3
+                },
+                "2": {
+                    "temperature": -10,
+                    "wind": 1,
+                    "precipitation": 0,
+                    "humidity": 3
+                },
+                "3": {
+                    "temperature": -10,
+                    "wind": 1,
+                    "precipitation": 0,
+                    "humidity": 3
+                },
+                "4": {
+                    "temperature": -10,
+                    "wind": 1,
+                    "precipitation": 0,
+                    "humidity": 3
+                },
+                "5": {
+                    "temperature": -10,
+                    "wind": 1,
+                    "precipitation": 0,
+                    "humidity": 3
+                },
+                "6": {
+                    "temperature": -10,
+                    "wind": 1,
+                    "precipitation": 0,
+                    "humidity": 3
+                },
+                "22": {
+                    "temperature": -10,
+                    "wind": 1,
+                    "precipitation": 0,
+                    "humidity": 3
+                },
+                "23": {
+                    "temperature": -10,
+                    "wind": 1,
+                    "precipitation": 0,
+                    "humidity": 3
+                },
+                "24": {
                     "temperature": -10,
                     "wind": 1,
                     "precipitation": 0,
@@ -242,7 +455,7 @@
         "mudflats": {
             "name": "Mudflats",
             "description": "Water seeps upward, saturating the land to create a soupy mess. Some areas are lush with vegetation, while others are hard, cracked clay that might not support a traveler's weight.",
-            "temperature": 4,
+            "temperature": -2,
             "wind": -2,
             "precipitation": -5,
             "humidity": 5,
@@ -260,7 +473,55 @@
             "humidity": -5,
             "variability": 9,
             "timeModifiers": {
-                "Night": {
+                "1": {
+                    "temperature": -10,
+                    "wind": 1,
+                    "precipitation": 0,
+                    "humidity": 3
+                },
+                "2": {
+                    "temperature": -10,
+                    "wind": 1,
+                    "precipitation": 0,
+                    "humidity": 3
+                },
+                "3": {
+                    "temperature": -10,
+                    "wind": 1,
+                    "precipitation": 0,
+                    "humidity": 3
+                },
+                "4": {
+                    "temperature": -10,
+                    "wind": 1,
+                    "precipitation": 0,
+                    "humidity": 3
+                },
+                "5": {
+                    "temperature": -10,
+                    "wind": 1,
+                    "precipitation": 0,
+                    "humidity": 3
+                },
+                "6": {
+                    "temperature": -10,
+                    "wind": 1,
+                    "precipitation": 0,
+                    "humidity": 3
+                },
+                "22": {
+                    "temperature": -10,
+                    "wind": 1,
+                    "precipitation": 0,
+                    "humidity": 3
+                },
+                "23": {
+                    "temperature": -10,
+                    "wind": 1,
+                    "precipitation": 0,
+                    "humidity": 3
+                },
+                "24": {
                     "temperature": -10,
                     "wind": 1,
                     "precipitation": 0,
@@ -276,13 +537,61 @@
         "rockyBadlands": {
             "name": "Rocky Badlands",
             "description": "Highly eroded mazes of sharp-edged ridges, winding canyons, and thorn-choked ravines stretch endlessly. Daunting escarpments force travelers into meandering courses.",
-            "temperature": 5,
+            "temperature": 2,
             "wind": 0,
             "precipitation": -10,
             "humidity": -10,
             "variability": 6,
             "timeModifiers": {
-                "Night": {
+                "1": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "2": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "3": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "4": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "5": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "6": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "22": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "23": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "24": {
                     "temperature": -6,
                     "wind": 0,
                     "precipitation": 0,
@@ -296,25 +605,91 @@
         "saltFlats": {
             "name": "Salt Flats",
             "description": "Great flat plains encrusted with salt that is white, brown, or black stretch for miles. The ground crunches underfoot, and temperatures reach brutal extremes.",
-            "temperature": 6,
+            "temperature": 2,
             "wind": 2,
             "precipitation": -10,
             "humidity": -10,
             "variability": 3,
             "timeModifiers": {
-                "Early Morning": {
+                "6": {
                     "temperature": -2,
                     "wind": 0,
                     "precipitation": 0,
                     "humidity": 1
                 },
-                "Night": {
+                "7": {
+                    "temperature": -2,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 1
+                },
+                "8": {
+                    "temperature": -2,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 1
+                },
+                "9": {
+                    "temperature": -2,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 1
+                },
+                "10": {
+                    "temperature": -2,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 1
+                },
+                "1": {
                     "temperature": -6,
                     "wind": 0,
                     "precipitation": 0,
                     "humidity": 2
                 },
-                "Late Night": {
+                "2": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "3": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "4": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "5": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "6": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "22": {
+                    "temperature": -7,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "23": {
+                    "temperature": -7,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "24": {
                     "temperature": -7,
                     "wind": 0,
                     "precipitation": 0,
@@ -328,7 +703,7 @@
         "saltMarshes": {
             "name": "Salt Marshes",
             "description": "Low grasses and reeds dot the landscape, with ankle-deep channels of briny water winding through. Tough stands of scrub and occasional trees rise above the vegetation.",
-            "temperature": 4,
+            "temperature": 0,
             "wind": -2,
             "precipitation": -5,
             "humidity": 5,
@@ -340,25 +715,91 @@
         "sandyWastes": {
             "name": "Sandy Wastes",
             "description": "Vast stretches of yellow sand stretch to the horizon. Some areas are flat and still, while others feature great dunes that shift endlessly under the wind.",
-            "temperature": 6,
+            "temperature": 2,
             "wind": 3,
             "precipitation": -10,
             "humidity": -10,
             "variability": 4,
             "timeModifiers": {
-                "Early Morning": {
+                "6": {
                     "temperature": -2,
                     "wind": 0,
                     "precipitation": 0,
                     "humidity": 1
                 },
-                "Night": {
+                "7": {
+                    "temperature": -2,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 1
+                },
+                "8": {
+                    "temperature": -2,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 1
+                },
+                "9": {
+                    "temperature": -2,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 1
+                },
+                "10": {
+                    "temperature": -2,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 1
+                },
+                "1": {
                     "temperature": -6,
                     "wind": 0,
                     "precipitation": 0,
                     "humidity": 2
                 },
-                "Late Night": {
+                "2": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "3": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "4": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "5": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "6": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "22": {
+                    "temperature": -7,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "23": {
+                    "temperature": -7,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "24": {
                     "temperature": -7,
                     "wind": 0,
                     "precipitation": 0,
@@ -372,13 +813,61 @@
         "scrubPlains": {
             "name": "Scrub Plains",
             "description": "Low, thorny vegetation dots the landscape, with occasional clusters of stunted trees. The ground is hard-packed earth, cracked and dry.",
-            "temperature": 4,
+            "temperature": 1,
             "wind": -1,
             "precipitation": -5,
             "humidity": -5,
             "variability": 4,
             "timeModifiers": {
-                "Night": {
+                "1": {
+                    "temperature": -7,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "2": {
+                    "temperature": -7,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "3": {
+                    "temperature": -7,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "4": {
+                    "temperature": -7,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "5": {
+                    "temperature": -7,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "6": {
+                    "temperature": -7,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "22": {
+                    "temperature": -7,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "23": {
+                    "temperature": -7,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "24": {
                     "temperature": -7,
                     "wind": 0,
                     "precipitation": 0,
@@ -390,25 +879,91 @@
         "seaOfSilt": {
             "name": "Sea of Silt",
             "description": "A vast expanse of fine, powdery silt that behaves like a liquid. The surface ripples and flows like water, concealing deadly depths. Extreme heat and strong winds create dangerous conditions, while the fine particles can choke the unwary.",
-            "temperature": 7,
+            "temperature": 2,
             "wind": 2,
             "precipitation": -10,
             "humidity": -10,
             "variability": 4,
             "timeModifiers": {
-                "Early Morning": {
+                "6": {
                     "temperature": -2,
                     "wind": 0,
                     "precipitation": 0,
                     "humidity": 1
                 },
-                "Night": {
+                "7": {
+                    "temperature": -2,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 1
+                },
+                "8": {
+                    "temperature": -2,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 1
+                },
+                "9": {
+                    "temperature": -2,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 1
+                },
+                "10": {
+                    "temperature": -2,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 1
+                },
+                "1": {
                     "temperature": -6,
                     "wind": 0,
                     "precipitation": 0,
                     "humidity": 2
                 },
-                "Late Night": {
+                "2": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "3": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "4": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "5": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "6": {
+                    "temperature": -6,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "22": {
+                    "temperature": -7,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "23": {
+                    "temperature": -7,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "24": {
                     "temperature": -7,
                     "wind": 0,
                     "precipitation": 0,
@@ -445,7 +1000,7 @@
         "verdantBelts": {
             "name": "Verdant Belts",
             "description": "Lush vegetation lines the banks of rivers and oases. The air is thick with moisture, and the ground is soft and fertile.",
-            "temperature": 3,
+            "temperature": 0,
             "wind": -4,
             "precipitation": 5,
             "humidity": 10,
