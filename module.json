@@ -6,9 +6,9 @@
   "library": "false",
   "manifestPlusVersion": "1.2.0",
   "compatibility": {
-    "minimum": "13",
-    "verified": "13",
-    "maximum": "13"
+    "minimum": "12",
+    "verified": "12.999",
+    "maximum": "12.999"
   },
   "authors": [
     {
@@ -85,11 +85,11 @@
         }
       },
       {
-        "id": "dark-sun-calendar",
+        "id": "simple-calendar",
         "type": "module",
-        "manifest": "https://github.com/ctbritt/dark-sun-calendar/releases/latest/download/module.json",
+        "manifest": "https://github.com/vigoren/foundryvtt-simple-calendar/releases/latest/download/module.json",
         "compatibility": {
-          "verified": "1.0.0"
+          "verified": "1.5.0"
         }
       },
       {
