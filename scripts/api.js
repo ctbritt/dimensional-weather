@@ -34,7 +34,7 @@ export class DimensionalWeatherAPI {
       // Initialize state manager
       this.stateManager = new StateManager();
       await this.stateManager.initialize();
-      
+
       // Load campaign settings
       this.settingsData = await this._loadCampaignSettings();
 
@@ -110,10 +110,13 @@ export class DimensionalWeatherAPI {
       // Update scene flags if a scene is active
       const scene = game.scenes.viewed;
       if (scene?.id) {
-        await SceneManager.updateWeatherState({
-          terrain: defaultTerrain,
-          season: defaultSeason
-        }, scene);
+        await SceneManager.updateWeatherState(
+          {
+            terrain: defaultTerrain,
+            season: defaultSeason,
+          },
+          scene
+        );
       }
 
       // Update settings
@@ -233,10 +236,10 @@ export class DimensionalWeatherAPI {
         await this.initialize();
       }
 
-      // Check if using Dark Sun Calendar integration
-      if (Settings.isDarkSunCalendarEnabled()) {
+      // Check if using Simple Calendar integration
+      if (Settings.isSimpleCalendarEnabled()) {
         ErrorHandler.logAndNotify(
-          "Cannot manually set season when Dark Sun Calendar integration is enabled",
+          "Cannot manually set season when Simple Calendar integration is enabled",
           null,
           true
         );
@@ -412,7 +415,7 @@ export class DimensionalWeatherAPI {
       this.stateManager.clearCaches();
     }
     // Import these directly to avoid circular dependencies
-    import("./time-utils.js").then(module => {
+    import("./time-utils.js").then((module) => {
       module.TimeUtils.clearCache();
     });
   }

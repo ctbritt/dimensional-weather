@@ -13,36 +13,52 @@ export class TimeUtils {
   };
 
   /**
-   * Get current time period based on hour from Dark Sun Calendar
+   * Get current time period based on hour from Simple Calendar
    * @param {boolean} useCache - Whether to use the cached value if available
    * @returns {string} Time period name
    */
   static getTimePeriod(useCache = true) {
-    if (!window.DSC) {
-      DebugLogger.log("time", "Dark Sun Calendar API not available in getTimePeriod");
+    const scApi = game.modules.get("simple-calendar")?.api;
+    if (!scApi) {
+      DebugLogger.log(
+        "time",
+        "Simple Calendar API not available in getTimePeriod"
+      );
       return "Unknown Time";
     }
 
     try {
-      // Get current date from Dark Sun Calendar
-      const currentDate = window.DSC.getCurrentDate();
+      // Get current date from Simple Calendar
+      const currentDate = scApi.currentDate;
       if (!currentDate?.time) {
-        DebugLogger.log("time", "Dark Sun Calendar time not available in getTimePeriod");
+        DebugLogger.log(
+          "time",
+          "Simple Calendar time not available in getTimePeriod"
+        );
         return "Unknown Time";
       }
 
       // Create a simple cache key based on the time
-      const cacheKey = `${currentDate.time.hour}:${currentDate.time.minute || 0}`;
-      
+      const cacheKey = `${currentDate.time.hour}:${
+        currentDate.time.minute || 0
+      }`;
+
       // Use cache if enabled and time hasn't changed
-      if (useCache && this._cache.timestamp === cacheKey && this._cache.period) {
+      if (
+        useCache &&
+        this._cache.timestamp === cacheKey &&
+        this._cache.period
+      ) {
         return this._cache.period;
       }
 
       // Extract hour from the time object
       const hours = currentDate.time.hour;
       if (hours === undefined || hours === null) {
-        DebugLogger.log("time", "Could not parse hours from Dark Sun Calendar data in getTimePeriod");
+        DebugLogger.log(
+          "time",
+          "Could not parse hours from Simple Calendar data in getTimePeriod"
+        );
         return "Unknown Time";
       }
 
@@ -65,45 +81,43 @@ export class TimeUtils {
       }
 
       // Update cache
-      this._cache = {
-        ...this._cache,
-        timestamp: cacheKey,
-        period,
-      };
+      this._cache.timestamp = cacheKey;
+      this._cache.period = period;
 
-      DebugLogger.log("time", `Time ${hours}:${currentDate.time.minute || 0} -> ${period}`);
       return period;
     } catch (error) {
-      ErrorHandler.logAndNotify("Error getting time period", error);
+      DebugLogger.warn("Error getting time period from Simple Calendar", error);
       return "Unknown Time";
     }
   }
 
   /**
-   * Get the current timestamp based on Dark Sun Calendar or system time
+   * Get the current timestamp based on Simple Calendar or system time
    * @returns {number} Current timestamp
    */
   static getCurrentTimestamp() {
-    if (window.DSC) {
+    const scApi = game.modules.get("simple-calendar")?.api;
+    if (scApi) {
       try {
-        const currentDate = window.DSC.getCurrentDate();
+        const currentDate = scApi.currentDate;
         if (currentDate) {
-          // Use DSC timestamp if available, otherwise fallback to system time
+          // Use Simple Calendar timestamp if available, otherwise fallback to system time
           return currentDate.timestamp || Date.now();
         }
       } catch (error) {
-        DebugLogger.warn("Error getting DSC timestamp", error);
+        DebugLogger.warn("Error getting Simple Calendar timestamp", error);
       }
     }
     return Date.now();
   }
 
   /**
-   * Get the current date display from Dark Sun Calendar
+   * Get the current date display from Simple Calendar
    * @returns {Object} Date display object
    */
   static getCurrentDateDisplay() {
-    if (!window.DSC) {
+    const scApi = game.modules.get("simple-calendar")?.api;
+    if (!scApi) {
       const now = new Date();
       return {
         date: now.toLocaleDateString(),
@@ -113,7 +127,7 @@ export class TimeUtils {
     }
 
     try {
-      const currentDate = window.DSC.getCurrentDate();
+      const currentDate = scApi.currentDate;
       if (!currentDate) {
         const now = new Date();
         return {
@@ -123,14 +137,19 @@ export class TimeUtils {
         };
       }
 
-      const formattedDate = window.DSC.formatDarkSunDate ? 
-        window.DSC.formatDarkSunDate(currentDate) : 
-        currentDate.dateString || "Unknown Date";
-      
-      const timeString = currentDate.time && currentDate.time.getTimeString ? 
-        currentDate.time.getTimeString() : 
-        `${currentDate.time?.hour || 0}:${String(currentDate.time?.minute || 0).padStart(2, '0')}:${String(currentDate.time?.second || 0).padStart(2, '0')}`;
-      
+      // Format date using Simple Calendar's date object
+      const formattedDate = currentDate.dateString || "Unknown Date";
+
+      // Format time string
+      const timeString = currentDate.time
+        ? `${currentDate.time.hour || 0}:${String(
+            currentDate.time.minute || 0
+          ).padStart(2, "0")}:${String(currentDate.time.second || 0).padStart(
+            2,
+            "0"
+          )}`
+        : "00:00:00";
+
       return {
         date: formattedDate,
         time: timeString,
@@ -167,31 +186,35 @@ export class TimeUtils {
   }
 
   /**
-   * Get current season from Dark Sun Calendar
+   * Get current season from Simple Calendar
    * @returns {string|null} Season key or null if not found
    */
   static getCurrentSeason() {
-    if (!window.DSC) {
-      DebugLogger.log("time", "Dark Sun Calendar API not available in getCurrentSeason");
+    const scApi = game.modules.get("simple-calendar")?.api;
+    if (!scApi) {
+      DebugLogger.log(
+        "time",
+        "Simple Calendar API not available in getCurrentSeason"
+      );
       return null;
     }
 
     try {
-      const currentDate = window.DSC.getCurrentDate();
-      if (!currentDate?.season) {
+      const currentSeason = scApi.getCurrentSeason();
+      if (!currentSeason) {
         DebugLogger.log("time", "No season data in current date");
         return null;
       }
 
-      // Get the season key directly from the DSC season object
-      const seasonKey = currentDate.season.key || currentDate.season.id;
+      // Get the season key directly from the Simple Calendar season object
+      const seasonKey = currentSeason.key || currentSeason.id;
       if (seasonKey) {
         DebugLogger.log("time", `Found season key: ${seasonKey}`);
         return seasonKey;
       }
 
       // Fallback to season name if no key/id available
-      const seasonName = currentDate.season.name;
+      const seasonName = currentSeason.name;
       if (seasonName) {
         // Convert name to lowercase key format
         const seasonKey = seasonName.toLowerCase();
@@ -250,17 +273,18 @@ export class TimeUtils {
   }
 
   /**
-   * Format a timestamp as a readable string using Dark Sun Calendar if available
+   * Format a timestamp as a readable string using Simple Calendar if available
    * @param {number} timestamp - Timestamp to format
    * @returns {string} Formatted timestamp
    */
   static formatTimestamp(timestamp) {
-    if (!window.DSC) {
+    const scApi = game.modules.get("simple-calendar")?.api;
+    if (!scApi) {
       return new Date(timestamp).toLocaleString();
     }
 
     try {
-      // Use current DSC date formatting
+      // Use current Simple Calendar date formatting
       const dateDisplay = this.getCurrentDateDisplay();
       return dateDisplay.display;
     } catch (error) {

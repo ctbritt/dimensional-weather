@@ -444,18 +444,19 @@ export class UIController {
    * @returns {string} Season name
    */
   _getSeasonName(seasonKey) {
-    // Try to get season from Dark Sun Calendar first
-    if (Settings.isDarkSunCalendarEnabled() && window.DSC) {
-      const currentDate = window.DSC.getCurrentDate();
-      if (currentDate) {
-        const seasonInfo = window.DSC.getSeasonInfo(currentDate);
-        if (seasonInfo?.name) {
-          return seasonInfo.name;
-        }
+    // Try to get season from Simple Calendar first
+    if (
+      Settings.isSimpleCalendarEnabled() &&
+      game.modules.get("simple-calendar")?.api
+    ) {
+      const scApi = game.modules.get("simple-calendar").api;
+      const currentSeason = scApi.getCurrentSeason();
+      if (currentSeason?.name) {
+        return currentSeason.name;
       }
     }
 
-    // Fall back to settings if Dark Sun Calendar is not available or has no season
+    // Fall back to settings if Simple Calendar is not available or has no season
     const season = this.settingsData?.seasons?.[seasonKey];
     if (season?.name) {
       return season.name;
@@ -476,12 +477,13 @@ export class UIController {
    * @returns {string} Time period name
    */
   _getTimePeriod() {
-    if (!window.DSC) {
+    const scApi = game.modules.get("simple-calendar")?.api;
+    if (!scApi) {
       return "Unknown Time";
     }
 
-    // Get current date from Dark Sun Calendar
-    const currentDate = window.DSC.getCurrentDate();
+    // Get current date from Simple Calendar
+    const currentDate = scApi.currentDate;
     if (!currentDate?.time) {
       return "Unknown Time";
     }
@@ -631,17 +633,20 @@ export class UIController {
    * @returns {string} Calendar info HTML
    */
   getCalendarInfo() {
-    if (!window.DSC) {
-      return "Dark Sun Calendar is not active.";
+    const scApi = game.modules.get("simple-calendar")?.api;
+    if (!scApi) {
+      return "Simple Calendar is not active.";
     }
 
-    const currentDate = window.DSC.getCurrentDate();
+    const currentDate = scApi.currentDate;
     if (!currentDate) {
-      return "Dark Sun Calendar date not available.";
+      return "Simple Calendar date not available.";
     }
 
-    const formattedDate = window.DSC.formatDarkSunDate(currentDate);
-    const timeString = currentDate.time ? currentDate.getTimeString() : "00:00:00";
+    const formattedDate = scApi.formatDate(currentDate);
+    const timeString = currentDate.time
+      ? currentDate.getTimeString()
+      : "00:00:00";
 
     return `<div class="weather-calendar">
       <h3>Calendar Information</h3>

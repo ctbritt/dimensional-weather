@@ -24,7 +24,7 @@ export class WeatherCommandSystem {
   register() {
     // Register with chat command library if available
     this._registerWithChatCommandLib();
-    
+
     // Register internal command handlers
     this._registerInternalCommands();
   }
@@ -35,7 +35,9 @@ export class WeatherCommandSystem {
    */
   _registerWithChatCommandLib() {
     if (!game.chatCommands) {
-      DebugLogger.warn("Chat Commands module not found, only slash commands will be available");
+      DebugLogger.warn(
+        "Chat Commands module not found, only slash commands will be available"
+      );
       return;
     }
 
@@ -47,7 +49,7 @@ export class WeatherCommandSystem {
       icon: "<i class='fas fa-cloud-sun'></i>",
       requiredRole: "NONE",
       aliases: ["/weather", "weather"],
-      callback: (chat, parameters, messageData) => 
+      callback: (chat, parameters, messageData) =>
         this._handleChatCommand(chat, parameters, messageData),
       autocompleteCallback: (menu, alias, parameters) =>
         this._autocompleteCommand(menu, alias, parameters),
@@ -233,7 +235,7 @@ export class WeatherCommandSystem {
 
   /**
    * Handle a command from any source
-   * @param {string} command - Command name 
+   * @param {string} command - Command name
    * @param {string[]} args - Command arguments
    * @param {Object} options - Additional options
    * @returns {Promise<Object>} Command result
@@ -395,7 +397,7 @@ export class WeatherCommandSystem {
         .map(([cmd, info]) => ({
           cmd,
           desc: info.description,
-          gmOnly: info.requiresGM
+          gmOnly: info.requiresGM,
         }))
         .filter((cmd) => !cmd.gmOnly || game.user.isGM);
 
@@ -575,7 +577,7 @@ export class WeatherCommandSystem {
   }
 
   // Command handlers
-  
+
   /**
    * Handle the update command
    * @param {string[]} args - Command arguments
@@ -671,10 +673,10 @@ export class WeatherCommandSystem {
    * @returns {Promise<Object>} Command result
    */
   async _handleSeasonCommand(args) {
-    // Check if Dark Sun Calendar integration is enabled
-    if (Settings.isDarkSunCalendarEnabled()) {
+    // Check if Simple Calendar integration is enabled
+    if (Settings.isSimpleCalendarEnabled()) {
       return this._createErrorResponse(
-        "Turn off Dark Sun Calendar integration to manually change seasons.",
+        "Turn off Simple Calendar integration to manually change seasons.",
         { whisper: [game.user.id] }
       );
     }
@@ -779,7 +781,9 @@ export class WeatherCommandSystem {
         <ul>
           <li>Terrain: ${terrain.name}</li>
           <li>Season: ${season.name}</li>
-          <li>Variability: ${weatherState.variability || Settings.getSetting("variability")}</li>
+          <li>Variability: ${
+            weatherState.variability || Settings.getSetting("variability")
+          }</li>
         </ul>
         <h4>Base Values</h4>
         <ul>
@@ -914,10 +918,9 @@ export class WeatherCommandSystem {
       settings.render(true);
     }
 
-    return this._createSuccessResponse(
-      "Opening weather settings panel...",
-      { whisper: [game.user.id] }
-    );
+    return this._createSuccessResponse("Opening weather settings panel...", {
+      whisper: [game.user.id],
+    });
   }
 
   /**

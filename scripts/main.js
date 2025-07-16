@@ -98,7 +98,10 @@ async function checkTimeBasedUpdate() {
     }
 
     if (!Settings.getSetting("autoUpdate")) {
-      DebugLogger.log("weather", "Auto-update disabled, skipping time-based update");
+      DebugLogger.log(
+        "weather",
+        "Auto-update disabled, skipping time-based update"
+      );
       return;
     }
 
@@ -121,9 +124,7 @@ async function checkTimeBasedUpdate() {
 
     const updateFrequency = Settings.getSetting("updateFrequency");
     const lastUpdate = weatherState.lastUpdate || 0;
-    const currentTime = window.DSC
-      ? new Date().getTime()
-      : Date.now();
+    const currentTime = Date.now();
     const hoursSinceLastUpdate = (currentTime - lastUpdate) / (1000 * 60 * 60);
 
     if (Settings.getSetting("debugTimePeriod")) {
@@ -137,7 +138,12 @@ async function checkTimeBasedUpdate() {
     }
 
     if (hoursSinceLastUpdate >= updateFrequency) {
-      DebugLogger.log("weather", `Time-based weather update triggered (${hoursSinceLastUpdate.toFixed(1)} hours since last update)`);
+      DebugLogger.log(
+        "weather",
+        `Time-based weather update triggered (${hoursSinceLastUpdate.toFixed(
+          1
+        )} hours since last update)`
+      );
       await game.dimWeather.updateWeather();
       await game.dimWeather.displayWeather();
     }
@@ -167,27 +173,41 @@ Hooks.on("canvasReady", () => handleSceneWeather());
 // Handle world time changes
 Hooks.on("updateWorldTime", checkTimeBasedUpdate);
 
-// Handle Dark Sun Calendar time changes
-Hooks.on("darkSunCalendar.dateTimeChange", async (dateTime) => {
-  if (!initialized || !Settings.getSetting("useDarkSunCalendar")) return;
+// Handle Simple Calendar time changes
+Hooks.on("simpleCalendar.dateTimeChange", async (dateTime) => {
+  if (!initialized || !Settings.getSetting("useSimpleCalendar")) return;
 
   try {
-    DebugLogger.log("weather", "Dark Sun Calendar time change detected", dateTime);
+    DebugLogger.log(
+      "weather",
+      "Simple Calendar time change detected",
+      dateTime
+    );
     await checkTimeBasedUpdate();
   } catch (error) {
-    ErrorHandler.logAndNotify("Error handling Dark Sun Calendar time change", error);
+    ErrorHandler.logAndNotify(
+      "Error handling Simple Calendar time change",
+      error
+    );
   }
 });
 
-// Handle Dark Sun Calendar season changes
-Hooks.on("darkSunCalendar.seasonChange", async (season) => {
-  if (!initialized || !Settings.getSetting("useDarkSunCalendar")) return;
+// Handle Simple Calendar season changes
+Hooks.on("simpleCalendar.seasonChange", async (season) => {
+  if (!initialized || !Settings.getSetting("useSimpleCalendar")) return;
 
   try {
-    DebugLogger.log("weather", "Dark Sun Calendar season change detected", season);
+    DebugLogger.log(
+      "weather",
+      "Simple Calendar season change detected",
+      season
+    );
     await handleSceneWeather(true);
   } catch (error) {
-    ErrorHandler.logAndNotify("Error handling Dark Sun Calendar season change", error);
+    ErrorHandler.logAndNotify(
+      "Error handling Simple Calendar season change",
+      error
+    );
   }
 });
 

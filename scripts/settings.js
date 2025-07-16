@@ -78,43 +78,11 @@ export class Settings {
         humidity: 0,
       },
     },
-    debugTimePeriod: {
-      name: "Debug Time Period",
-      hint: "Enable debug logging for time period calculations",
-      scope: "world",
-      config: true,
-      type: Boolean,
-      default: false,
-    },
-    debugTime: {
-      name: "Debug Time Utils",
-      hint: "Enable debug logging for time utility functions",
-      scope: "world",
-      config: true,
-      type: Boolean,
-      default: false,
-    },
-    debugSettings: {
-      name: "Debug Settings",
-      hint: "Enable debug logging for settings operations",
-      scope: "world",
-      config: true,
-      type: Boolean,
-      default: false,
-    },
-    debugWeather: {
-      name: "Debug Weather",
-      hint: "Enable debug logging for weather calculations",
-      scope: "world",
-      config: true,
-      type: Boolean,
-      default: false,
-    },
 
-    useDarkSunCalendar: {
-      name: "Use Dark Sun Calendar",
+    useSimpleCalendar: {
+      name: "Use Simple Calendar",
       hint:
-        "Integrate with Dark Sun Calendar for automatic season changes and time-based updates",
+        "Integrate with Simple Calendar for automatic season changes and time-based updates",
       scope: "world",
       config: true,
       type: Boolean,
@@ -126,7 +94,7 @@ export class Settings {
       scope: "world",
       config: true,
       type: Boolean,
-      default: true,
+      default: false,
     },
     manualOnly: {
       name: "Manual Weather Updates Only",
@@ -135,7 +103,7 @@ export class Settings {
       scope: "world",
       config: true,
       type: Boolean,
-      default: false,
+      default: true,
     },
     updateFrequency: {
       name: "Weather Update Frequency (hours)",
@@ -191,6 +159,38 @@ export class Settings {
       config: true,
       type: Boolean,
       default: true,
+    },
+    debugTimePeriod: {
+      name: "Debug Time Period",
+      hint: "Enable debug logging for time period calculations",
+      scope: "world",
+      config: true,
+      type: Boolean,
+      default: false,
+    },
+    debugTime: {
+      name: "Debug Time Utils",
+      hint: "Enable debug logging for time utility functions",
+      scope: "world",
+      config: true,
+      type: Boolean,
+      default: false,
+    },
+    debugSettings: {
+      name: "Debug Settings",
+      hint: "Enable debug logging for settings operations",
+      scope: "world",
+      config: true,
+      type: Boolean,
+      default: false,
+    },
+    debugWeather: {
+      name: "Debug Weather",
+      hint: "Enable debug logging for weather calculations",
+      scope: "world",
+      config: true,
+      type: Boolean,
+      default: false,
     },
 
     campaignSettings: {
@@ -325,23 +325,37 @@ export class Settings {
       // Use absolute URL constructed from module base URL
       const baseUrl = this.getModuleBaseUrl();
       const settingPath = `${baseUrl}/campaign_settings/${settingId}.json`;
-      DebugLogger.log("settings", "Attempting to load setting from", settingPath);
+      DebugLogger.log(
+        "settings",
+        "Attempting to load setting from",
+        settingPath
+      );
 
       return await Cache.getOrFetch(`campaign_${settingId}`, async () => {
         try {
           DebugLogger.log("settings", "Fetching setting from", settingPath);
           const response = await fetch(settingPath);
-          DebugLogger.log("settings", "Setting response status", response.status);
+          DebugLogger.log(
+            "settings",
+            "Setting response status",
+            response.status
+          );
           if (!response.ok) {
             throw new Error(
               `Failed with status ${response.status}: ${response.statusText}`
             );
           }
           const data = await response.json();
-          DebugLogger.log("settings", `Successfully loaded setting: ${settingId}`, data);
+          DebugLogger.log(
+            "settings",
+            `Successfully loaded setting: ${settingId}`,
+            data
+          );
           return data;
         } catch (error) {
-          DebugLogger.warn(`Failed to load ${settingId} from file, trying fallback`);
+          DebugLogger.warn(
+            `Failed to load ${settingId} from file, trying fallback`
+          );
           // Fallback to embedded data for common settings
           return this.getFallbackCampaignSetting(settingId);
         }
@@ -436,13 +450,13 @@ export class Settings {
   }
 
   /**
-   * Check if Dark Sun Calendar is available and enabled
-   * @returns {boolean} True if Dark Sun Calendar is available
+   * Check if Simple Calendar is available and enabled
+   * @returns {boolean} True if Simple Calendar is available
    */
-  static isDarkSunCalendarEnabled() {
+  static isSimpleCalendarEnabled() {
     return (
-      game.modules.get("dark-sun-calendar")?.active &&
-      Settings.getSetting("useDarkSunCalendar")
+      game.modules.get("simple-calendar")?.active &&
+      Settings.getSetting("useSimpleCalendar")
     );
   }
 }

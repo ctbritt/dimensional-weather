@@ -241,18 +241,21 @@ export class WeatherEngine {
   }
 
   /**
-   * Determine current season based on Dark Sun Calendar or saved state
+   * Determine current season based on Simple Calendar or saved state
    * @private
    * @param {Object} weatherState - Current weather state
    * @returns {string|null} Season key or null if not found
    */
   _determineCurrentSeason(weatherState = null) {
-    // If Dark Sun Calendar integration is enabled and API is available
-    if (Settings.getSetting("useDarkSunCalendar") && window.DSC) {
-      const dscSeason = TimeUtils.getCurrentSeason();
-      if (dscSeason) {
-        DebugLogger.log("weather", `Using DSC season: ${dscSeason}`);
-        return dscSeason;
+    // If Simple Calendar integration is enabled and API is available
+    if (
+      Settings.getSetting("useSimpleCalendar") &&
+      game.modules.get("simple-calendar")?.api
+    ) {
+      const scSeason = TimeUtils.getCurrentSeason();
+      if (scSeason) {
+        DebugLogger.log("weather", `Using Simple Calendar season: ${scSeason}`);
+        return scSeason;
       }
     }
 

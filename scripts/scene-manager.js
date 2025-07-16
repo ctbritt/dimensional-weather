@@ -140,9 +140,8 @@ export class SceneManager {
     if (!weatherState?.lastUpdate) return true;
 
     const lastUpdateTime = weatherState.lastUpdate;
-    const currentTime = window.DSC
-      ? new Date().getTime()
-      : Date.now();
+    const scApi = game.modules.get("simple-calendar")?.api;
+    const currentTime = scApi?.currentDate?.timestamp || Date.now();
     const hoursSinceLastUpdate = (currentTime - lastUpdateTime) / 3600;
 
     return hoursSinceLastUpdate >= updateFrequency;
