@@ -7,6 +7,7 @@ import { Settings } from "./settings.js";
 import { DOMUtils, ErrorHandler } from "./utils.js";
 import { SceneManager } from "./scene-manager.js";
 import { WeatherDescriptionService } from "./services/weather-description.js";
+import { TimeUtils } from "./time-utils.js";
 
 export class UIController {
   /**
@@ -477,36 +478,8 @@ export class UIController {
    * @returns {string} Time period name
    */
   _getTimePeriod() {
-    const scApi = game.modules.get("simple-calendar")?.api;
-    if (!scApi) {
-      return "Unknown Time";
-    }
-
-    // Get current date from Simple Calendar
-    const currentDate = scApi.currentDate;
-    if (!currentDate?.time) {
-      return "Unknown Time";
-    }
-
-    // Extract hour from the time object
-    const hours = currentDate.time.hour;
-
-    // Define time periods based on hour ranges to match campaign settings
-    if (hours >= 5 && hours < 8) {
-      return "Early Morning";
-    } else if (hours >= 8 && hours < 12) {
-      return "Morning";
-    } else if (hours >= 12 && hours < 14) {
-      return "Noon";
-    } else if (hours >= 14 && hours < 18) {
-      return "Afternoon";
-    } else if (hours >= 18 && hours < 21) {
-      return "Evening";
-    } else if (hours >= 21 || hours < 2) {
-      return "Night";
-    } else {
-      return "Late Night";
-    }
+    // Use the centralized TimeUtils method for consistency
+    return TimeUtils.getTimePeriod();
   }
 
   /**
@@ -633,25 +606,30 @@ export class UIController {
    * @returns {string} Calendar info HTML
    */
   getCalendarInfo() {
-    const scApi = game.modules.get("simple-calendar")?.api;
-    if (!scApi) {
-      return "Simple Calendar is not active.";
+    try {
+      if (!TimeUtils.isSimpleCalendarAvailable()) {
+        return "Simple Calendar is not active.";
+      }
+
+      const currentDate = SimpleCalendar.api.currentDateTime();
+      if (!currentDate) {
+        return "Simple Calendar date not available.";
+      }
+
+      const dateDisplay = SimpleCalendar.api.currentDateTimeDisplay();
+      if (!dateDisplay) {
+        return "Simple Calendar date display not available.";
+      }
+
+      return `<div class="weather-calendar">
+        <h3>Calendar Information</h3>
+        <p>Date: ${dateDisplay.date}</p>
+        <p>Time: ${dateDisplay.time}</p>
+        <p>Day: ${dateDisplay.weekday}</p>
+      </div>`;
+    } catch (error) {
+      DebugLogger.warn("Error getting calendar information", error);
+      return "Error retrieving calendar information.";
     }
-
-    const currentDate = scApi.currentDate;
-    if (!currentDate) {
-      return "Simple Calendar date not available.";
-    }
-
-    const formattedDate = scApi.formatDate(currentDate);
-    const timeString = currentDate.time
-      ? currentDate.getTimeString()
-      : "00:00:00";
-
-    return `<div class="weather-calendar">
-      <h3>Calendar Information</h3>
-      <p>Date: ${formattedDate}</p>
-      <p>Time: ${timeString}</p>
-    </div>`;
   }
 }

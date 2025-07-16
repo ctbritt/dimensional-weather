@@ -22,11 +22,15 @@ export class WeatherCommandSystem {
    * Register all commands with chat system and internal handlers
    */
   register() {
+    DebugLogger.info("Registering weather command system");
+
     // Register with chat command library if available
     this._registerWithChatCommandLib();
 
     // Register internal command handlers
     this._registerInternalCommands();
+
+    DebugLogger.info("Weather command system registration complete");
   }
 
   /**
@@ -41,42 +45,54 @@ export class WeatherCommandSystem {
       return;
     }
 
-    // Register weather command
-    game.chatCommands.register({
-      name: "weather",
-      module: "dimensional-weather",
-      description: "Display current weather conditions",
-      icon: "<i class='fas fa-cloud-sun'></i>",
-      requiredRole: "NONE",
-      aliases: ["/weather", "weather"],
-      callback: (chat, parameters, messageData) =>
-        this._handleChatCommand(chat, parameters, messageData),
-      autocompleteCallback: (menu, alias, parameters) =>
-        this._autocompleteCommand(menu, alias, parameters),
-      closeOnComplete: true,
-    });
+    DebugLogger.info("Registering with Chat Commands library");
 
-    // Register date command for GMs
-    game.chatCommands.register({
-      name: "date",
-      module: "dimensional-weather",
-      description: "Display calendar information (GM only)",
-      icon: "<i class='fas fa-calendar'></i>",
-      requiredRole: "GAMEMASTER",
-      aliases: ["/date", "date"],
-      callback: (chat, parameters, messageData) =>
-        this._handleDateCommand(chat, parameters, messageData),
-      autocompleteCallback: (menu, alias, parameters) => {
-        return [
-          game.chatCommands.createInfoElement(
-            "Display current calendar information."
-          ),
-        ];
-      },
-      closeOnComplete: true,
-    });
+    // Add a small delay to ensure Chat Commands library is fully loaded
+    setTimeout(() => {
+      try {
+        // Register weather command
+        game.chatCommands.register({
+          name: "weather",
+          module: "dimensional-weather",
+          description: "Display current weather conditions",
+          icon: "<i class='fas fa-cloud-sun'></i>",
+          requiredRole: "NONE",
+          aliases: ["/weather", "weather"],
+          callback: (chat, parameters, messageData) =>
+            this._handleChatCommand(chat, parameters, messageData),
+          autocompleteCallback: (menu, alias, parameters) =>
+            this._autocompleteCommand(menu, alias, parameters),
+          closeOnComplete: true,
+        });
 
-    DebugLogger.info("Chat commands registered");
+        // Register date command for GMs
+        game.chatCommands.register({
+          name: "date",
+          module: "dimensional-weather",
+          description: "Display calendar information (GM only)",
+          icon: "<i class='fas fa-calendar'></i>",
+          requiredRole: "GAMEMASTER",
+          aliases: ["/date", "date"],
+          callback: (chat, parameters, messageData) =>
+            this._handleDateCommand(chat, parameters, messageData),
+          autocompleteCallback: (menu, alias, parameters) => {
+            return [
+              game.chatCommands.createInfoElement(
+                "Display current calendar information."
+              ),
+            ];
+          },
+          closeOnComplete: true,
+        });
+
+        DebugLogger.info("Chat commands registered successfully");
+      } catch (error) {
+        DebugLogger.warn(
+          "Failed to register with Chat Commands library",
+          error
+        );
+      }
+    }, 100); // 100ms delay
   }
 
   /**
@@ -205,24 +221,30 @@ export class WeatherCommandSystem {
   }
 
   /**
-   * Process a command from slash commands
-   * @param {string} parameters - Command string (without /weather)
+   * Process a weather command
+   * @param {string} parameters - Command parameters
    * @returns {Promise<Object|void>} Command result
    */
   async processCommand(parameters) {
     try {
+      DebugLogger.log("command", `Processing weather command: "${parameters}"`);
+
       if (!this.api.initialized) {
+        DebugLogger.log("command", "API not initialized, initializing...");
         await this.api.initialize();
       }
 
       // If no parameters, just display current weather
       if (!parameters) {
+        DebugLogger.log("command", "No parameters, displaying current weather");
         await this.api.displayWeather();
         return;
       }
 
       const args = parameters.split(" ");
       const subcommand = args[0]?.toLowerCase();
+
+      DebugLogger.log("command", `Subcommand: "${subcommand}", args:`, args);
 
       return await this.handleCommand(subcommand, args);
     } catch (error) {

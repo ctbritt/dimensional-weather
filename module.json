@@ -79,25 +79,22 @@
       {
         "id": "_chatcommands",
         "type": "module",
-        "manifest": "https://gitlab.com/woodentavern/foundryvtt-chat-command-lib/-/raw/master/src/module.json",
         "compatibility": {
-          "verified": "2.0.1"
+          "minimum": "2.0.3"
         }
       },
       {
-        "id": "simple-calendar",
+        "id": "foundryvtt-simple-calendar",
         "type": "module",
-        "manifest": "https://github.com/vigoren/foundryvtt-simple-calendar/releases/latest/download/module.json",
         "compatibility": {
-          "verified": "1.5.0"
+          "minimum": "2.4.18"
         }
       },
       {
         "id": "lib-wrapper",
         "type": "module",
-        "manifest": "https://github.com/ruipin/fvtt-lib-wrapper/releases/download/v1.12.11.0/module.json",
         "compatibility": {
-          "verified": "1.12.11.0"
+          "minimum": "1.13.3.0"
         }
       }
     ]

@@ -13,35 +13,41 @@ export class TimeUtils {
   };
 
   /**
+   * Check if Simple Calendar API is available
+   * @returns {boolean} True if Simple Calendar API is available
+   */
+  static isSimpleCalendarAvailable() {
+    return game.modules.get("simple-calendar")?.active && SimpleCalendar?.api;
+  }
+
+  /**
    * Get current time period based on hour from Simple Calendar
    * @param {boolean} useCache - Whether to use the cached value if available
    * @returns {string} Time period name
    */
   static getTimePeriod(useCache = true) {
-    const scApi = game.modules.get("simple-calendar")?.api;
-    if (!scApi) {
-      DebugLogger.log(
-        "time",
-        "Simple Calendar API not available in getTimePeriod"
-      );
-      return "Unknown Time";
-    }
-
     try {
-      // Get current date from Simple Calendar
-      const currentDate = scApi.currentDate;
-      if (!currentDate?.time) {
+      // Check if Simple Calendar is available
+      if (!this.isSimpleCalendarAvailable()) {
         DebugLogger.log(
           "time",
-          "Simple Calendar time not available in getTimePeriod"
+          "Simple Calendar not available, using system time"
         );
-        return "Unknown Time";
+        return this._getTimePeriodFromSystem();
+      }
+
+      // Get current date from Simple Calendar
+      const currentDate = SimpleCalendar.api.currentDateTime();
+      if (!currentDate) {
+        DebugLogger.log(
+          "time",
+          "Simple Calendar returned null date, using system time"
+        );
+        return this._getTimePeriodFromSystem();
       }
 
       // Create a simple cache key based on the time
-      const cacheKey = `${currentDate.time.hour}:${
-        currentDate.time.minute || 0
-      }`;
+      const cacheKey = `${currentDate.hour}:${currentDate.minute || 0}`;
 
       // Use cache if enabled and time hasn't changed
       if (
@@ -53,7 +59,7 @@ export class TimeUtils {
       }
 
       // Extract hour from the time object
-      const hours = currentDate.time.hour;
+      const hours = currentDate.hour;
       if (hours === undefined || hours === null) {
         DebugLogger.log(
           "time",
@@ -63,22 +69,7 @@ export class TimeUtils {
       }
 
       // Determine period based on hour
-      let period;
-      if (hours >= 5 && hours < 8) {
-        period = "Early Morning";
-      } else if (hours >= 8 && hours < 12) {
-        period = "Morning";
-      } else if (hours >= 12 && hours < 14) {
-        period = "Noon";
-      } else if (hours >= 14 && hours < 18) {
-        period = "Afternoon";
-      } else if (hours >= 18 && hours < 21) {
-        period = "Evening";
-      } else if (hours >= 21 || hours < 2) {
-        period = "Night";
-      } else {
-        period = "Late Night";
-      }
+      const period = this._determineTimePeriod(hours);
 
       // Update cache
       this._cache.timestamp = cacheKey;
@@ -87,27 +78,64 @@ export class TimeUtils {
       return period;
     } catch (error) {
       DebugLogger.warn("Error getting time period from Simple Calendar", error);
-      return "Unknown Time";
+      return this._getTimePeriodFromSystem();
+    }
+  }
+
+  /**
+   * Get time period from system time as fallback
+   * @private
+   * @returns {string} Time period name
+   */
+  static _getTimePeriodFromSystem() {
+    const now = new Date();
+    const hours = now.getHours();
+    return this._determineTimePeriod(hours);
+  }
+
+  /**
+   * Determine time period based on hour
+   * @private
+   * @param {number} hours - Hour of day (0-23)
+   * @returns {string} Time period name
+   */
+  static _determineTimePeriod(hours) {
+    if (hours >= 5 && hours < 8) {
+      return "Early Morning";
+    } else if (hours >= 8 && hours < 12) {
+      return "Morning";
+    } else if (hours >= 12 && hours < 14) {
+      return "Noon";
+    } else if (hours >= 14 && hours < 18) {
+      return "Afternoon";
+    } else if (hours >= 18 && hours < 21) {
+      return "Evening";
+    } else if (hours >= 21 || hours < 2) {
+      return "Night";
+    } else {
+      return "Late Night";
     }
   }
 
   /**
    * Get the current timestamp based on Simple Calendar or system time
-   * @returns {number} Current timestamp
+   * @returns {number} Current timestamp in milliseconds
    */
   static getCurrentTimestamp() {
-    const scApi = game.modules.get("simple-calendar")?.api;
-    if (scApi) {
-      try {
-        const currentDate = scApi.currentDate;
-        if (currentDate) {
-          // Use Simple Calendar timestamp if available, otherwise fallback to system time
-          return currentDate.timestamp || Date.now();
-        }
-      } catch (error) {
-        DebugLogger.warn("Error getting Simple Calendar timestamp", error);
+    try {
+      if (!this.isSimpleCalendarAvailable()) {
+        return Date.now();
       }
+
+      const scTimestamp = SimpleCalendar.api.timestamp();
+      if (scTimestamp !== null && scTimestamp !== undefined) {
+        // Simple Calendar returns timestamp in seconds, convert to milliseconds
+        return scTimestamp * 1000;
+      }
+    } catch (error) {
+      DebugLogger.warn("Error getting Simple Calendar timestamp", error);
     }
+
     return Date.now();
   }
 
@@ -116,18 +144,17 @@ export class TimeUtils {
    * @returns {Object} Date display object
    */
   static getCurrentDateDisplay() {
-    const scApi = game.modules.get("simple-calendar")?.api;
-    if (!scApi) {
-      const now = new Date();
-      return {
-        date: now.toLocaleDateString(),
-        time: now.toLocaleTimeString(),
-        display: now.toLocaleString(),
-      };
-    }
-
     try {
-      const currentDate = scApi.currentDate;
+      if (!this.isSimpleCalendarAvailable()) {
+        const now = new Date();
+        return {
+          date: now.toLocaleDateString(),
+          time: now.toLocaleTimeString(),
+          display: now.toLocaleString(),
+        };
+      }
+
+      const currentDate = SimpleCalendar.api.currentDateTimeDisplay();
       if (!currentDate) {
         const now = new Date();
         return {
@@ -138,17 +165,10 @@ export class TimeUtils {
       }
 
       // Format date using Simple Calendar's date object
-      const formattedDate = currentDate.dateString || "Unknown Date";
+      const formattedDate = currentDate.date || "Unknown Date";
 
       // Format time string
-      const timeString = currentDate.time
-        ? `${currentDate.time.hour || 0}:${String(
-            currentDate.time.minute || 0
-          ).padStart(2, "0")}:${String(currentDate.time.second || 0).padStart(
-            2,
-            "0"
-          )}`
-        : "00:00:00";
+      const timeString = currentDate.time;
 
       return {
         date: formattedDate,
@@ -190,17 +210,16 @@ export class TimeUtils {
    * @returns {string|null} Season key or null if not found
    */
   static getCurrentSeason() {
-    const scApi = game.modules.get("simple-calendar")?.api;
-    if (!scApi) {
-      DebugLogger.log(
-        "time",
-        "Simple Calendar API not available in getCurrentSeason"
-      );
-      return null;
-    }
-
     try {
-      const currentSeason = scApi.getCurrentSeason();
+      if (!this.isSimpleCalendarAvailable()) {
+        DebugLogger.log(
+          "time",
+          "Simple Calendar not available for season lookup"
+        );
+        return null;
+      }
+
+      const currentSeason = SimpleCalendar.api.getCurrentSeason();
       if (!currentSeason) {
         DebugLogger.log("time", "No season data in current date");
         return null;
@@ -232,7 +251,7 @@ export class TimeUtils {
 
   /**
    * Calculate time passed since a timestamp
-   * @param {number} timestamp - Previous timestamp
+   * @param {number} timestamp - Previous timestamp in milliseconds
    * @returns {Object} Time passed in different units
    */
   static getTimeSince(timestamp) {
@@ -250,7 +269,7 @@ export class TimeUtils {
 
   /**
    * Check if an update is needed based on frequency
-   * @param {number} lastUpdate - Last update timestamp
+   * @param {number} lastUpdate - Last update timestamp in milliseconds
    * @param {number} frequency - Update frequency in hours
    * @returns {boolean} Whether an update is needed
    */
@@ -274,22 +293,32 @@ export class TimeUtils {
 
   /**
    * Format a timestamp as a readable string using Simple Calendar if available
-   * @param {number} timestamp - Timestamp to format
+   * @param {number} timestamp - Timestamp in milliseconds to format
    * @returns {string} Formatted timestamp
    */
   static formatTimestamp(timestamp) {
-    const scApi = game.modules.get("simple-calendar")?.api;
-    if (!scApi) {
-      return new Date(timestamp).toLocaleString();
+    try {
+      if (!this.isSimpleCalendarAvailable()) {
+        return new Date(timestamp).toLocaleString();
+      }
+
+      // Convert milliseconds to seconds for Simple Calendar
+      const scTimestamp = Math.floor(timestamp / 1000);
+
+      // Use Simple Calendar's formatTimestamp method
+      const formatted = SimpleCalendar.api.formatTimestamp(scTimestamp);
+      if (formatted && typeof formatted === "object") {
+        return `${formatted.date} ${formatted.time}`;
+      } else if (typeof formatted === "string") {
+        return formatted;
+      }
+    } catch (error) {
+      DebugLogger.warn(
+        "Error formatting timestamp with Simple Calendar",
+        error
+      );
     }
 
-    try {
-      // Use current Simple Calendar date formatting
-      const dateDisplay = this.getCurrentDateDisplay();
-      return dateDisplay.display;
-    } catch (error) {
-      DebugLogger.warn("Error formatting timestamp", error);
-      return new Date(timestamp).toLocaleString();
-    }
+    return new Date(timestamp).toLocaleString();
   }
 }

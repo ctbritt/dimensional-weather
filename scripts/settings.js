@@ -425,9 +425,18 @@ export class Settings {
    * @returns {string} Campaign setting ID
    */
   static getCurrentCampaign() {
-    return (
-      game.settings.get(this.NAMESPACE, "campaign") || this.DEFAULT_CAMPAIGN
-    );
+    try {
+      return (
+        game.settings.get(this.NAMESPACE, "campaign") || this.DEFAULT_CAMPAIGN
+      );
+    } catch (error) {
+      // If settings aren't registered yet, return the default campaign
+      if (error.message.includes("is not a registered game setting")) {
+        DebugLogger.warn("Settings not registered yet, using default campaign");
+        return this.DEFAULT_CAMPAIGN;
+      }
+      throw error;
+    }
   }
 
   /**
@@ -446,7 +455,21 @@ export class Settings {
    * @returns {any} Setting value
    */
   static getSetting(key) {
-    return game.settings.get(this.NAMESPACE, key);
+    try {
+      return game.settings.get(this.NAMESPACE, key);
+    } catch (error) {
+      // If settings aren't registered yet, return the default value
+      if (error.message.includes("is not a registered game setting")) {
+        const setting = this.SETTINGS[key];
+        if (setting) {
+          DebugLogger.warn(
+            `Settings not registered yet, using default for ${key}`
+          );
+          return setting.default;
+        }
+      }
+      throw error;
+    }
   }
 
   /**

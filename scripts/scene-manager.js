@@ -4,6 +4,7 @@
  */
 
 import { ErrorHandler } from "./utils.js";
+import { TimeUtils } from "./time-utils.js";
 
 export class SceneManager {
   /**
@@ -140,9 +141,9 @@ export class SceneManager {
     if (!weatherState?.lastUpdate) return true;
 
     const lastUpdateTime = weatherState.lastUpdate;
-    const scApi = game.modules.get("simple-calendar")?.api;
-    const currentTime = scApi?.currentDate?.timestamp || Date.now();
-    const hoursSinceLastUpdate = (currentTime - lastUpdateTime) / 3600;
+    const currentTime = TimeUtils.getCurrentTimestamp();
+    const hoursSinceLastUpdate = (currentTime - lastUpdateTime) / 3600000; // Convert to hours
+    console.log("currentTime", currentTime);
 
     return hoursSinceLastUpdate >= updateFrequency;
   }

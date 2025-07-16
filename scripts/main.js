@@ -1,39 +1,52 @@
 /**
  * Dimensional Weather - Main Module
- * Entry point for the Dimensional Weather system
+ * Entry point and initialization
  */
 
 import { Settings } from "./settings.js";
-import { DimensionalWeatherAPI } from "./api.js";
 import { ErrorHandler, DebugLogger } from "./utils.js";
-import { WeatherCommandSystem } from "./command-system.js";
 import { SceneManager } from "./scene-manager.js";
+import { TimeUtils } from "./time-utils.js";
+import { DimensionalWeatherAPI } from "./api.js";
+import { WeatherCommandSystem } from "./command-system.js";
 
-// Module constants
-const MODULE_ID = "dimensional-weather";
 const MODULE_TITLE = "Dimensional Weather";
 
-// Module state
-let commandSystem;
 let initialized = false;
+let commandSystem;
 
 /**
  * Initialize the module
- * @returns {Promise<void>}
  */
 async function initializeModule() {
-  if (initialized) return;
-
   try {
-    // Register settings first
-    await Settings.register(onCampaignChange);
+    if (initialized) return;
 
-    // Register global module API
+    // Register settings first - this is critical for the module to work
+    try {
+      await Settings.register(onCampaignChange);
+      DebugLogger.info("Settings registered successfully");
+    } catch (error) {
+      ErrorHandler.logAndNotify("Failed to register settings", error);
+      return; // Don't continue if settings registration fails
+    }
+
+    // Initialize the API
     game.dimWeather = new DimensionalWeatherAPI();
     await game.dimWeather.initialize();
 
-    // Initialize unified command system
+    // Initialize command system
     commandSystem = new WeatherCommandSystem(game.dimWeather);
+
+    // Check if Chat Commands library is available
+    if (game.chatCommands) {
+      DebugLogger.info("Chat Commands library is available");
+    } else {
+      DebugLogger.warn(
+        "Chat Commands library is not available - using fallback chat handler"
+      );
+    }
+
     commandSystem.register();
 
     initialized = true;
@@ -124,8 +137,8 @@ async function checkTimeBasedUpdate() {
 
     const updateFrequency = Settings.getSetting("updateFrequency");
     const lastUpdate = weatherState.lastUpdate || 0;
-    const currentTime = Date.now();
-    const hoursSinceLastUpdate = (currentTime - lastUpdate) / (1000 * 60 * 60);
+    const currentTime = TimeUtils.getCurrentTimestamp();
+    const hoursSinceLastUpdate = (currentTime - lastUpdate) / 3600000; // Convert to hours
 
     if (Settings.getSetting("debugTimePeriod")) {
       DebugLogger.log("weather", "Time check", {
@@ -217,8 +230,15 @@ Hooks.on("chatMessage", (message, options, userId) => {
 
   const content = message.content || message;
   if (typeof content === "string" && content.startsWith("/weather")) {
-    commandSystem.processCommand(content.slice(8).trim());
-    return false;
+    try {
+      // Remove the /weather prefix and process the command
+      const parameters = content.slice(8).trim();
+      commandSystem.processCommand(parameters);
+      return false; // Prevent the message from being posted
+    } catch (error) {
+      ErrorHandler.logAndNotify("Error processing weather command", error);
+      return true; // Allow the message to be posted if there's an error
+    }
   }
   return true;
 });
