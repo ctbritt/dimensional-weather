@@ -44,14 +44,8 @@ export class WeatherCalculator {
     details.timePeriod = timePeriod;
 
     // Get modifiers
-    const globalTimeModifiers = TimeUtils.getTimeModifiers(
-      timePeriod,
-      settingsData
-    );
-    const terrainTimeModifiers = this._getTerrainTimeModifiers(
-      timePeriod,
-      terrain
-    );
+    const globalTimeModifiers = TimeUtils.getTimeModifiers(settingsData);
+    const terrainTimeModifiers = this._getTerrainTimeModifiers(terrain);
 
     // Combine global and terrain-specific time modifiers
     const timeModifiers = {
@@ -253,12 +247,13 @@ export class WeatherCalculator {
   /**
    * Get terrain-specific time modifiers
    * @private
-   * @param {string} timePeriod - Time period name
    * @param {Object} terrain - Terrain data
    * @returns {Object} Terrain time modifiers
    */
-  static _getTerrainTimeModifiers(timePeriod, terrain) {
-    if (!terrain?.timeModifiers?.[timePeriod]) {
+  static _getTerrainTimeModifiers(terrain) {
+    const currentHour = TimeUtils.getCurrentHour();
+
+    if (!terrain?.timeModifiers?.[currentHour]) {
       return {
         temperature: 0,
         wind: 0,
@@ -267,7 +262,7 @@ export class WeatherCalculator {
       };
     }
 
-    return terrain.timeModifiers[timePeriod];
+    return terrain.timeModifiers[currentHour];
   }
 
   /**

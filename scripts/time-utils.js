@@ -71,8 +71,11 @@ export class TimeUtils {
         return "Unknown Time";
       }
 
+      DebugLogger.log("time", `Simple Calendar hour: ${hours}`);
+
       // Determine period based on hour
       const period = this._determineTimePeriod(hours);
+      DebugLogger.log("time", `Determined time period: ${period}`);
 
       // Update cache
       this._cache.timestamp = cacheKey;
@@ -103,20 +106,20 @@ export class TimeUtils {
    * @returns {string} Time period name
    */
   static _determineTimePeriod(hours) {
-    if (hours >= 5 && hours < 8) {
-      return "Early Morning";
+    if (hours >= 0 && hours < 4) {
+      return "2nd Watch";
+    } else if (hours >= 4 && hours < 8) {
+      return "3rd Watch";
     } else if (hours >= 8 && hours < 12) {
       return "Morning";
-    } else if (hours >= 12 && hours < 14) {
+    } else if (hours >= 12 && hours < 16) {
       return "Noon";
-    } else if (hours >= 14 && hours < 18) {
-      return "Afternoon";
-    } else if (hours >= 18 && hours < 21) {
+    } else if (hours >= 16 && hours < 20) {
       return "Evening";
-    } else if (hours >= 21 || hours < 2) {
-      return "Night";
+    } else if (hours >= 20 && hours < 24) {
+      return "1st Watch";
     } else {
-      return "Late Night";
+      return "Unknown Time";
     }
   }
 
@@ -190,13 +193,53 @@ export class TimeUtils {
   }
 
   /**
-   * Get time modifiers for a time period
-   * @param {string} timePeriod - Time period name
+   * Get the current hour from Simple Calendar or system time
+   * @returns {number} Current hour (1-24)
+   */
+  static getCurrentHour() {
+    try {
+      if (!this.isSimpleCalendarAvailable()) {
+        const now = new Date();
+        return now.getHours() + 1; // Convert to 1-24 range
+      }
+
+      const currentDate = SimpleCalendar.api.currentDateTime();
+      if (
+        !currentDate ||
+        currentDate.hour === undefined ||
+        currentDate.hour === null
+      ) {
+        DebugLogger.log(
+          "time",
+          "Could not get hour from Simple Calendar, using system time"
+        );
+        const now = new Date();
+        return now.getHours() + 1; // Convert to 1-24 range
+      }
+
+      // Simple Calendar uses 0-23, convert to 1-24 for our timeModifiers
+      return currentDate.hour + 1;
+    } catch (error) {
+      DebugLogger.warn("Error getting current hour", error);
+      const now = new Date();
+      return now.getHours() + 1; // Convert to 1-24 range
+    }
+  }
+
+  /**
+   * Get time modifiers for the current hour
    * @param {Object} settingsData - Campaign settings data
    * @returns {Object} Time modifiers
    */
-  static getTimeModifiers(timePeriod, settingsData) {
-    if (!settingsData?.timeModifiers?.[timePeriod]) {
+  static getTimeModifiers(settingsData) {
+    const currentHour = this.getCurrentHour();
+    DebugLogger.log("time", `Getting time modifiers for hour: ${currentHour}`);
+
+    if (!settingsData?.timeModifiers?.[currentHour]) {
+      DebugLogger.log(
+        "time",
+        `No time modifiers found for hour ${currentHour}, using default`
+      );
       return {
         temperature: 0,
         wind: 0,
@@ -205,7 +248,13 @@ export class TimeUtils {
       };
     }
 
-    return settingsData.timeModifiers[timePeriod];
+    const modifiers = settingsData.timeModifiers[currentHour];
+    DebugLogger.log(
+      "time",
+      `Time modifiers for hour ${currentHour}:`,
+      modifiers
+    );
+    return modifiers;
   }
 
   /**
@@ -284,10 +333,18 @@ export class TimeUtils {
    */
   static clearCache() {
     this._cache = {
-      timestamp: 0,
+      timestamp: null,
       period: null,
-      fullDate: null,
     };
+    DebugLogger.log("time", "Time cache cleared");
+  }
+
+  /**
+   * Force refresh the time period (ignores cache)
+   * @returns {string} Time period name
+   */
+  static getTimePeriodForceRefresh() {
+    return this.getTimePeriod(false);
   }
 
   /**

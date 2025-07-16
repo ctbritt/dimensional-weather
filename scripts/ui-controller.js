@@ -240,6 +240,17 @@ export class UIController {
       const seasonDisplay = this._getSeasonName(weatherState.season);
       const timeDisplay = this._getTimePeriod();
 
+      // Debug logging for chat message
+      const currentHour = TimeUtils.getCurrentHour();
+      const currentTimePeriod = TimeUtils.getTimePeriod();
+      DebugLogger.log("ui", "=== WEATHER CHAT DEBUG ===");
+      DebugLogger.log("ui", `Current Hour: ${currentHour}`);
+      DebugLogger.log("ui", `Time Period: ${currentTimePeriod}`);
+      DebugLogger.log("ui", `Season: ${seasonDisplay}`);
+      DebugLogger.log("ui", `Temperature: ${weatherState.temperature}`);
+      DebugLogger.log("ui", `Terrain: ${weatherState.terrain}`);
+      DebugLogger.log("ui", "=== END DEBUG ===");
+
       // Build chat card
       const campaignStyles = this.settingsData?.styles || {}; // Get styles from loaded settings
       let styleString = "";
