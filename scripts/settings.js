@@ -478,7 +478,7 @@ export class Settings {
    */
   static isSimpleCalendarEnabled() {
     return (
-      game.modules.get("simple-calendar")?.active &&
+      game.modules.get("foundryvtt-simple-calendar")?.active &&
       Settings.getSetting("useSimpleCalendar")
     );
   }

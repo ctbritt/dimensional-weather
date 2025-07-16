@@ -17,7 +17,10 @@ export class TimeUtils {
    * @returns {boolean} True if Simple Calendar API is available
    */
   static isSimpleCalendarAvailable() {
-    return game.modules.get("simple-calendar")?.active && SimpleCalendar?.api;
+    return (
+      game.modules.get("foundryvtt-simple-calendar")?.active &&
+      SimpleCalendar?.api
+    );
   }
 
   /**
@@ -207,7 +210,7 @@ export class TimeUtils {
 
   /**
    * Get current season from Simple Calendar
-   * @returns {string|null} Season key or null if not found
+   * @returns {string|null} Season name or null if not found
    */
   static getCurrentSeason() {
     try {
@@ -219,29 +222,25 @@ export class TimeUtils {
         return null;
       }
 
+      DebugLogger.log("time", "Getting current season from Simple Calendar");
       const currentSeason = SimpleCalendar.api.getCurrentSeason();
+      DebugLogger.log("time", "Simple Calendar season data:", currentSeason);
+
       if (!currentSeason) {
         DebugLogger.log("time", "No season data in current date");
         return null;
       }
 
-      // Get the season key directly from the Simple Calendar season object
-      const seasonKey = currentSeason.key || currentSeason.id;
-      if (seasonKey) {
-        DebugLogger.log("time", `Found season key: ${seasonKey}`);
-        return seasonKey;
+      // Always use the season name from Simple Calendar
+      if (currentSeason?.name) {
+        DebugLogger.log(
+          "time",
+          `Using Simple Calendar season name: ${currentSeason.name}`
+        );
+        return currentSeason.name;
       }
 
-      // Fallback to season name if no key/id available
-      const seasonName = currentSeason.name;
-      if (seasonName) {
-        // Convert name to lowercase key format
-        const seasonKey = seasonName.toLowerCase();
-        DebugLogger.log("time", `Using season name as key: ${seasonKey}`);
-        return seasonKey;
-      }
-
-      DebugLogger.log("time", "No season key or name found");
+      DebugLogger.log("time", "No season name found");
       return null;
     } catch (error) {
       ErrorHandler.logAndNotify("Error getting season", error);

@@ -4,7 +4,7 @@
  */
 
 import { Settings } from "./settings.js";
-import { DOMUtils, ErrorHandler } from "./utils.js";
+import { DOMUtils, ErrorHandler, DebugLogger } from "./utils.js";
 import { SceneManager } from "./scene-manager.js";
 import { WeatherDescriptionService } from "./services/weather-description.js";
 import { TimeUtils } from "./time-utils.js";
@@ -445,31 +445,44 @@ export class UIController {
    * @returns {string} Season name
    */
   _getSeasonName(seasonKey) {
+    DebugLogger.log("ui", `Getting season name for key: ${seasonKey}`);
+
     // Try to get season from Simple Calendar first
-    if (
-      Settings.isSimpleCalendarEnabled() &&
-      game.modules.get("simple-calendar")?.api
-    ) {
-      const scApi = game.modules.get("simple-calendar").api;
-      const currentSeason = scApi.getCurrentSeason();
-      if (currentSeason?.name) {
-        return currentSeason.name;
+    if (Settings.isSimpleCalendarEnabled()) {
+      DebugLogger.log("ui", "Simple Calendar is enabled, checking for season");
+      const scSeasonName = TimeUtils.getCurrentSeason();
+      DebugLogger.log("ui", `Simple Calendar season name: ${scSeasonName}`);
+
+      if (scSeasonName) {
+        DebugLogger.log(
+          "ui",
+          `Using Simple Calendar season name: ${scSeasonName}`
+        );
+        return scSeasonName;
       }
+    } else {
+      DebugLogger.log("ui", "Simple Calendar is not enabled");
     }
 
     // Fall back to settings if Simple Calendar is not available or has no season
     const season = this.settingsData?.seasons?.[seasonKey];
+    DebugLogger.log("ui", `Settings season data for key ${seasonKey}:`, season);
+
     if (season?.name) {
+      DebugLogger.log("ui", `Using settings season name: ${season.name}`);
       return season.name;
     }
 
     // If all else fails, format the season key
-    return seasonKey
+    const formattedKey = seasonKey
       .replace(/([A-Z])/g, " $1")
       .trim()
       .split(" ")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(" ");
+
+    DebugLogger.log("ui", `Using formatted season key: ${formattedKey}`);
+    return formattedKey;
   }
 
   /**

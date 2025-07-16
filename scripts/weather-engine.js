@@ -250,7 +250,7 @@ export class WeatherEngine {
     // If Simple Calendar integration is enabled and API is available
     if (
       Settings.getSetting("useSimpleCalendar") &&
-      game.modules.get("simple-calendar")?.api
+      game.modules.get("foundryvtt-simple-calendar")?.api
     ) {
       const scSeason = TimeUtils.getCurrentSeason();
       if (scSeason) {

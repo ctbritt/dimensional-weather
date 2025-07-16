@@ -47,6 +47,18 @@ async function initializeModule() {
       );
     }
 
+    // Check Simple Calendar integration
+    const useSimpleCalendar = Settings.getSetting("useSimpleCalendar");
+    DebugLogger.info(
+      `Simple Calendar integration setting: ${useSimpleCalendar}`
+    );
+
+    if (game.modules.get("foundryvtt-simple-calendar")?.active) {
+      DebugLogger.info("Simple Calendar module is active");
+    } else {
+      DebugLogger.warn("Simple Calendar module is not active");
+    }
+
     commandSystem.register();
 
     initialized = true;
