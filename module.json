@@ -74,29 +74,4 @@
   ],
   "changelog": "CHANGELOG.md",
   "socket": false,
-  "relationships": {
-    "requires": [
-      {
-        "id": "_chatcommands",
-        "type": "module",
-        "compatibility": {
-          "minimum": "2.0.3"
-        }
-      },
-      {
-        "id": "foundryvtt-simple-calendar",
-        "type": "module",
-        "compatibility": {
-          "minimum": "2.4.18"
-        }
-      },
-      {
-        "id": "lib-wrapper",
-        "type": "module",
-        "compatibility": {
-          "minimum": "1.13.3.0"
-        }
-      }
-    ]
-  }
 }
