@@ -73,5 +73,5 @@
     }
   ],
   "changelog": "CHANGELOG.md",
-  "socket": false,
+  "socket": false
 }
