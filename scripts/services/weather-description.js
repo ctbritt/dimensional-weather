@@ -43,6 +43,9 @@ export class WeatherDescriptionService {
       const prompt = this._buildPrompt(conditions);
       const result = await this._callOpenAI(prompt);
       this.lastCallTime = Date.now();
+      if (!result || !String(result).trim()) {
+        return this._getBasicDescription(conditions);
+      }
       return result;
     } catch (error) {
       // Provide a graceful fallback
@@ -79,75 +82,84 @@ export class WeatherDescriptionService {
    * @returns {Promise<string>} API response
    */
   async _callOpenAI(prompt) {
-    const model = this.model || Settings.getSetting("openaiModel") || "gpt-4o-mini";
-    const isGpt5 = /^gpt-5/i.test(model);
+    const model = this.model || Settings.getSetting("openaiModel") || "gpt-5-mini";
 
-    const body = {
-      model,
-      messages: [
-        { role: "system", content: "You are a weather system for the Dark Sun D&D setting. Generate very concise, atmospheric descriptions (2-3 sentences max) focusing on the most critical environmental effects and immediate survival concerns. Give your responses in the style of the Wanderer from the Wanderer's Chronicle." },
-        { role: "user", content: prompt },
-      ],
+    const buildBody = (maxTokens) => {
+      const base = {
+        model,
+        messages: [
+          { role: "system", content: "You are a weather system for the Dark Sun D&D setting. Generate very concise, atmospheric descriptions (2-3 sentences max) focusing on the most critical environmental effects and immediate survival concerns. Give your responses in the style of the Wanderer from the Wanderer's Chronicle." },
+          { role: "user", content: prompt },
+        ],
+      };
+      // GPT-5 style parameters (no temperature, use max_completion_tokens)
+      base.max_completion_tokens = maxTokens;
+      return base;
     };
 
-    // Newer OpenAI models (e.g., gpt-5) use 'max_completion_tokens'
-    if (isGpt5) {
-      body.max_completion_tokens = 150;
-    } else {
-      body.max_tokens = 150;
-      // Only set temperature for non-GPT-5 models
-      body.temperature = 0.7;
-    }
+    const callOnce = async (body) => {
+      const resp = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${this.apiKey}`,
+        },
+        body: JSON.stringify(body),
+      });
+      if (!resp.ok) {
+        const errorData = await resp.json().catch(() => ({}));
+        throw new Error(`OpenAI API error: ${errorData.error?.message || resp.statusText}`);
+      }
+      const data = await resp.json();
+      try { console.log("Dimensional Weather | OpenAI response:", data); } catch (e) {}
+      let contentText = null;
+      let finishReason = null;
 
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${this.apiKey}`,
-      },
-      body: JSON.stringify(body),
-    });
+      if (Array.isArray(data?.choices) && data.choices.length > 0) {
+        const choice = data.choices[0];
+        finishReason = choice?.finish_reason || null;
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(`OpenAI API error: ${errorData.error?.message || response.statusText}`);
-    }
+        if (typeof choice?.message?.content === "string") {
+          contentText = choice.message.content;
+        }
 
-    const data = await response.json();
-    let contentText = null;
+        if (!contentText && Array.isArray(choice?.message?.content)) {
+          const parts = choice.message.content;
+          const texts = parts
+            .map((p) => {
+              if (typeof p === "string") return p;
+              if (p && typeof p === "object") {
+                if (typeof p.text === "string") return p.text;
+                if (typeof p.content === "string") return p.content;
+              }
+              return null;
+            })
+            .filter(Boolean);
+          if (texts.length) contentText = texts.join("\n");
+        }
 
-    if (Array.isArray(data?.choices) && data.choices.length > 0) {
-      const choice = data.choices[0];
-
-      // Standard string content
-      if (typeof choice?.message?.content === "string") {
-        contentText = choice.message.content;
+        if (!contentText && typeof choice?.text === "string") {
+          contentText = choice.text;
+        }
       }
 
-      // Array-based content (gpt-4o/gpt-5): collect any text-bearing parts
-      if (!contentText && Array.isArray(choice?.message?.content)) {
-        const parts = choice.message.content;
-        const texts = parts
-          .map((p) => {
-            if (typeof p === "string") return p;
-            if (p && typeof p === "object") {
-              if (typeof p.text === "string") return p.text;
-              if (typeof p.content === "string") return p.content;
-            }
-            return null;
-          })
-          .filter(Boolean);
-        if (texts.length) contentText = texts.join("\n");
-      }
+      return { contentText: contentText ? String(contentText).trim() : "", finishReason };
+    };
 
-      // Some responses expose top-level choice.text
-      if (!contentText && typeof choice?.text === "string") {
-        contentText = choice.text;
-      }
+    // First attempt
+    const initialTokens = 300;
+    let { contentText, finishReason } = await callOnce(buildBody(initialTokens));
+
+    // Retry once if empty content or length-capped
+    if (!contentText || finishReason === "length") {
+      const retryTokens = initialTokens + 200; // give more budget
+      const retry = await callOnce(buildBody(retryTokens));
+      contentText = retry.contentText || contentText;
+      finishReason = retry.finishReason || finishReason;
     }
 
     if (!contentText) throw new Error("Unexpected OpenAI response format");
-    return String(contentText).trim();
+    return contentText;
   }
 
   /**
