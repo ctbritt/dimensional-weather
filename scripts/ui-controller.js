@@ -302,6 +302,9 @@ export class UIController {
       return "<p>Weather system is not fully initialized.</p>";
     }
 
+    // Ensure description service reflects current settings (handles runtime changes)
+    this._ensureDescriptionService();
+
     // Get dimension descriptions
     const tempDesc = this._getDimensionDescription(
       "temperature",
@@ -369,6 +372,41 @@ export class UIController {
       precipDesc,
       humidDesc
     );
+  }
+
+  /**
+   * Ensure the description service matches current AI settings
+   * Recreates service if provider, key, or model changed
+   * @private
+   */
+  _ensureDescriptionService() {
+    if (!Settings.getSetting("useAI")) {
+      this.descriptionService = null;
+      return;
+    }
+
+    const provider = Settings.getSetting("aiProvider") || "openai";
+    const apiKey = provider === "anthropic"
+      ? Settings.getSetting("anthropicApiKey")
+      : Settings.getSetting("apiKey");
+    const model = provider === "anthropic"
+      ? Settings.getSetting("anthropicModel")
+      : Settings.getSetting("openaiModel");
+
+    if (!apiKey) {
+      this.descriptionService = null;
+      return;
+    }
+
+    const needsNew =
+      !this.descriptionService ||
+      this.descriptionService.provider !== provider ||
+      this.descriptionService.apiKey !== apiKey ||
+      this.descriptionService.model !== model;
+
+    if (needsNew) {
+      this.descriptionService = new WeatherDescriptionService({ provider, apiKey, model });
+    }
   }
 
   /**

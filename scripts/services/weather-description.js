@@ -180,9 +180,22 @@ export class WeatherDescriptionService {
     }
 
     const data = await response.json();
-    const content = data?.content?.[0]?.text || data?.content?.[0]?.content || "";
-    if (!content) throw new Error("Unexpected Anthropic response format");
-    return String(content).trim();
+    let contentText = null;
+
+    // Messages API returns an array of content blocks
+    if (Array.isArray(data?.content)) {
+      // Prefer first text block
+      const textBlock = data.content.find((c) => c?.type === "text" && (c.text || c.content));
+      contentText = textBlock?.text || textBlock?.content || null;
+    }
+
+    // Fallback: some bridges may return top-level 'text'
+    if (!contentText && typeof data?.text === "string") {
+      contentText = data.text;
+    }
+
+    if (!contentText) throw new Error("Unexpected Anthropic response format");
+    return String(contentText).trim();
   }
 
   /**
