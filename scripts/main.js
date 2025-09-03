@@ -38,7 +38,7 @@ async function initializeModule() {
     commandSystem.register();
 
     initialized = true;
-    DebugLogger.info("Module initialized successfully");
+    DebugLogger.log("weather", "Module initialized successfully");
   } catch (error) {
     ErrorHandler.logAndNotify(
       `Failed to initialize ${MODULE_TITLE} module`,

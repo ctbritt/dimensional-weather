@@ -82,19 +82,18 @@ export class WeatherDescriptionService {
    * @returns {Promise<string>} API response
    */
   async _callOpenAI(prompt) {
-    const model = this.model || Settings.getSetting("openaiModel") || "gpt-5-mini";
+    const model = this.model || Settings.getSetting("openaiModel") || "gpt-4o-mini";
 
     const buildBody = (maxTokens) => {
-      const base = {
+      return {
         model,
         messages: [
           { role: "system", content: "You are a weather system for the Dark Sun D&D setting. Generate very concise, atmospheric descriptions (2-3 sentences max) focusing on the most critical environmental effects and immediate survival concerns. Give your responses in the style of the Wanderer from the Wanderer's Chronicle." },
           { role: "user", content: prompt },
         ],
+        // Use Chat Completions-compatible parameter
+        max_tokens: maxTokens,
       };
-      // GPT-5 style parameters (no temperature, use max_completion_tokens)
-      base.max_completion_tokens = maxTokens;
-      return base;
     };
 
     const callOnce = async (body) => {
@@ -111,7 +110,6 @@ export class WeatherDescriptionService {
         throw new Error(`OpenAI API error: ${errorData.error?.message || resp.statusText}`);
       }
       const data = await resp.json();
-      try { console.log("Dimensional Weather | OpenAI response:", data); } catch (e) {}
       let contentText = null;
       let finishReason = null;
 
@@ -143,6 +141,11 @@ export class WeatherDescriptionService {
         }
       }
 
+      // Fallback for Responses API style
+      if (!contentText && typeof data?.output_text === "string" && data.output_text.trim()) {
+        contentText = data.output_text.trim();
+      }
+
       return { contentText: contentText ? String(contentText).trim() : "", finishReason };
     };
 
@@ -158,7 +161,8 @@ export class WeatherDescriptionService {
       finishReason = retry.finishReason || finishReason;
     }
 
-    if (!contentText) throw new Error("Unexpected OpenAI response format");
+    // If still empty, return empty string so caller can gracefully fallback
+    if (!contentText) return "";
     return contentText;
   }
 

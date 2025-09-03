@@ -352,8 +352,7 @@ export class UIController {
 
         return `${aiDescription} ${weatherDetails} ${survivalRules}`;
       } catch (error) {
-        console.error("AI description generation failed:", error);
-        // Fall back to basic description
+        // Fall back to basic description silently
       }
     }
 

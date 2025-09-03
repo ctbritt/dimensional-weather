@@ -181,7 +181,7 @@ export class Settings {
       scope: "world",
       config: true,
       type: String,
-      default: "gpt-5-mini",
+      default: "gpt-4o-mini",
     },
     useCustomStyles: {
       name: "Use Custom Campaign Styles",
@@ -253,7 +253,7 @@ export class Settings {
       `;
       document.head.appendChild(style);
 
-      DebugLogger.info("Settings registered successfully");
+      DebugLogger.log("settings", "Settings registered successfully");
     } catch (error) {
       ErrorHandler.logAndNotify("Failed to register settings", error);
     }

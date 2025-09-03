@@ -74,7 +74,7 @@ export class WeatherCommandSystem {
       closeOnComplete: true,
     });
 
-    DebugLogger.info("Chat commands registered");
+    DebugLogger.log("weather", "Chat commands registered");
   }
 
   /**
@@ -182,7 +182,7 @@ export class WeatherCommandSystem {
       description: "List available terrains",
     });
 
-    DebugLogger.info("Internal commands registered");
+    DebugLogger.log("weather", "Internal commands registered");
   }
 
   /**
