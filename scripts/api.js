@@ -42,10 +42,25 @@ export class DimensionalWeatherAPI {
       this.engine = new WeatherEngine(this.settingsData);
       this.ui = new UIController(this.settingsData);
 
-      // Initialize description service if API key is provided
-      const apiKey = Settings.getSetting("apiKey");
-      if (apiKey && Settings.getSetting("useAI")) {
-        this.descriptionService = new WeatherDescriptionService(apiKey);
+      // Initialize description service based on provider settings
+      if (Settings.getSetting("useAI")) {
+        const provider = Settings.getSetting("aiProvider") || "openai";
+        const apiKey =
+          provider === "anthropic"
+            ? Settings.getSetting("anthropicApiKey")
+            : Settings.getSetting("apiKey");
+        const model =
+          provider === "anthropic"
+            ? Settings.getSetting("anthropicModel")
+            : Settings.getSetting("openaiModel");
+
+        if (apiKey) {
+          this.descriptionService = new WeatherDescriptionService({
+            provider,
+            apiKey,
+            model,
+          });
+        }
       }
 
       this.initialized = true;

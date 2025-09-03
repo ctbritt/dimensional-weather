@@ -18,10 +18,20 @@ export class UIController {
     this.settingsData = settingsData;
     this.descriptionService = null;
 
-    // Load description service if API key is available
-    const apiKey = Settings.getSetting("apiKey");
-    if (apiKey && Settings.getSetting("useAI")) {
-      this.descriptionService = new WeatherDescriptionService(apiKey);
+    // Load description service per settings (provider + model)
+    if (Settings.getSetting("useAI")) {
+      const provider = Settings.getSetting("aiProvider") || "openai";
+      const apiKey =
+        provider === "anthropic"
+          ? Settings.getSetting("anthropicApiKey")
+          : Settings.getSetting("apiKey");
+      const model =
+        provider === "anthropic"
+          ? Settings.getSetting("anthropicModel")
+          : Settings.getSetting("openaiModel");
+      if (apiKey) {
+        this.descriptionService = new WeatherDescriptionService({ provider, apiKey, model });
+      }
     }
 
     // Default styles

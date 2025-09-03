@@ -4,17 +4,22 @@
  */
 
 import { ErrorHandler } from "../utils.js";
+import { Settings } from "../settings.js";
 
 export class WeatherDescriptionService {
   /**
    * Create a new weather description service
-   * @param {string} apiKey - OpenAI API key
+   * @param {Object} options - Provider configuration
+   * @param {string} options.provider - 'openai' | 'anthropic'
+   * @param {string} options.apiKey - API key for selected provider
+   * @param {string} options.model - Model name for provider
    */
-  constructor(apiKey) {
+  constructor({ provider, apiKey, model }) {
+    this.provider = provider || Settings.getSetting("aiProvider") || "openai";
     this.apiKey = apiKey;
+    this.model = model;
     this.lastCallTime = 0;
     this.RATE_LIMIT_MS = 5000; // 5 seconds between API calls
-    this.MODEL = "gpt-4o-mini"; // Default model to use
   }
 
   /**
@@ -24,7 +29,7 @@ export class WeatherDescriptionService {
    */
   async generateWeatherDescription(conditions) {
     if (!this.apiKey) {
-      throw new Error("No OpenAI API key configured");
+      throw new Error("No API key configured for AI provider");
     }
 
     // Rate limiting
@@ -38,7 +43,7 @@ export class WeatherDescriptionService {
 
     try {
       const prompt = this._buildPrompt(conditions);
-      const result = await this._callOpenAI(prompt);
+      const result = await this._callAI(prompt);
       this.lastCallTime = Date.now();
       return result;
     } catch (error) {
@@ -75,52 +80,72 @@ export class WeatherDescriptionService {
    * @param {string} prompt - Prompt to send
    * @returns {Promise<string>} API response
    */
-  async _callOpenAI(prompt) {
-    try {
-      const response = await fetch(
-        "https://api.openai.com/v1/chat/completions",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${this.apiKey}`,
-          },
-          body: JSON.stringify({
-            model: this.MODEL,
-            messages: [
-              {
-                role: "system",
-                content:
-                  "You are a weather system for a D&D setting. Generate very concise, atmospheric descriptions (2-3 sentences max) focusing on the most critical environmental effects and immediate survival concerns. Be direct and avoid flowery language.",
-              },
-              {
-                role: "user",
-                content: prompt,
-              },
-            ],
-            temperature: 0.7,
-            max_tokens: 150,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          `OpenAI API error: ${errorData.error?.message || response.statusText}`
-        );
-      }
-
-      const data = await response.json();
-
-      if (!data.choices?.[0]?.message?.content) {
-        throw new Error("Unexpected API response format");
-      }
-
-      return data.choices[0].message.content.trim();
-    } catch (error) {
-      throw new Error(`OpenAI API call failed: ${error.message}`);
+  async _callAI(prompt) {
+    if (this.provider === "anthropic") {
+      return await this._callAnthropic(prompt);
     }
+    return await this._callOpenAI(prompt);
+  }
+
+  async _callOpenAI(prompt) {
+    const model = this.model || Settings.getSetting("openaiModel") || "gpt-4o-mini";
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${this.apiKey}`,
+      },
+      body: JSON.stringify({
+        model,
+        messages: [
+          { role: "system", content: "You are a weather system for a D&D setting. Generate very concise, atmospheric descriptions (2-3 sentences max) focusing on the most critical environmental effects and immediate survival concerns. Be direct and avoid flowery language." },
+          { role: "user", content: prompt },
+        ],
+        temperature: 0.7,
+        max_tokens: 150,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`OpenAI API error: ${errorData.error?.message || response.statusText}`);
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content;
+    if (!content) throw new Error("Unexpected OpenAI response format");
+    return content.trim();
+  }
+
+  async _callAnthropic(prompt) {
+    const model = this.model || Settings.getSetting("anthropicModel") || "claude-sonnet-4-0";
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": this.apiKey,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: 300,
+        system: "You are a weather system for a TTRPG. Generate very concise, atmospheric descriptions (2-3 sentences) focusing on critical environmental effects and immediate survival concerns.",
+        messages: [
+          { role: "user", content: prompt },
+        ],
+        temperature: 0.7,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`Anthropic API error: ${errorData.error?.message || response.statusText}`);
+    }
+
+    const data = await response.json();
+    const content = data?.content?.[0]?.text || data?.content?.[0]?.content || "";
+    if (!content) throw new Error("Unexpected Anthropic response format");
+    return String(content).trim();
   }
 
   /**
