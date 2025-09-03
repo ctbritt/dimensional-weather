@@ -94,10 +94,9 @@ export class WeatherDescriptionService {
     const body = {
       model,
       messages: [
-        { role: "system", content: "You are a weather system for a D&D setting. Generate very concise, atmospheric descriptions (2-3 sentences max) focusing on the most critical environmental effects and immediate survival concerns. Be direct and avoid flowery language." },
+        { role: "system", content: "You are a weather system for the Dark Sun D&D setting. Generate very concise, atmospheric descriptions (2-3 sentences max) focusing on the most critical environmental effects and immediate survival concerns. Give your responses in the style of the Wanderer from the Wanderer's Chronicle." },
         { role: "user", content: prompt },
       ],
-      temperature: 0.7,
     };
 
     // Newer OpenAI models (e.g., gpt-5) use 'max_completion_tokens'
@@ -105,6 +104,8 @@ export class WeatherDescriptionService {
       body.max_completion_tokens = 150;
     } else {
       body.max_tokens = 150;
+      // Only set temperature for non-GPT-5 models
+      body.temperature = 0.7;
     }
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -139,7 +140,7 @@ export class WeatherDescriptionService {
       body: JSON.stringify({
         model,
         max_tokens: 300,
-        system: "You are a weather system for a TTRPG. Generate very concise, atmospheric descriptions (2-3 sentences) focusing on critical environmental effects and immediate survival concerns.",
+        system: "You are a weather system for the Dark Sun D&D setting. Generate very concise, atmospheric descriptions (2-3 sentences max) focusing on the most critical environmental effects and immediate survival concerns. Give your responses in the style of the Wanderer from the Wanderer's Chronicle.",
         messages: [
           { role: "user", content: prompt },
         ],
@@ -166,9 +167,9 @@ export class WeatherDescriptionService {
    */
   _getBasicDescription(conditions) {
     return `The ${conditions.terrain || "landscape"} unfolds before you. 
-    The temperature is ${conditions.tempDesc || "moderate"}, with 
+    The temperature is ${conditions.tempDesc || "sweltering"}, with 
     ${conditions.windDesc || "gentle winds"} and 
-    ${conditions.precipDesc || "clear skies"}. 
-    The air feels ${conditions.humidDesc || "comfortable"}.`;
+    ${conditions.precipDesc || "hazy skies"}. 
+    The air feels ${conditions.humidDesc || "dry and dusty"}.`;
   }
 }
