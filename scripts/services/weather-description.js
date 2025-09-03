@@ -119,23 +119,28 @@ export class WeatherDescriptionService {
     if (Array.isArray(data?.choices) && data.choices.length > 0) {
       const choice = data.choices[0];
 
-      // chat/completions string content
+      // Standard string content
       if (typeof choice?.message?.content === "string") {
         contentText = choice.message.content;
       }
 
-      // chat/completions array content (some newer models)
+      // Array-based content (gpt-4o/gpt-5): collect any text-bearing parts
       if (!contentText && Array.isArray(choice?.message?.content)) {
-        const part = choice.message.content.find((p) => {
-          if (p && typeof p === "object") {
-            return p.type === "text" && (p.text || p.content);
-          }
-          return false;
-        });
-        contentText = part?.text || part?.content || null;
+        const parts = choice.message.content;
+        const texts = parts
+          .map((p) => {
+            if (typeof p === "string") return p;
+            if (p && typeof p === "object") {
+              if (typeof p.text === "string") return p.text;
+              if (typeof p.content === "string") return p.content;
+            }
+            return null;
+          })
+          .filter(Boolean);
+        if (texts.length) contentText = texts.join("\n");
       }
 
-      // fallback: some responses expose choice.text
+      // Some responses expose top-level choice.text
       if (!contentText && typeof choice?.text === "string") {
         contentText = choice.text;
       }
