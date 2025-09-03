@@ -247,13 +247,11 @@ export class WeatherEngine {
    * @returns {string|null} Season key or null if not found
    */
   _determineCurrentSeason(weatherState = null) {
-    // If Dark Sun Calendar integration is enabled and API is available
-    if (Settings.getSetting("useDarkSunCalendar") && window.DSC) {
-      const dscSeason = TimeUtils.getCurrentSeason();
-      if (dscSeason) {
-        DebugLogger.log("weather", `Using DSC season: ${dscSeason}`);
-        return dscSeason;
-      }
+    // Prefer Seasons & Stars API if available
+    const seasonFromSS = TimeUtils.getCurrentSeason();
+    if (seasonFromSS) {
+      DebugLogger.log("weather", `Using S&S season: ${seasonFromSS}`);
+      return seasonFromSS;
     }
 
     // Fall back to stored season

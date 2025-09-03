@@ -233,16 +233,6 @@ export class DimensionalWeatherAPI {
         await this.initialize();
       }
 
-      // Check if using Dark Sun Calendar integration
-      if (Settings.isDarkSunCalendarEnabled()) {
-        ErrorHandler.logAndNotify(
-          "Cannot manually set season when Dark Sun Calendar integration is enabled",
-          null,
-          true
-        );
-        return false;
-      }
-
       if (!this.settingsData?.seasons?.[seasonKey]) {
         ErrorHandler.logAndNotify(`Invalid season: ${seasonKey}`, null, true);
         return false;

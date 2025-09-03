@@ -671,14 +671,6 @@ export class WeatherCommandSystem {
    * @returns {Promise<Object>} Command result
    */
   async _handleSeasonCommand(args) {
-    // Check if Dark Sun Calendar integration is enabled
-    if (Settings.isDarkSunCalendarEnabled()) {
-      return this._createErrorResponse(
-        "Turn off Dark Sun Calendar integration to manually change seasons.",
-        { whisper: [game.user.id] }
-      );
-    }
-
     // Join all arguments after "season" to handle multi-word season names
     const seasonName = args.slice(1).join(" ").toLowerCase();
 

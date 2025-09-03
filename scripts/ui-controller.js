@@ -7,6 +7,7 @@ import { Settings } from "./settings.js";
 import { DOMUtils, ErrorHandler } from "./utils.js";
 import { SceneManager } from "./scene-manager.js";
 import { WeatherDescriptionService } from "./services/weather-description.js";
+import { TimeUtils } from "./time-utils.js";
 
 export class UIController {
   /**
@@ -445,17 +446,12 @@ export class UIController {
    */
   _getSeasonName(seasonKey) {
     // Try to get season from Dark Sun Calendar first
-    if (Settings.isDarkSunCalendarEnabled() && window.DSC) {
-      const currentDate = window.DSC.getCurrentDate();
-      if (currentDate) {
-        const seasonInfo = window.DSC.getSeasonInfo(currentDate);
-        if (seasonInfo?.name) {
-          return seasonInfo.name;
-        }
-      }
-    }
+    // Prefer Seasons & Stars via TimeUtils
+    const ssSeasonKey = TimeUtils.getCurrentSeason();
+    const ssSeasonName = this.settingsData?.seasons?.[ssSeasonKey]?.name;
+    if (ssSeasonName) return ssSeasonName;
 
-    // Fall back to settings if Dark Sun Calendar is not available or has no season
+    // Fall back to settings if S&S not available
     const season = this.settingsData?.seasons?.[seasonKey];
     if (season?.name) {
       return season.name;
@@ -476,35 +472,7 @@ export class UIController {
    * @returns {string} Time period name
    */
   _getTimePeriod() {
-    if (!window.DSC) {
-      return "Unknown Time";
-    }
-
-    // Get current date from Dark Sun Calendar
-    const currentDate = window.DSC.getCurrentDate();
-    if (!currentDate?.time) {
-      return "Unknown Time";
-    }
-
-    // Extract hour from the time object
-    const hours = currentDate.time.hour;
-
-    // Define time periods based on hour ranges to match campaign settings
-    if (hours >= 5 && hours < 8) {
-      return "Early Morning";
-    } else if (hours >= 8 && hours < 12) {
-      return "Morning";
-    } else if (hours >= 12 && hours < 14) {
-      return "Noon";
-    } else if (hours >= 14 && hours < 18) {
-      return "Afternoon";
-    } else if (hours >= 18 && hours < 21) {
-      return "Evening";
-    } else if (hours >= 21 || hours < 2) {
-      return "Night";
-    } else {
-      return "Late Night";
-    }
+    return TimeUtils.getTimePeriod();
   }
 
   /**
@@ -631,22 +599,11 @@ export class UIController {
    * @returns {string} Calendar info HTML
    */
   getCalendarInfo() {
-    if (!window.DSC) {
-      return "Dark Sun Calendar is not active.";
-    }
-
-    const currentDate = window.DSC.getCurrentDate();
-    if (!currentDate) {
-      return "Dark Sun Calendar date not available.";
-    }
-
-    const formattedDate = window.DSC.formatDarkSunDate(currentDate);
-    const timeString = currentDate.time ? currentDate.getTimeString() : "00:00:00";
-
+    const dateDisplay = TimeUtils.getCurrentDateDisplay();
     return `<div class="weather-calendar">
       <h3>Calendar Information</h3>
-      <p>Date: ${formattedDate}</p>
-      <p>Time: ${timeString}</p>
+      <p>Date: ${dateDisplay.date}</p>
+      <p>Time: ${dateDisplay.time}</p>
     </div>`;
   }
 }

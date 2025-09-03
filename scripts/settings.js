@@ -111,15 +111,7 @@ export class Settings {
       default: false,
     },
 
-    useDarkSunCalendar: {
-      name: "Use Dark Sun Calendar",
-      hint:
-        "Integrate with Dark Sun Calendar for automatic season changes and time-based updates",
-      scope: "world",
-      config: true,
-      type: Boolean,
-      default: false,
-    },
+    // Dark Sun Calendar integration removed in favor of Seasons & Stars
     autoUpdate: {
       name: "Auto-update Weather",
       hint: "Automatically update weather based on the update frequency",
@@ -439,10 +431,5 @@ export class Settings {
    * Check if Dark Sun Calendar is available and enabled
    * @returns {boolean} True if Dark Sun Calendar is available
    */
-  static isDarkSunCalendarEnabled() {
-    return (
-      game.modules.get("dark-sun-calendar")?.active &&
-      Settings.getSetting("useDarkSunCalendar")
-    );
-  }
+  // Dark Sun Calendar integration helper removed
 }

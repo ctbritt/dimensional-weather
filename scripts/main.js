@@ -8,6 +8,7 @@ import { DimensionalWeatherAPI } from "./api.js";
 import { ErrorHandler, DebugLogger } from "./utils.js";
 import { WeatherCommandSystem } from "./command-system.js";
 import { SceneManager } from "./scene-manager.js";
+import { TimeUtils } from "./time-utils.js";
 
 // Module constants
 const MODULE_ID = "dimensional-weather";
@@ -121,9 +122,7 @@ async function checkTimeBasedUpdate() {
 
     const updateFrequency = Settings.getSetting("updateFrequency");
     const lastUpdate = weatherState.lastUpdate || 0;
-    const currentTime = window.DSC
-      ? new Date().getTime()
-      : Date.now();
+    const currentTime = TimeUtils.getCurrentTimestamp();
     const hoursSinceLastUpdate = (currentTime - lastUpdate) / (1000 * 60 * 60);
 
     if (Settings.getSetting("debugTimePeriod")) {
@@ -167,27 +166,15 @@ Hooks.on("canvasReady", () => handleSceneWeather());
 // Handle world time changes
 Hooks.on("updateWorldTime", checkTimeBasedUpdate);
 
-// Handle Dark Sun Calendar time changes
-Hooks.on("darkSunCalendar.dateTimeChange", async (dateTime) => {
-  if (!initialized || !Settings.getSetting("useDarkSunCalendar")) return;
+// Handle Seasons & Stars date changes
+Hooks.on("seasons-stars:dateChanged", async (data) => {
+  if (!initialized) return;
 
   try {
-    DebugLogger.log("weather", "Dark Sun Calendar time change detected", dateTime);
+    DebugLogger.log("weather", "Seasons & Stars date change detected", data);
     await checkTimeBasedUpdate();
   } catch (error) {
-    ErrorHandler.logAndNotify("Error handling Dark Sun Calendar time change", error);
-  }
-});
-
-// Handle Dark Sun Calendar season changes
-Hooks.on("darkSunCalendar.seasonChange", async (season) => {
-  if (!initialized || !Settings.getSetting("useDarkSunCalendar")) return;
-
-  try {
-    DebugLogger.log("weather", "Dark Sun Calendar season change detected", season);
-    await handleSceneWeather(true);
-  } catch (error) {
-    ErrorHandler.logAndNotify("Error handling Dark Sun Calendar season change", error);
+    ErrorHandler.logAndNotify("Error handling Seasons & Stars date change", error);
   }
 });
 
