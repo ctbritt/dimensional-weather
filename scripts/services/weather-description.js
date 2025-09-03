@@ -89,21 +89,31 @@ export class WeatherDescriptionService {
 
   async _callOpenAI(prompt) {
     const model = this.model || Settings.getSetting("openaiModel") || "gpt-4o-mini";
+    const isGpt5 = /^gpt-5/i.test(model);
+
+    const body = {
+      model,
+      messages: [
+        { role: "system", content: "You are a weather system for a D&D setting. Generate very concise, atmospheric descriptions (2-3 sentences max) focusing on the most critical environmental effects and immediate survival concerns. Be direct and avoid flowery language." },
+        { role: "user", content: prompt },
+      ],
+      temperature: 0.7,
+    };
+
+    // Newer OpenAI models (e.g., gpt-5) use 'max_completion_tokens'
+    if (isGpt5) {
+      body.max_completion_tokens = 150;
+    } else {
+      body.max_tokens = 150;
+    }
+
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${this.apiKey}`,
       },
-      body: JSON.stringify({
-        model,
-        messages: [
-          { role: "system", content: "You are a weather system for a D&D setting. Generate very concise, atmospheric descriptions (2-3 sentences max) focusing on the most critical environmental effects and immediate survival concerns. Be direct and avoid flowery language." },
-          { role: "user", content: prompt },
-        ],
-        temperature: 0.7,
-        max_tokens: 150,
-      }),
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
