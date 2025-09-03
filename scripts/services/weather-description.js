@@ -123,9 +123,35 @@ export class WeatherDescriptionService {
     }
 
     const data = await response.json();
-    const content = data.choices?.[0]?.message?.content;
-    if (!content) throw new Error("Unexpected OpenAI response format");
-    return content.trim();
+    let contentText = null;
+
+    if (Array.isArray(data?.choices) && data.choices.length > 0) {
+      const choice = data.choices[0];
+
+      // chat/completions string content
+      if (typeof choice?.message?.content === "string") {
+        contentText = choice.message.content;
+      }
+
+      // chat/completions array content (some newer models)
+      if (!contentText && Array.isArray(choice?.message?.content)) {
+        const part = choice.message.content.find((p) => {
+          if (p && typeof p === "object") {
+            return p.type === "text" && (p.text || p.content);
+          }
+          return false;
+        });
+        contentText = part?.text || part?.content || null;
+      }
+
+      // fallback: some responses expose choice.text
+      if (!contentText && typeof choice?.text === "string") {
+        contentText = choice.text;
+      }
+    }
+
+    if (!contentText) throw new Error("Unexpected OpenAI response format");
+    return String(contentText).trim();
   }
 
   async _callAnthropic(prompt) {
@@ -168,7 +194,7 @@ export class WeatherDescriptionService {
   _getBasicDescription(conditions) {
     return `The ${conditions.terrain || "landscape"} unfolds before you. 
     The temperature is ${conditions.tempDesc || "sweltering"}, with 
-    ${conditions.windDesc || "gentle winds"} and 
+    ${conditions.windDesc || "scratchy winds"} and 
     ${conditions.precipDesc || "hazy skies"}. 
     The air feels ${conditions.humidDesc || "dry and dusty"}.`;
   }
