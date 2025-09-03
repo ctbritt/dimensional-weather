@@ -193,7 +193,7 @@ export class Settings {
       scope: "world",
       config: true,
       type: String,
-      default: "gpt-4o-mini",
+      default: "gpt-5-mini",
     },
     anthropicApiKey: {
       name: "Anthropic API Key",
@@ -214,6 +214,15 @@ export class Settings {
       config: true,
       type: String,
       default: "claude-sonnet-4-0",
+    },
+    anthropicProxyUrl: {
+      name: "Anthropic Proxy URL",
+      hint:
+        "Optional: Server-side proxy endpoint to call Anthropic (avoids CORS and secures your API key)",
+      scope: "world",
+      config: true,
+      type: String,
+      default: "",
     },
     useCustomStyles: {
       name: "Use Custom Campaign Styles",

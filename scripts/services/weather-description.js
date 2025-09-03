@@ -156,13 +156,21 @@ export class WeatherDescriptionService {
 
   async _callAnthropic(prompt) {
     const model = this.model || Settings.getSetting("anthropicModel") || "claude-sonnet-4-0";
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    const proxyUrl = Settings.getSetting("anthropicProxyUrl");
+    const url = proxyUrl && proxyUrl.trim() ? proxyUrl.trim() : "https://api.anthropic.com/v1/messages";
+    const headers = {
+      "Content-Type": "application/json",
+    };
+
+    // Only attach Anthropic headers when calling Anthropic directly (not via user proxy)
+    if (!proxyUrl) {
+      headers["x-api-key"] = this.apiKey;
+      headers["anthropic-version"] = "2023-06-01";
+    }
+
+    const response = await fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": this.apiKey,
-        "anthropic-version": "2023-06-01",
-      },
+      headers,
       body: JSON.stringify({
         model,
         max_tokens: 300,
