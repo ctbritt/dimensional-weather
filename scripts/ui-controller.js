@@ -18,19 +18,12 @@ export class UIController {
     this.settingsData = settingsData;
     this.descriptionService = null;
 
-    // Load description service per settings (provider + model)
+    // Load OpenAI description service
     if (Settings.getSetting("useAI")) {
-      const provider = Settings.getSetting("aiProvider") || "openai";
-      const apiKey =
-        provider === "anthropic"
-          ? Settings.getSetting("anthropicApiKey")
-          : Settings.getSetting("apiKey");
-      const model =
-        provider === "anthropic"
-          ? Settings.getSetting("anthropicModel")
-          : Settings.getSetting("openaiModel");
+      const apiKey = Settings.getSetting("apiKey");
+      const model = Settings.getSetting("openaiModel");
       if (apiKey) {
-        this.descriptionService = new WeatherDescriptionService({ provider, apiKey, model });
+        this.descriptionService = new WeatherDescriptionService({ apiKey, model });
       }
     }
 
@@ -385,14 +378,8 @@ export class UIController {
       return;
     }
 
-    const provider = Settings.getSetting("aiProvider") || "openai";
-    const apiKey = provider === "anthropic"
-      ? Settings.getSetting("anthropicApiKey")
-      : Settings.getSetting("apiKey");
-    const model = provider === "anthropic"
-      ? Settings.getSetting("anthropicModel")
-      : Settings.getSetting("openaiModel");
-
+    const apiKey = Settings.getSetting("apiKey");
+    const model = Settings.getSetting("openaiModel");
     if (!apiKey) {
       this.descriptionService = null;
       return;
@@ -400,12 +387,11 @@ export class UIController {
 
     const needsNew =
       !this.descriptionService ||
-      this.descriptionService.provider !== provider ||
       this.descriptionService.apiKey !== apiKey ||
       this.descriptionService.model !== model;
 
     if (needsNew) {
-      this.descriptionService = new WeatherDescriptionService({ provider, apiKey, model });
+      this.descriptionService = new WeatherDescriptionService({ apiKey, model });
     }
   }
 

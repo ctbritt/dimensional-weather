@@ -8,14 +8,12 @@ import { Settings } from "../settings.js";
 
 export class WeatherDescriptionService {
   /**
-   * Create a new weather description service
-   * @param {Object} options - Provider configuration
-   * @param {string} options.provider - 'openai' | 'anthropic'
-   * @param {string} options.apiKey - API key for selected provider
-   * @param {string} options.model - Model name for provider
+   * Create a new weather description service (OpenAI only)
+   * @param {Object} options - configuration
+   * @param {string} options.apiKey - OpenAI API key
+   * @param {string} options.model - OpenAI model name
    */
-  constructor({ provider, apiKey, model }) {
-    this.provider = provider || Settings.getSetting("aiProvider") || "openai";
+  constructor({ apiKey, model }) {
     this.apiKey = apiKey;
     this.model = model;
     this.lastCallTime = 0;
@@ -29,7 +27,7 @@ export class WeatherDescriptionService {
    */
   async generateWeatherDescription(conditions) {
     if (!this.apiKey) {
-      throw new Error("No API key configured for AI provider");
+      throw new Error("No OpenAI API key configured");
     }
 
     // Rate limiting
@@ -43,7 +41,7 @@ export class WeatherDescriptionService {
 
     try {
       const prompt = this._buildPrompt(conditions);
-      const result = await this._callAI(prompt);
+      const result = await this._callOpenAI(prompt);
       this.lastCallTime = Date.now();
       return result;
     } catch (error) {
@@ -80,13 +78,6 @@ export class WeatherDescriptionService {
    * @param {string} prompt - Prompt to send
    * @returns {Promise<string>} API response
    */
-  async _callAI(prompt) {
-    if (this.provider === "anthropic") {
-      return await this._callAnthropic(prompt);
-    }
-    return await this._callOpenAI(prompt);
-  }
-
   async _callOpenAI(prompt) {
     const model = this.model || Settings.getSetting("openaiModel") || "gpt-4o-mini";
     const isGpt5 = /^gpt-5/i.test(model);
@@ -151,58 +142,6 @@ export class WeatherDescriptionService {
     }
 
     if (!contentText) throw new Error("Unexpected OpenAI response format");
-    return String(contentText).trim();
-  }
-
-  async _callAnthropic(prompt) {
-    const model = this.model || Settings.getSetting("anthropicModel") || "claude-sonnet-4-0";
-    const proxyUrl = Settings.getSetting("anthropicProxyUrl");
-    const url = proxyUrl && proxyUrl.trim() ? proxyUrl.trim() : "https://api.anthropic.com/v1/messages";
-    const headers = {
-      "Content-Type": "application/json",
-    };
-
-    // Only attach Anthropic headers when calling Anthropic directly (not via user proxy)
-    if (!proxyUrl) {
-      headers["x-api-key"] = this.apiKey;
-      headers["anthropic-version"] = "2023-06-01";
-    }
-
-    const response = await fetch(url, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({
-        model,
-        max_tokens: 300,
-        system: "You are a weather system for the Dark Sun D&D setting. Generate very concise, atmospheric descriptions (2-3 sentences max) focusing on the most critical environmental effects and immediate survival concerns. Give your responses in the style of the Wanderer from the Wanderer's Chronicle.",
-        messages: [
-          { role: "user", content: prompt },
-        ],
-        temperature: 0.7,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(`Anthropic API error: ${errorData.error?.message || response.statusText}`);
-    }
-
-    const data = await response.json();
-    let contentText = null;
-
-    // Messages API returns an array of content blocks
-    if (Array.isArray(data?.content)) {
-      // Prefer first text block
-      const textBlock = data.content.find((c) => c?.type === "text" && (c.text || c.content));
-      contentText = textBlock?.text || textBlock?.content || null;
-    }
-
-    // Fallback: some bridges may return top-level 'text'
-    if (!contentText && typeof data?.text === "string") {
-      contentText = data.text;
-    }
-
-    if (!contentText) throw new Error("Unexpected Anthropic response format");
     return String(contentText).trim();
   }
 
