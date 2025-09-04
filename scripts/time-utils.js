@@ -20,11 +20,11 @@ export class TimeUtils {
   static getTimePeriod(useCache = true) {
     try {
       const ss = game.seasonsStars?.api;
-      const currentDate = ss?.getCurrentDate?.();
+      const calDate = ss?.getCurrentDate?.();
 
       // Fallback to system time when S&S is unavailable
-      const hours = currentDate?.time?.hour ?? new Date().getHours();
-      const minutes = currentDate?.time?.minute ?? new Date().getMinutes();
+      const hours = calDate?.time?.hour ?? new Date().getHours();
+      const minutes = calDate?.time?.minute ?? new Date().getMinutes();
 
       // Cache key based on hour/minute
       const cacheKey = `${hours}:${minutes}`;
@@ -32,6 +32,15 @@ export class TimeUtils {
         return this._cache.period;
       }
 
+      // Prefer Seasons & Stars canonical hours via named format
+      if (calDate?.formatter?.formatNamed) {
+        const period = calDate.formatter.formatNamed(calDate, 'mixed') || "Unknown Time";
+        this._cache = { ...this._cache, timestamp: cacheKey, period };
+        DebugLogger.log("time", `Time ${hours}:${minutes} -> ${period}`);
+        return period;
+      }
+
+      // Fallback to local mapping
       let period = "Unknown Time";
       if (hours >= 0 && hours < 4) period = "2nd Watch";
       else if (hours >= 4 && hours < 8) period = "3rd Watch";
