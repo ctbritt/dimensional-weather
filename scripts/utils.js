@@ -83,38 +83,6 @@ export class Cache {
 /**
  * Batch updates to avoid multiple renders
  */
-export class BatchUpdater {
-  static pendingUpdates = new Map();
-  static updateTimers = new Map();
-
-  /**
-   * Schedule an update to be executed after a delay
-   * @param {string} id - Unique identifier for this update
-   * @param {Function} updateFn - Function to execute for the update
-   * @param {number} delay - Delay in ms before executing (defaults to 100ms)
-   */
-  static scheduleUpdate(id, updateFn, delay = 100) {
-    // If a timer already exists for this ID, clear it
-    if (this.updateTimers.has(id)) {
-      clearTimeout(this.updateTimers.get(id));
-    }
-
-    // Store the update function
-    this.pendingUpdates.set(id, updateFn);
-
-    // Set a new timer
-    const timerId = setTimeout(() => {
-      if (this.pendingUpdates.has(id)) {
-        const fn = this.pendingUpdates.get(id);
-        this.pendingUpdates.delete(id);
-        this.updateTimers.delete(id);
-        fn();
-      }
-    }, delay);
-
-    this.updateTimers.set(id, timerId);
-  }
-}
 
 export class DOMUtils {
   /**
@@ -196,44 +164,4 @@ export class DebugLogger {
   }
 }
 
-export class RandomUtils {
-  /**
-   * Generate a random number within a range
-   * @param {number} min - Minimum value
-   * @param {number} max - Maximum value
-   * @returns {number} Random number between min and max
-   */
-  static getRandomRange(min, max) {
-    return Math.random() * (max - min) + min;
-  }
-  
-  /**
-   * Generate a random integer within a range
-   * @param {number} min - Minimum value
-   * @param {number} max - Maximum value
-   * @returns {number} Random integer between min and max (inclusive)
-   */
-  static getRandomInt(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-  
-  /**
-   * Get a random element from an array
-   * @param {Array} array - Array to pick from
-   * @returns {*} Random element from the array
-   */
-  static getRandomElement(array) {
-    return array[Math.floor(Math.random() * array.length)];
-  }
-  
-  /**
-   * Generate a random boolean with a given probability
-   * @param {number} probability - Probability of true (0-1)
-   * @returns {boolean} Random boolean
-   */
-  static getRandomBool(probability = 0.5) {
-    return Math.random() < probability;
-  }
-}
+// Removed unused BatchUpdater and RandomUtils.

@@ -132,12 +132,24 @@
         }
     },
     "timeModifiers": {
-        "2nd Watch": { "temperature": -6 },
-        "3rd Watch": { "temperature": -5 },
-        "Morning": { "temperature": 1 },
-        "Noon": { "temperature": 6 },
-        "Evening": { "temperature": 3 },
-        "1st Watch": { "temperature": -3 }
+        "2nd Watch": {
+            "temperature": -6
+        },
+        "3rd Watch": {
+            "temperature": -5
+        },
+        "Morning": {
+            "temperature": 1
+        },
+        "Noon": {
+            "temperature": 6
+        },
+        "Evening": {
+            "temperature": 3
+        },
+        "1st Watch": {
+            "temperature": -3
+        }
     },
     "terrains": {
         "boulderFields": {
@@ -149,9 +161,24 @@
             "humidity": -10,
             "variability": 6,
             "timeModifiers": {
-                "1st Watch": { "temperature": -7, "wind": 0, "precipitation": 0, "humidity": 2 },
-                "2nd Watch": { "temperature": -8, "wind": 0, "precipitation": 0, "humidity": 2 },
-                "3rd Watch": { "temperature": -7, "wind": 0, "precipitation": 0, "humidity": 2 }
+                "1st Watch": {
+                    "temperature": -7,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "2nd Watch": {
+                    "temperature": -8,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "3rd Watch": {
+                    "temperature": -7,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                }
             },
             "rules": []
         },
@@ -164,86 +191,26 @@
             "humidity": -5,
             "variability": 8,
             "timeModifiers": {
-                "6": {
+                "Morning": {
                     "temperature": -2,
                     "wind": 0,
                     "precipitation": 0,
                     "humidity": 1
                 },
-                "7": {
-                    "temperature": -2,
-                    "wind": 0,
-                    "precipitation": 0,
-                    "humidity": 1
-                },
-                "8": {
-                    "temperature": -2,
-                    "wind": 0,
-                    "precipitation": 0,
-                    "humidity": 1
-                },
-                "9": {
-                    "temperature": -2,
-                    "wind": 0,
-                    "precipitation": 0,
-                    "humidity": 1
-                },
-                "10": {
-                    "temperature": -2,
-                    "wind": 0,
-                    "precipitation": 0,
-                    "humidity": 1
-                },
-                "1": {
-                    "temperature": -6,
-                    "wind": 0,
-                    "precipitation": 0,
-                    "humidity": 2
-                },
-                "2": {
-                    "temperature": -6,
-                    "wind": 0,
-                    "precipitation": 0,
-                    "humidity": 2
-                },
-                "3": {
-                    "temperature": -6,
-                    "wind": 0,
-                    "precipitation": 0,
-                    "humidity": 2
-                },
-                "4": {
-                    "temperature": -6,
-                    "wind": 0,
-                    "precipitation": 0,
-                    "humidity": 2
-                },
-                "5": {
-                    "temperature": -6,
-                    "wind": 0,
-                    "precipitation": 0,
-                    "humidity": 2
-                },
-                "6": {
-                    "temperature": -6,
-                    "wind": 0,
-                    "precipitation": 0,
-                    "humidity": 2
-                },
-                "22": {
+                "1st Watch": {
                     "temperature": -7,
                     "wind": 0,
                     "precipitation": 0,
                     "humidity": 2
                 },
-                "23": {
-                    "temperature": -7,
+                "2nd Watch": {
+                    "temperature": -6,
                     "wind": 0,
                     "precipitation": 0,
                     "humidity": 2
                 },
-                "24": {
-                    "temperature": -7,
+                "3rd Watch": {
+                    "temperature": -6,
                     "wind": 0,
                     "precipitation": 0,
                     "humidity": 2
@@ -262,12 +229,24 @@
             "humidity": 10,
             "variability": 5,
             "timeModifiers": {
-                "Morning": { "humidity": 2 },
-                "Noon": { "humidity": 2 },
-                "Evening": { "humidity": 2 },
-                "1st Watch": { "humidity": 3 },
-                "2nd Watch": { "humidity": 3 },
-                "3rd Watch": { "humidity": 3 }
+                "Morning": {
+                    "humidity": 2
+                },
+                "Noon": {
+                    "humidity": 2
+                },
+                "Evening": {
+                    "humidity": 2
+                },
+                "1st Watch": {
+                    "humidity": 3
+                },
+                "2nd Watch": {
+                    "humidity": 3
+                },
+                "3rd Watch": {
+                    "humidity": 3
+                }
             },
             "rules": [
                 "Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)"
@@ -282,55 +261,19 @@
             "humidity": -5,
             "variability": 9,
             "timeModifiers": {
-                "1": {
+                "1st Watch": {
                     "temperature": -10,
                     "wind": 1,
                     "precipitation": 0,
                     "humidity": 3
                 },
-                "2": {
+                "2nd Watch": {
                     "temperature": -10,
                     "wind": 1,
                     "precipitation": 0,
                     "humidity": 3
                 },
-                "3": {
-                    "temperature": -10,
-                    "wind": 1,
-                    "precipitation": 0,
-                    "humidity": 3
-                },
-                "4": {
-                    "temperature": -10,
-                    "wind": 1,
-                    "precipitation": 0,
-                    "humidity": 3
-                },
-                "5": {
-                    "temperature": -10,
-                    "wind": 1,
-                    "precipitation": 0,
-                    "humidity": 3
-                },
-                "6": {
-                    "temperature": -10,
-                    "wind": 1,
-                    "precipitation": 0,
-                    "humidity": 3
-                },
-                "22": {
-                    "temperature": -10,
-                    "wind": 1,
-                    "precipitation": 0,
-                    "humidity": 3
-                },
-                "23": {
-                    "temperature": -10,
-                    "wind": 1,
-                    "precipitation": 0,
-                    "humidity": 3
-                },
-                "24": {
+                "3rd Watch": {
                     "temperature": -10,
                     "wind": 1,
                     "precipitation": 0,
@@ -364,55 +307,19 @@
             "humidity": -5,
             "variability": 9,
             "timeModifiers": {
-                "1": {
+                "1st Watch": {
                     "temperature": -10,
                     "wind": 1,
                     "precipitation": 0,
                     "humidity": 3
                 },
-                "2": {
+                "2nd Watch": {
                     "temperature": -10,
                     "wind": 1,
                     "precipitation": 0,
                     "humidity": 3
                 },
-                "3": {
-                    "temperature": -10,
-                    "wind": 1,
-                    "precipitation": 0,
-                    "humidity": 3
-                },
-                "4": {
-                    "temperature": -10,
-                    "wind": 1,
-                    "precipitation": 0,
-                    "humidity": 3
-                },
-                "5": {
-                    "temperature": -10,
-                    "wind": 1,
-                    "precipitation": 0,
-                    "humidity": 3
-                },
-                "6": {
-                    "temperature": -10,
-                    "wind": 1,
-                    "precipitation": 0,
-                    "humidity": 3
-                },
-                "22": {
-                    "temperature": -10,
-                    "wind": 1,
-                    "precipitation": 0,
-                    "humidity": 3
-                },
-                "23": {
-                    "temperature": -10,
-                    "wind": 1,
-                    "precipitation": 0,
-                    "humidity": 3
-                },
-                "24": {
+                "3rd Watch": {
                     "temperature": -10,
                     "wind": 1,
                     "precipitation": 0,
@@ -434,9 +341,24 @@
             "humidity": -10,
             "variability": 6,
             "timeModifiers": {
-                "1st Watch": { "temperature": -7, "wind": 0, "precipitation": 0, "humidity": 2 },
-                "2nd Watch": { "temperature": -8, "wind": 0, "precipitation": 0, "humidity": 2 },
-                "3rd Watch": { "temperature": -7, "wind": 0, "precipitation": 0, "humidity": 2 }
+                "1st Watch": {
+                    "temperature": -7,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "2nd Watch": {
+                    "temperature": -8,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "3rd Watch": {
+                    "temperature": -7,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                }
             },
             "rules": [
                 "Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)"
@@ -451,10 +373,30 @@
             "humidity": -10,
             "variability": 3,
             "timeModifiers": {
-                "Morning": { "temperature": -3, "wind": 0, "precipitation": 0, "humidity": 1 },
-                "1st Watch": { "temperature": -10, "wind": 0, "precipitation": 0, "humidity": 2 },
-                "2nd Watch": { "temperature": -10, "wind": 0, "precipitation": 0, "humidity": 2 },
-                "3rd Watch": { "temperature": -9, "wind": 0, "precipitation": 0, "humidity": 2 }
+                "Morning": {
+                    "temperature": -3,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 1
+                },
+                "1st Watch": {
+                    "temperature": -10,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "2nd Watch": {
+                    "temperature": -10,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "3rd Watch": {
+                    "temperature": -9,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                }
             },
             "rules": [
                 "During the day, creatures without eye protection have disadvantage on Perception checks"
@@ -481,10 +423,30 @@
             "humidity": -10,
             "variability": 4,
             "timeModifiers": {
-                "Morning": { "temperature": -3, "wind": 0, "precipitation": 0, "humidity": 1 },
-                "1st Watch": { "temperature": -9, "wind": 0, "precipitation": 0, "humidity": 2 },
-                "2nd Watch": { "temperature": -10, "wind": 0, "precipitation": 0, "humidity": 2 },
-                "3rd Watch": { "temperature": -8, "wind": 0, "precipitation": 0, "humidity": 2 }
+                "Morning": {
+                    "temperature": -3,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 1
+                },
+                "1st Watch": {
+                    "temperature": -9,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "2nd Watch": {
+                    "temperature": -10,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "3rd Watch": {
+                    "temperature": -8,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                }
             },
             "rules": [
                 "Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)"
@@ -499,55 +461,19 @@
             "humidity": -5,
             "variability": 4,
             "timeModifiers": {
-                "1": {
+                "1st Watch": {
                     "temperature": -7,
                     "wind": 0,
                     "precipitation": 0,
                     "humidity": 2
                 },
-                "2": {
+                "2nd Watch": {
                     "temperature": -7,
                     "wind": 0,
                     "precipitation": 0,
                     "humidity": 2
                 },
-                "3": {
-                    "temperature": -7,
-                    "wind": 0,
-                    "precipitation": 0,
-                    "humidity": 2
-                },
-                "4": {
-                    "temperature": -7,
-                    "wind": 0,
-                    "precipitation": 0,
-                    "humidity": 2
-                },
-                "5": {
-                    "temperature": -7,
-                    "wind": 0,
-                    "precipitation": 0,
-                    "humidity": 2
-                },
-                "6": {
-                    "temperature": -7,
-                    "wind": 0,
-                    "precipitation": 0,
-                    "humidity": 2
-                },
-                "22": {
-                    "temperature": -7,
-                    "wind": 0,
-                    "precipitation": 0,
-                    "humidity": 2
-                },
-                "23": {
-                    "temperature": -7,
-                    "wind": 0,
-                    "precipitation": 0,
-                    "humidity": 2
-                },
-                "24": {
+                "3rd Watch": {
                     "temperature": -7,
                     "wind": 0,
                     "precipitation": 0,
@@ -565,10 +491,30 @@
             "humidity": -10,
             "variability": 4,
             "timeModifiers": {
-                "Morning": { "temperature": -3, "wind": 0, "precipitation": 0, "humidity": 1 },
-                "1st Watch": { "temperature": -8, "wind": 0, "precipitation": 0, "humidity": 2 },
-                "2nd Watch": { "temperature": -9, "wind": 0, "precipitation": 0, "humidity": 2 },
-                "3rd Watch": { "temperature": -8, "wind": 0, "precipitation": 0, "humidity": 2 }
+                "Morning": {
+                    "temperature": -3,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 1
+                },
+                "1st Watch": {
+                    "temperature": -8,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "2nd Watch": {
+                    "temperature": -9,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "3rd Watch": {
+                    "temperature": -8,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                }
             },
             "rules": [
                 "Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)",
@@ -586,9 +532,24 @@
             "humidity": -5,
             "variability": 5,
             "timeModifiers": {
-                "1st Watch": { "temperature": -4, "wind": 0, "precipitation": 0, "humidity": 2 },
-                "2nd Watch": { "temperature": -5, "wind": 0, "precipitation": 0, "humidity": 2 },
-                "3rd Watch": { "temperature": -5, "wind": 0, "precipitation": 0, "humidity": 2 }
+                "1st Watch": {
+                    "temperature": -4,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "2nd Watch": {
+                    "temperature": -5,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                },
+                "3rd Watch": {
+                    "temperature": -5,
+                    "wind": 0,
+                    "precipitation": 0,
+                    "humidity": 2
+                }
             },
             "rules": [
                 "Movement is Difficult terrain (costs 2 feet for every 1 foot of movement)"
@@ -599,7 +560,7 @@
             "description": "Lush vegetation lines the banks of rivers and oases. The air is thick with moisture, and the ground is soft and fertile.",
             "temperature": 0,
             "wind": -4,
-            "precipitation": 5,
+            "precipitation": 2,
             "humidity": 10,
             "variability": 6,
             "rules": []

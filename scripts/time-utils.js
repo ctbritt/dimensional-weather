@@ -128,233 +128,31 @@ export class TimeUtils {
   }
 
   /**
-   * Get current season from Dark Sun Calendar
+   * Get current season using Seasons & Stars if available
    * @returns {string|null} Season key or null if not found
    */
   static getCurrentSeason() {
     try {
       const ss = game.seasonsStars?.api;
-      // Prefer Seasons & Stars explicit season info API if available
-      let seasonInfo = null;
-      if (typeof ss?.getSeasonInfo === "function") {
-        const worldTime = game?.time?.worldTime;
-        let currentData = null;
-        try {
-          if (typeof ss.getCurrentDate === "function") {
-            const calendarId = this._getSSCalendarId(ss);
-            // Try (calendarId, worldTime) signature first if we have an ID
-            if (calendarId && ss.getCurrentDate.length >= 2) {
-              currentData = ss.getCurrentDate(calendarId, worldTime);
-            } else if (ss.getCurrentDate.length >= 1) {
-              // Ambiguous single-arg signature: try calendarId then worldTime
-              try {
-                currentData = ss.getCurrentDate(calendarId || worldTime);
-              } catch (e1) {
-                try {
-                  currentData = ss.getCurrentDate(worldTime);
-                } catch (e2) {
-                  currentData = ss.getCurrentDate();
-                }
-              }
-            } else {
-              currentData = ss.getCurrentDate();
-            }
-          }
-        } catch (e) {
-          DebugLogger.warn("Failed S&S getCurrentDate with calendarId/worldTime, falling back", e);
-          try {
-            currentData = ss?.getCurrentDate?.();
-          } catch (_) {
-            currentData = null;
-          }
-        }
-        seasonInfo = ss.getSeasonInfo(currentData || ss?.getCurrentDate?.());
-      } else {
-        seasonInfo = ss?.getCurrentDate?.()?.season || null;
-      }
+      if (!ss) return null;
 
-      // Attempt to map S&S season to the current campaign's season keys
+      const date = typeof ss.getCurrentDate === "function" ? ss.getCurrentDate() : null;
+      const seasonInfo = typeof ss.getSeasonInfo === "function"
+        ? ss.getSeasonInfo(date)
+        : (date?.season || null);
+
+      // Map to campaign keys when possible
       const settingsData = game.dimWeather?.settingsData || null;
       const mapped = this._mapSeasonToCampaignKey(seasonInfo, settingsData);
       if (mapped) return mapped;
 
-      // Fallbacks to raw S&S identifiers
+      // Fall back to raw identifiers
       if (seasonInfo?.key) return String(seasonInfo.key).toLowerCase();
       if (seasonInfo?.id) return String(seasonInfo.id).toLowerCase();
       if (seasonInfo?.name) return this._normalizeSeasonString(seasonInfo.name);
       return null;
     } catch (error) {
       ErrorHandler.logAndNotify("Error getting current season from Seasons & Stars", error);
-      return null;
-    }
-  }
-
-  /**
-   * Get the day of the year (1-based), preferring Seasons & Stars.
-   * For Athas: Scorch = Day 1, Highest Sun 5 = Day 375.
-   * @returns {number|null} Day of year or null if unavailable
-   */
-  static getDayOfYear() {
-    try {
-      const ss = game.seasonsStars?.api;
-      if (!ss) return null;
-
-      const calendarId = this._getSSCalendarId(ss);
-      const worldTime = game?.time?.worldTime;
-
-      let dateObj = null;
-      try {
-        if (typeof ss.getCurrentDate === "function") {
-          if (calendarId && ss.getCurrentDate.length >= 2) {
-            dateObj = ss.getCurrentDate(calendarId, worldTime);
-          } else if (ss.getCurrentDate.length >= 1) {
-            try {
-              dateObj = ss.getCurrentDate(calendarId || worldTime);
-            } catch (e1) {
-              try {
-                dateObj = ss.getCurrentDate(worldTime);
-              } catch (e2) {
-                dateObj = ss.getCurrentDate();
-              }
-            }
-          } else {
-            dateObj = ss.getCurrentDate();
-          }
-        }
-      } catch (err) {
-        DebugLogger.warn("S&S getCurrentDate error in getDayOfYear", err);
-      }
-
-      // 1) Direct API, if available
-      try {
-        if (typeof ss.getDayOfYear === "function") {
-          const v = ss.getDayOfYear(dateObj);
-          if (typeof v === "number" && isFinite(v)) return Math.max(1, Math.floor(v));
-        }
-      } catch (err) {
-        DebugLogger.warn("S&S getDayOfYear failed", err);
-      }
-
-      // 2) Use season/date info return fields
-      try {
-        const seasonInfo = typeof ss.getSeasonInfo === "function" ? ss.getSeasonInfo(dateObj) : null;
-        const fromSeason = this._extractOrdinalFromAny(seasonInfo);
-        if (fromSeason) return fromSeason;
-
-        const fromDate = this._extractOrdinalFromAny(dateObj);
-        if (fromDate) return fromDate;
-      } catch (err) {
-        DebugLogger.warn("S&S season/date info extraction failed", err);
-      }
-
-      return null;
-    } catch (error) {
-      ErrorHandler.logAndNotify("Error getting day of year", error);
-      return null;
-    }
-  }
-
-  /**
-   * Get total number of days since the start of the calendar (1-based).
-   * Uses Seasons & Stars with game.time.worldTime; Athas fallback assumes 375-day years.
-   * @param {number} [worldTime] - Foundry world time (defaults to game.time.worldTime)
-   * @returns {number|null} Total days since day 1, or null if unavailable
-   */
-  static getTotalDaysSinceCalendarStart(worldTime = undefined) {
-    try {
-      const ss = game.seasonsStars?.api;
-      if (!ss) return null;
-
-      const wt = worldTime ?? game?.time?.worldTime;
-      const calendarId = this._getSSCalendarId(ss);
-
-      // Get a date object for the provided world time
-      let dateObj = null;
-      try {
-        if (typeof ss.getCurrentDate === "function") {
-          if (calendarId && ss.getCurrentDate.length >= 2) {
-            dateObj = ss.getCurrentDate(calendarId, wt);
-          } else if (ss.getCurrentDate.length >= 1) {
-            try {
-              dateObj = ss.getCurrentDate(calendarId || wt);
-            } catch (e1) {
-              try {
-                dateObj = ss.getCurrentDate(wt);
-              } catch (e2) {
-                dateObj = ss.getCurrentDate();
-              }
-            }
-          } else {
-            dateObj = ss.getCurrentDate();
-          }
-        }
-      } catch (err) {
-        DebugLogger.warn("S&S getCurrentDate error in getTotalDaysSinceCalendarStart", err);
-      }
-
-      // 1) Prefer a direct API if available
-      try {
-        if (typeof ss.getDaysSinceEpoch === "function") {
-          const v = ss.getDaysSinceEpoch(dateObj);
-          if (typeof v === "number" && isFinite(v)) return Math.max(1, Math.floor(v));
-        }
-      } catch (err) {
-        DebugLogger.warn("S&S getDaysSinceEpoch failed", err);
-      }
-
-      try {
-        if (typeof ss.getAbsoluteDay === "function") {
-          const v = ss.getAbsoluteDay(dateObj);
-          if (typeof v === "number" && isFinite(v)) return Math.max(1, Math.floor(v));
-        }
-      } catch (err) {
-        DebugLogger.warn("S&S getAbsoluteDay failed", err);
-      }
-
-      // 2) Try to read an absolute day-like field
-      const abs = this._extractAbsoluteDayFromAny(dateObj);
-      if (abs) return abs;
-
-      // 3) Derive from year + day-of-year
-      const dayOfYear = this.getDayOfYear();
-      const yearNum = this._extractYearNumber(dateObj);
-      if (dayOfYear && yearNum) {
-        // Try dynamic days-per-year from API
-        let daysInYear = null;
-        try {
-          if (typeof ss.getDaysInYear === "function") {
-            const diy = ss.getDaysInYear(dateObj);
-            if (typeof diy === "number" && isFinite(diy) && diy > 0) daysInYear = Math.floor(diy);
-          }
-        } catch (err) {
-          DebugLogger.warn("S&S getDaysInYear failed", err);
-        }
-
-        // Fallback: Athas known year length
-        if (!daysInYear && game.dimWeather?.settingsData?.id === "athas") {
-          daysInYear = 375;
-        }
-
-        if (daysInYear) {
-          return (Math.max(1, Math.floor(yearNum) - 1) * daysInYear) + Math.max(1, Math.floor(dayOfYear));
-        }
-      }
-
-      // 4) Last-resort: derive via world seconds per day, if S&S exposes it
-      try {
-        const spd = (typeof ss.getWorldSecondsPerDay === "function")
-          ? ss.getWorldSecondsPerDay(calendarId)
-          : (typeof ss.getSecondsPerDay === "function" ? ss.getSecondsPerDay(calendarId) : null);
-        if (typeof spd === "number" && isFinite(spd) && spd > 0 && typeof wt === "number") {
-          return Math.max(1, Math.floor(wt / spd) + 1);
-        }
-      } catch (err) {
-        DebugLogger.warn("S&S seconds-per-day fallback failed", err);
-      }
-
-      return null;
-    } catch (error) {
-      ErrorHandler.logAndNotify("Error getting total days since calendar start", error);
       return null;
     }
   }
@@ -417,32 +215,6 @@ export class TimeUtils {
   }
 
   /**
-   * Find the active Seasons & Stars calendar ID, if any
-   * @private
-   * @param {Object} ss - Seasons & Stars API
-   * @returns {string|null} calendar id
-   */
-  static _getSSCalendarId(ss) {
-    try {
-      // Common places an active calendar ID might be exposed
-      const active = ss?.getActiveCalendar?.();
-      if (active?.id) return String(active.id);
-      if (typeof ss?.getDefaultCalendarId === "function") {
-        const id = ss.getDefaultCalendarId();
-        if (id) return String(id);
-      }
-      if (typeof ss?.getCalendars === "function") {
-        const list = ss.getCalendars();
-        if (Array.isArray(list) && list.length && list[0]?.id) return String(list[0].id);
-      }
-      // Last resort: check a likely config spot
-      const cfg = game.settings?.get?.("seasons-and-stars", "activeCalendarId");
-      if (cfg) return String(cfg);
-    } catch (_) {}
-    return null;
-  }
-
-  /**
    * Normalize a season string for comparison (lowercase, remove non-alphanumerics, map synonyms)
    * @private
    * @param {string} value - Season label
@@ -496,71 +268,6 @@ export class TimeUtils {
     }
   }
 
-  /**
-   * Try to extract a 1-based day-of-year ordinal from an arbitrary S&S object
-   * Common fields supported: ordinal, dayOfYear, day, dayOfYearIndex
-   * @private
-   * @param {any} obj - object to inspect
-   * @returns {number|null}
-   */
-  static _extractOrdinalFromAny(obj) {
-    try {
-      if (!obj || typeof obj !== "object") return null;
-      const candidates = [
-        obj.ordinal,
-        obj.dayOfYear,
-        obj.dayOfYearIndex,
-        obj.day, // some calendars expose absolute day within year
-      ];
-      for (const c of candidates) {
-        const n = Number(c);
-        if (Number.isFinite(n) && n > 0) return Math.floor(n);
-      }
-      return null;
-    } catch (_) {
-      return null;
-    }
-  }
-
-  /**
-   * Try to extract an absolute day count from an S&S date object (1-based)
-   * Common fields supported: absoluteDay, absolute, dayCount
-   * @private
-   * @param {any} obj - object to inspect
-   * @returns {number|null}
-   */
-  static _extractAbsoluteDayFromAny(obj) {
-    try {
-      if (!obj || typeof obj !== "object") return null;
-      const candidates = [obj.absoluteDay, obj.absolute, obj.dayCount];
-      for (const c of candidates) {
-        const n = Number(c);
-        if (Number.isFinite(n) && n > 0) return Math.floor(n);
-      }
-      return null;
-    } catch (_) {
-      return null;
-    }
-  }
-
-  /**
-   * Try to extract a numeric year from an S&S date object
-   * Common fields supported: year, y, yearNumber
-   * @private
-   * @param {any} obj - object to inspect
-   * @returns {number|null}
-   */
-  static _extractYearNumber(obj) {
-    try {
-      if (!obj || typeof obj !== "object") return null;
-      const candidates = [obj.year, obj.y, obj.yearNumber];
-      for (const c of candidates) {
-        const n = Number(c);
-        if (Number.isFinite(n)) return Math.floor(n);
-      }
-      return null;
-    } catch (_) {
-      return null;
-    }
-  }
+  // Removed legacy extraction helpers and calendar ID resolution to avoid duplication with
+  // Seasons & Stars and its calendar packs. TimeUtils now serves as a thin adapter only.
 }

@@ -342,7 +342,7 @@ export class UIController {
         );
 
         // Get survival rules
-        const survivalRules = this._getSurvivalRules(weatherState);
+        const survivalRules = game.dimWeather?.engine?.getSurvivalRules?.() || this._getSurvivalRules(weatherState);
 
         // Format the weather conditions with appropriate styling
         const weatherDetails = `<p><strong>Heat:</strong> ${tempDesc}</p>
@@ -533,7 +533,7 @@ export class UIController {
 <p><strong>Precipitation:</strong> ${precipDesc}</p>`;
 
     // Get survival rules
-    const survivalRules = this._getSurvivalRules();
+    const survivalRules = game.dimWeather?.engine?.getSurvivalRules?.() || this._getSurvivalRules();
 
     return `${weatherDesc}\n\n${survivalRules}`;
   }

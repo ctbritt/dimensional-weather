@@ -91,6 +91,22 @@
         "compatibility": {
           "verified": "1.12.11.0"
         }
+      },
+      {
+        "id": "seasons-and-stars",
+        "type": "module",
+        "manifest": "https://github.com/rayners/fvtt-seasons-and-stars/releases/download/v1.1.0/module.json",
+        "compatibility": {
+          "verified": "1.1.0"
+        }
+      },
+      {
+        "id": "seasons-and-stars-athas",
+        "type": "module",
+        "manifest": "https://github.com/ctbritt/fvtt-seasons-and-stars-athas/releases/download/v1.1.0/module.json",
+        "compatibility": {
+          "verified": "1.1.0"
+        }
       }
     ]
   }

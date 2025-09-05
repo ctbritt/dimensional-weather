@@ -130,21 +130,5 @@ export class SceneManager {
     }
   }
 
-  /**
-   * Check if weather update is needed based on time
-   * @param {Object} weatherState - Current weather state
-   * @param {number} updateFrequency - Update frequency in hours
-   * @returns {boolean} Whether an update is needed
-   */
-  static isUpdateNeeded(weatherState, updateFrequency) {
-    if (!weatherState?.lastUpdate) return true;
-
-    const lastUpdateTime = weatherState.lastUpdate;
-    const currentTime = window.DSC
-      ? new Date().getTime()
-      : Date.now();
-    const hoursSinceLastUpdate = (currentTime - lastUpdateTime) / 3600;
-
-    return hoursSinceLastUpdate >= updateFrequency;
-  }
+  // Removed legacy isUpdateNeeded; TimeUtils.isUpdateNeeded is the single source of truth.
 }

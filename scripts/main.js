@@ -163,8 +163,7 @@ Hooks.once("ready", initializeModule);
 // Handle canvas ready
 Hooks.on("canvasReady", () => handleSceneWeather());
 
-// Handle world time changes
-Hooks.on("updateWorldTime", checkTimeBasedUpdate);
+// Removed duplicate updateWorldTime hook; S&S dateChanged covers time updates
 
 // Handle Seasons & Stars date changes
 Hooks.on("seasons-stars:dateChanged", async (data) => {
