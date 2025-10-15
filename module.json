@@ -22,6 +22,7 @@
     "scripts/api.js",
     "scripts/command-system.js",
     "scripts/main.js",
+    "scripts/scene-config.js",
     "scripts/scene-manager.js",
     "scripts/settings.js",
     "scripts/state-manager.js",

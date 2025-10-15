@@ -8,6 +8,7 @@ import { ErrorHandler, DebugLogger } from "./utils.js";
 import { TimeUtils } from "./time-utils.js";
 import { WeatherCalculator } from "./weather-calculator.js";
 import { SceneManager } from "./scene-manager.js";
+import { SceneConfiguration } from "./scene-config.js";
 
 export class WeatherEngine {
   /**
@@ -51,8 +52,15 @@ export class WeatherEngine {
     }
 
     try {
-      // Get current terrain and season from settings
-      const terrain = Settings.getSetting("terrain");
+      // Get terrain: check scene-specific terrain first, then fall back to global setting
+      const sceneTerrain = SceneConfiguration.getSceneTerrain(scene);
+      const terrain = sceneTerrain || Settings.getSetting("terrain");
+
+      DebugLogger.log("weather", `Initializing weather for scene: ${scene.name}`, {
+        sceneTerrain,
+        globalTerrain: Settings.getSetting("terrain"),
+        usingTerrain: terrain
+      });
 
       // Determine season
       const season =
@@ -150,8 +158,28 @@ export class WeatherEngine {
         }
       }
 
-      // Get current terrain from saved state
-      const currentTerrain = weatherState.terrain;
+      // Check if scene has a specific terrain assigned that differs from saved state
+      const sceneTerrain = SceneConfiguration.getSceneTerrain(scene);
+      const savedTerrain = weatherState.terrain;
+
+      // If scene has specific terrain and it differs from saved state, update it
+      let currentTerrain = savedTerrain;
+      if (sceneTerrain && sceneTerrain !== savedTerrain) {
+        DebugLogger.log("weather", `Scene terrain changed from ${savedTerrain} to ${sceneTerrain}, reinitializing weather`);
+        // Reset weather state to use new terrain
+        await SceneManager.resetWeatherState(scene);
+        const success = await this.initializeWeather(scene);
+        if (!success) return null;
+        return SceneManager.getWeatherState(scene);
+      }
+      // If no scene terrain specified, check if global terrain has changed
+      else if (!sceneTerrain && savedTerrain !== Settings.getSetting("terrain")) {
+        const globalTerrain = Settings.getSetting("terrain");
+        DebugLogger.log("weather", `Global terrain changed from ${savedTerrain} to ${globalTerrain}, updating weather state`);
+        currentTerrain = globalTerrain;
+        // Update the terrain in weather state
+        await SceneManager.setWeatherAttribute("terrain", globalTerrain, scene);
+      }
 
       // Determine current season
       const currentSeason =

@@ -564,6 +564,48 @@
             "humidity": 10,
             "variability": 6,
             "rules": []
+        },
+        "city": {
+            "name": "City",
+            "description": "Towering adobe walls and narrow streets create a maze of shadow and light. The press of bodies, cooking fires, and bustling markets generates waves of heat, while the sound of commerce and labor fills the air. Ancient windcatchers and shaded bazaars offer respite from the brutal sun.",
+            "temperature": 1,
+            "wind": -4,
+            "precipitation": -10,
+            "humidity": -3,
+            "variability": 3,
+            "timeModifiers": {
+                "Morning": {
+                    "temperature": -1,
+                    "wind": -1,
+                    "humidity": 1
+                },
+                "Noon": {
+                    "temperature": 1,
+                    "wind": -2
+                },
+                "Evening": {
+                    "temperature": 0,
+                    "wind": 0,
+                    "humidity": -1
+                },
+                "1st Watch": {
+                    "temperature": -2,
+                    "wind": -2,
+                    "humidity": 1
+                },
+                "2nd Watch": {
+                    "temperature": -3,
+                    "wind": -1,
+                    "humidity": 2
+                },
+                "3rd Watch": {
+                    "temperature": -3,
+                    "wind": -1,
+                    "humidity": 2
+                }
+            },
+            "rules": [
+            ]
         }
     }
 }
