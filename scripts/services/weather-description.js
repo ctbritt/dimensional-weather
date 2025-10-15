@@ -92,6 +92,7 @@ export class WeatherDescriptionService {
    */
   async _callOpenAI(prompt) {
     const model = this.model || Settings.getSetting("openaiModel") || "gpt-4o-mini";
+    console.log("Dimensional Weather | Using OpenAI model:", model);
 
     const buildBody = (maxTokens) => {
       const body = {
@@ -102,8 +103,15 @@ export class WeatherDescriptionService {
         ],
       };
 
-      // Newer models (GPT-4.1, O-series) use max_completion_tokens instead of max_tokens
-      if (model.includes("gpt-4.1") || model.includes("o3") || model.includes("o4")) {
+      // Newer models (GPT-4.1+, GPT-5+, O-series) use max_completion_tokens instead of max_tokens
+      const useNewParam = model.includes("gpt-4.1") ||
+                          model.includes("gpt-5") ||
+                          model.includes("o3") ||
+                          model.includes("o4");
+
+      console.log("Dimensional Weather | Model:", model, "Use max_completion_tokens:", useNewParam);
+
+      if (useNewParam) {
         body.max_completion_tokens = maxTokens;
       } else {
         body.max_tokens = maxTokens;
