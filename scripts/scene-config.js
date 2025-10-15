@@ -86,6 +86,10 @@ export class SceneConfiguration {
       const $html = html instanceof jQuery ? html : $(html);
       console.log("Dimensional Weather | HTML type:", typeof html, "jQuery:", $html.length);
 
+      // Debug: Let's see what tabs are available
+      const allTabs = $html.find('.tab');
+      console.log("Dimensional Weather | All tabs found:", allTabs.length, Array.from(allTabs).map(t => $(t).data('tab')));
+
       // Get current terrain from scene flag
       const currentTerrain = scene.getFlag(this.MODULE_ID, "terrain") || "";
 
@@ -112,12 +116,13 @@ export class SceneConfiguration {
 
       // Find the ambience tab or appropriate insertion point
       const ambienceTab = $html.find('.tab[data-tab="ambience"]');
-      console.log("Dimensional Weather | Ambience tab found:", ambienceTab.length);
+      console.log("Dimensional Weather | Ambience tab found:", ambienceTab.length, "visible:", ambienceTab.is(':visible'), "display:", ambienceTab.css('display'));
 
       if (ambienceTab.length > 0) {
         // Insert after the last form group in ambience tab
         const lastFormGroup = ambienceTab.find(".form-group").last();
         console.log("Dimensional Weather | Form groups in ambience:", ambienceTab.find(".form-group").length);
+        console.log("Dimensional Weather | Last form group:", lastFormGroup.find('label').text());
         if (lastFormGroup.length > 0) {
           lastFormGroup.after(formGroupHtml);
           console.log("Dimensional Weather | Inserted after last form group");
@@ -138,6 +143,10 @@ export class SceneConfiguration {
           console.log("Dimensional Weather | Appended to form");
         }
       }
+
+      // Verify the element was actually added
+      const addedSelect = $html.find(`select[name="flags.${this.MODULE_ID}.terrain"]`);
+      console.log("Dimensional Weather | Verification - dropdown in DOM:", addedSelect.length > 0, "parent visible:", addedSelect.parent().is(':visible'));
 
       // Adjust the app height to accommodate new field
       app.setPosition({ height: "auto" });
