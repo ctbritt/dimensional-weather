@@ -8,9 +8,10 @@ The Dimensional Weather module now supports **scene-specific terrain assignment*
 
 ### Scene Configuration UI
 
-When configuring a scene (right-click scene → Configure), you'll find a new **"Weather Terrain"** dropdown in the Ambience tab:
+When configuring a scene (right-click scene → Configure), you'll find a new **"Scene Terrain"** dropdown in the Ambience tab:
 
-- **Location**: Scene Configuration → Ambience tab → Weather Terrain dropdown
+- **Location**: Scene Configuration → Ambience tab → Basic Options → Scene Terrain dropdown
+- **Tooltip**: Hover over the "Scene Terrain" label for usage instructions
 - **Options**:
   - "None (Use Global Setting)" - Uses the module's global terrain setting
   - All available terrains from your current campaign (e.g., City, Mountains, Sandy Wastes, etc.)
