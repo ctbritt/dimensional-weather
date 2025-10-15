@@ -118,11 +118,11 @@ export class SceneConfiguration {
         </div>
       `;
 
-      // Try to find the environment subtab (within ambience) first
-      let targetTab = $html.find('.tab[data-tab="environment"]');
-      console.log("Dimensional Weather | Environment subtab found:", targetTab.length, "visible:", targetTab.is(':visible'));
+      // Try to find the basic subtab (within ambience) first - that's where scene playlist and weather are
+      let targetTab = $html.find('.tab[data-tab="basic"]');
+      console.log("Dimensional Weather | Basic subtab found:", targetTab.length, "visible:", targetTab.is(':visible'));
 
-      // Fall back to ambience tab if environment not found
+      // Fall back to ambience tab if basic not found
       if (targetTab.length === 0) {
         targetTab = $html.find('.tab[data-tab="ambience"]');
         console.log("Dimensional Weather | Using ambience tab instead");
