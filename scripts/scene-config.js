@@ -17,7 +17,9 @@ export class SceneConfiguration {
    * Register hooks for scene configuration
    */
   static register() {
+    console.log("Dimensional Weather | Registering SceneConfiguration hooks");
     Hooks.on("renderSceneConfig", this._onRenderSceneConfig.bind(this));
+    console.log("Dimensional Weather | SceneConfiguration hooks registered");
   }
 
   /**
@@ -58,13 +60,17 @@ export class SceneConfiguration {
    */
   static async _onRenderSceneConfig(app, html, data) {
     try {
+      DebugLogger.log("weather", "renderSceneConfig hook called", { app, hasObject: !!app.object });
+
       const scene = app.object;
 
       // Verify we have a valid scene
-      if (!scene || !scene.id || scene.documentName !== "Scene") {
-        DebugLogger.log("weather", "Skipping terrain dropdown - not a Scene document");
+      if (!scene || !scene.id) {
+        console.warn("Dimensional Weather | No valid scene found in SceneConfig");
         return;
       }
+
+      DebugLogger.log("weather", `Processing scene config for: ${scene.name}`);
 
       // Get current terrain from scene flag
       const currentTerrain = scene.getFlag(this.MODULE_ID, "terrain") || "";
@@ -92,29 +98,37 @@ export class SceneConfiguration {
 
       // Find the ambience tab or appropriate insertion point
       const ambienceTab = html.find('.tab[data-tab="ambience"]');
+      console.log("Dimensional Weather | Ambience tab found:", ambienceTab.length);
 
       if (ambienceTab.length > 0) {
-        // Insert before the last form group in ambience tab
+        // Insert after the last form group in ambience tab
         const lastFormGroup = ambienceTab.find(".form-group").last();
+        console.log("Dimensional Weather | Form groups in ambience:", ambienceTab.find(".form-group").length);
         if (lastFormGroup.length > 0) {
           lastFormGroup.after(formGroupHtml);
+          console.log("Dimensional Weather | Inserted after last form group");
         } else {
           ambienceTab.append(formGroupHtml);
+          console.log("Dimensional Weather | Appended to ambience tab");
         }
       } else {
         // Fallback: insert before submit buttons
+        console.log("Dimensional Weather | Ambience tab not found, using fallback");
         const footer = html.find("footer.sheet-footer, button[type='submit']").first();
         if (footer.length > 0) {
           footer.before(formGroupHtml);
+          console.log("Dimensional Weather | Inserted before footer");
         } else {
           // Last resort: append to form
           html.find("form").append(formGroupHtml);
+          console.log("Dimensional Weather | Appended to form");
         }
       }
 
       // Adjust the app height to accommodate new field
       app.setPosition({ height: "auto" });
 
+      console.log("Dimensional Weather | Terrain dropdown added successfully");
       DebugLogger.log("weather", "Added terrain dropdown to Scene Config");
     } catch (error) {
       ErrorHandler.logAndNotify(
