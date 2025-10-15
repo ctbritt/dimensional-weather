@@ -104,12 +104,19 @@ export class WeatherDescriptionService {
       };
 
       // Newer models (GPT-4.1+, GPT-5+, O-series) use max_completion_tokens instead of max_tokens
-      const useNewParam = model.includes("gpt-4.1") ||
-                          model.includes("gpt-5") ||
-                          model.includes("o3") ||
-                          model.includes("o4");
+      // Check if model starts with these prefixes or contains these strings
+      const useNewParam = model.startsWith("gpt-5") ||
+                          model.startsWith("gpt-4.1") ||
+                          model.startsWith("o3") ||
+                          model.startsWith("o4") ||
+                          model.includes("-5-") ||
+                          model.includes("-4.1-");
 
       console.log("Dimensional Weather | Model:", model, "Use max_completion_tokens:", useNewParam);
+
+      if (!useNewParam) {
+        console.warn("Dimensional Weather | Using legacy max_tokens parameter for model:", model);
+      }
 
       if (useNewParam) {
         body.max_completion_tokens = maxTokens;
