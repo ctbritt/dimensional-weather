@@ -42,13 +42,30 @@ export class DimensionalWeatherAPI {
       this.engine = new WeatherEngine(this.settingsData);
       this.ui = new UIController(this.settingsData);
 
-      // Initialize AI description service (OpenAI only)
+      // Initialize AI description service (OpenAI or Anthropic)
       if (Settings.getSetting("useAI")) {
-        const apiKey = Settings.getSetting("apiKey");
-        const model = Settings.getSetting("openaiModel");
+        console.log("Dimensional Weather | Ensuring AI service is initialized...");
+        const provider = Settings.getSetting("aiProvider") || "openai";
+        console.log("Dimensional Weather | Selected provider:", provider);
+
+        let apiKey, model;
+
+        if (provider === "anthropic") {
+          apiKey = Settings.getSetting("anthropicApiKey");
+          model = Settings.getSetting("anthropicModel");
+        } else {
+          apiKey = Settings.getSetting("apiKey");
+          model = Settings.getSetting("openaiModel");
+        }
+
+        console.log("Dimensional Weather | API key present:", !!apiKey);
+        console.log("Dimensional Weather | Model:", model);
 
         if (apiKey) {
-          this.descriptionService = new WeatherDescriptionService({ apiKey, provider: "openai", model });
+          this.descriptionService = new WeatherDescriptionService({ apiKey, provider, model });
+          console.log("Dimensional Weather | AI service initialized with provider:", provider);
+        } else {
+          console.warn("Dimensional Weather | No API key found for provider:", provider);
         }
       }
 
@@ -409,6 +426,71 @@ export class DimensionalWeatherAPI {
     import("./time-utils.js").then(module => {
       module.TimeUtils.clearCache();
     });
+  }
+
+  /**
+   * Toggle debug logging for a specific category
+   * @param {string} category - Debug category: "weather", "time", "timePeriod", or "settings"
+   * @param {boolean} [enabled] - Enable or disable (toggles if not provided)
+   * @returns {Promise<boolean>} New state
+   */
+  async toggleDebug(category, enabled) {
+    const settingMap = {
+      weather: "debugWeather",
+      time: "debugTime",
+      timePeriod: "debugTimePeriod",
+      settings: "debugSettings"
+    };
+
+    const settingKey = settingMap[category];
+    if (!settingKey) {
+      ui.notifications.error(`Invalid debug category: ${category}. Use: weather, time, timePeriod, or settings`);
+      return false;
+    }
+
+    const currentValue = Settings.getSetting(settingKey);
+    const newValue = enabled !== undefined ? enabled : !currentValue;
+
+    await Settings.updateSetting(settingKey, newValue);
+    ui.notifications.info(`Debug ${category}: ${newValue ? "ENABLED" : "DISABLED"}`);
+    return newValue;
+  }
+
+  /**
+   * Get current debug settings
+   * @returns {Object} Debug settings status
+   */
+  getDebugStatus() {
+    return {
+      weather: Settings.getSetting("debugWeather"),
+      time: Settings.getSetting("debugTime"),
+      timePeriod: Settings.getSetting("debugTimePeriod"),
+      settings: Settings.getSetting("debugSettings")
+    };
+  }
+
+  /**
+   * Enable all debug logging
+   * @returns {Promise<void>}
+   */
+  async enableAllDebug() {
+    await Settings.updateSetting("debugWeather", true);
+    await Settings.updateSetting("debugTime", true);
+    await Settings.updateSetting("debugTimePeriod", true);
+    await Settings.updateSetting("debugSettings", true);
+    ui.notifications.info("All debug logging ENABLED");
+  }
+
+  /**
+   * Disable all debug logging
+   * @returns {Promise<void>}
+   */
+  async disableAllDebug() {
+    await Settings.updateSetting("debugWeather", false);
+    await Settings.updateSetting("debugTime", false);
+    await Settings.updateSetting("debugTimePeriod", false);
+    await Settings.updateSetting("debugSettings", false);
+    ui.notifications.info("All debug logging DISABLED");
   }
 
   /**

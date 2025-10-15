@@ -189,14 +189,21 @@ export class WeatherDescriptionService {
       return { contentText: contentText ? String(contentText).trim() : "", finishReason };
     };
 
-    // First attempt
-    const initialTokens = 300;
+    // First attempt - reasoning models (GPT-5, O-series) need much more tokens
+    // They use reasoning_tokens internally before generating output
+    const isReasoningModel = model.startsWith("gpt-5") ||
+                            model.startsWith("o3") ||
+                            model.startsWith("o4") ||
+                            model.includes("-5-");
+
+    const initialTokens = isReasoningModel ? 1500 : 300;
     let { contentText, finishReason } = await callOnce(buildBody(initialTokens));
     console.log("Dimensional Weather | First attempt result - Content length:", contentText?.length || 0, "Finish:", finishReason);
 
     // Retry once if empty content or length-capped
     if (!contentText || finishReason === "length") {
-      const retryTokens = initialTokens + 200; // give more budget
+      const retryTokens = isReasoningModel ? 2000 : initialTokens + 200;
+      console.log("Dimensional Weather | Retrying with more tokens:", retryTokens);
       const retry = await callOnce(buildBody(retryTokens));
       contentText = retry.contentText || contentText;
       finishReason = retry.finishReason || finishReason;
@@ -215,6 +222,7 @@ export class WeatherDescriptionService {
    */
   async _callAnthropic(prompt) {
     const model = this.model || Settings.getSetting("anthropicModel") || "claude-sonnet-4-5-20250929";
+    console.log("Dimensional Weather | Using Anthropic model:", model);
 
     const body = {
       model,
@@ -228,12 +236,14 @@ export class WeatherDescriptionService {
       system: "You are a weather system for the Dark Sun D&D setting. Generate very concise, atmospheric descriptions (2-3 sentences max) focusing on the most critical environmental effects and immediate survival concerns. Give your responses in the style of the Wanderer from the Wanderer's Chronicle."
     };
 
+    console.log("Dimensional Weather | Calling Anthropic API with dangerous-direct-browser-access header");
     const resp = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "x-api-key": this.apiKey,
-        "anthropic-version": "2023-06-01"
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true"
       },
       body: JSON.stringify(body),
     });
@@ -241,6 +251,7 @@ export class WeatherDescriptionService {
     if (!resp.ok) {
       const errorData = await resp.json().catch(() => ({}));
       const errorMsg = errorData.error?.message || resp.statusText;
+      console.error("Dimensional Weather | Anthropic API error:", errorMsg, errorData);
 
       // Check if this might be a key mismatch
       if (errorMsg.includes("authentication") || errorMsg.includes("api_key") || errorMsg.includes("invalid")) {
@@ -251,15 +262,19 @@ export class WeatherDescriptionService {
     }
 
     const data = await resp.json();
+    console.log("Dimensional Weather | Anthropic raw response:", JSON.stringify(data, null, 2));
 
     // Anthropic returns content in a different format
     if (data.content && Array.isArray(data.content) && data.content.length > 0) {
       const textContent = data.content.find(c => c.type === "text");
       if (textContent && textContent.text) {
-        return textContent.text.trim();
+        const result = textContent.text.trim();
+        console.log("Dimensional Weather | Anthropic description:", result);
+        return result;
       }
     }
 
+    console.warn("Dimensional Weather | Anthropic returned no usable content");
     return "";
   }
 

@@ -6,13 +6,14 @@ A dynamic weather system for Foundry VTT, providing a modular system for develop
 
 This module adds a comprehensive weather system to your campaign, featuring:
 - Modular campaign settings system
-- Terrain-specific weather patterns
+- Terrain-specific weather patterns with **scene-level terrain assignment**
+- Seasonal weather variations
 - Survival rules based on conditions
 - Private GM commands for weather management
-- Optional AI-powered weather descriptions
-- API for other module developers
+- Optional AI-powered weather descriptions (OpenAI **and** Anthropic Claude support)
+- Comprehensive API for other module developers and scripting
 - Advanced scene and state management
-- Performance-optimized weather calculations
+- Performance-optimized weather calculations with caching
 
 ## How the Weather System Works
 The Dimensional Weather system was inspired by the hex flower power described at [Goblin's Henchman](https://goblinshenchman.wordpress.com/hex-power-flower/). It uses a dynamic, multi-dimensional approach to weather generation that combines:
@@ -104,13 +105,44 @@ The weather system gradually changes over time:
 3. Time of day automatically affects conditions
 4. GMs can force updates or change variability
 
+### Scene-Specific Terrain Assignment
+
+Each scene can have its own terrain type:
+1. Open Scene Configuration → Ambience → Basic Options
+2. Select a terrain from the "Scene Terrain" dropdown
+3. Leave as "None" to use the global terrain setting
+4. Weather automatically switches when you change scenes
+
+This allows you to have:
+- Desert weather in outdoor scenes
+- City weather in urban scenes
+- Different terrains for different regions of your world
+
 ### AI Integration (Optional)
+
+The module supports **two AI providers** for generating atmospheric weather descriptions:
+
+#### OpenAI Support
+- **Recommended Models:**
+  - `gpt-4o-mini` (Default) - Fast, cost-effective, great creative output
+  - `gpt-4o` - Faster, excellent for real-time generation
+  - `gpt-5-mini` - Higher quality, slower, more expensive
+- **Setup:** Add your OpenAI API key in module settings
+
+#### Anthropic Claude Support
+- **Recommended Models:**
+  - `claude-haiku-4` - Fastest, most cost-effective
+  - `claude-sonnet-4` - Balanced speed and quality
+  - `claude-sonnet-4-5` - Highest quality creative writing
+- **Setup:** Add your Anthropic API key in module settings
+- Uses the `anthropic-dangerous-direct-browser-access` header for browser-based API calls
 
 When AI descriptions are enabled:
 1. System combines all weather factors
-2. Generates atmospheric descriptions
+2. Generates atmospheric descriptions in the style of your setting
 3. Focuses on survival-relevant information
 4. Updates descriptions based on time of day
+5. Choose between OpenAI or Anthropic based on your preference
 
 ### Chat Commands
 Available chat commands:
@@ -327,28 +359,112 @@ That's it! The module settings will now reflect any changes you've made to the a
 
 ## API for Module Developers
 
-The module provides a comprehensive API for other modules to integrate with the weather system:
+The module provides a comprehensive API accessible via `game.dimWeather`:
 
-### Basic Usage
+### Weather Operations
 ```javascript
-// Get current weather data
-const weather = game.modules.get('dimensional-weather').api.getCurrentWeather();
+// Display current weather
+await game.dimWeather.displayWeather();
 
-// Subscribe to weather changes
-game.modules.get('dimensional-weather').api.onWeatherChange((weather) => {
-    console.log('Weather changed:', weather);
-});
+// Force weather update
+await game.dimWeather.updateWeather();
 
-// Get weather for a specific scene
-const sceneWeather = game.modules.get('dimensional-weather').api.getWeatherForScene(sceneId);
+// Generate and display forecast
+await game.dimWeather.displayForecast();
 ```
 
-### Available API Methods
-- `getCurrentWeather()` - Returns current weather data
-- `getWeatherForScene(sceneId)` - Get weather for specific scene
-- `onWeatherChange(callback)` - Subscribe to weather updates
-- `getCampaignSettings()` - Get available campaign settings
-- `setWeatherVariability(value)` - Set weather randomness (0-10)
+### Configuration
+```javascript
+// Change terrain (global or scene-specific via UI)
+await game.dimWeather.setTerrain("desert");
+
+// Change season
+await game.dimWeather.setSeason("summer");
+
+// Set variability (0-10)
+await game.dimWeather.setVariability(7);
+
+// Switch campaign setting
+await game.dimWeather.updateCampaignSetting("athas");
+```
+
+### Information & Stats
+```javascript
+// Get current weather statistics
+const stats = game.dimWeather.getWeatherStats();
+console.log(stats);
+/* Returns:
+{
+  initialized: true,
+  weatherAvailable: true,
+  campaign: "Athas",
+  temperature: 5,
+  wind: 3,
+  precipitation: -8,
+  humidity: -2,
+  variability: 5,
+  terrain: "Desert",
+  season: "High Sun",
+  lastUpdate: 1234567890,
+  scene: "Scene Name"
+}
+*/
+
+// Get current time period
+const period = game.dimWeather.getTimePeriod(); // "Morning", "Noon", etc.
+
+// Get help text
+const help = game.dimWeather.getHelpText();
+```
+
+### Debug Controls
+```javascript
+// Toggle specific debug category
+await game.dimWeather.toggleDebug("weather"); // Toggle on/off
+await game.dimWeather.toggleDebug("time", true); // Explicitly enable
+
+// Check debug status
+const debugStatus = game.dimWeather.getDebugStatus();
+// Returns: { weather: true, time: false, timePeriod: false, settings: false }
+
+// Enable/disable all debug logging
+await game.dimWeather.enableAllDebug();
+await game.dimWeather.disableAllDebug();
+```
+
+**Debug Categories:**
+- `weather` - Weather calculation and update logs
+- `time` - Time utility function logs
+- `timePeriod` - Time period calculation logs
+- `settings` - Settings loading and management logs
+
+### Utility Methods
+```javascript
+// Clear all caches
+game.dimWeather.clearCaches();
+
+// Display help in chat
+await game.dimWeather.displayHelp();
+```
+
+### Complete API Reference
+
+| Method | Parameters | Returns | Description |
+|--------|------------|---------|-------------|
+| `updateWeather()` | - | `Promise<boolean>` | Force weather update |
+| `displayWeather()` | - | `Promise<boolean>` | Display weather in chat |
+| `displayForecast()` | - | `Promise<string>` | Display forecast |
+| `setTerrain(key)` | terrain key | `Promise<boolean>` | Change terrain |
+| `setSeason(key)` | season key | `Promise<boolean>` | Change season |
+| `setVariability(value)` | 0-10 | `Promise<boolean>` | Set randomness |
+| `updateCampaignSetting(id)` | campaign id | `Promise<boolean>` | Switch campaign |
+| `getWeatherStats()` | - | `Object` | Get weather data |
+| `getTimePeriod()` | - | `string` | Get time period |
+| `toggleDebug(category, enabled)` | category, boolean | `Promise<boolean>` | Toggle debug |
+| `getDebugStatus()` | - | `Object` | Get debug status |
+| `enableAllDebug()` | - | `Promise<void>` | Enable all debug |
+| `disableAllDebug()` | - | `Promise<void>` | Disable all debug |
+| `clearCaches()` | - | `void` | Clear all caches |
 
 ## Installation
 

@@ -392,25 +392,34 @@ export class UIController {
       return;
     }
 
-    const apiKey = Settings.getSetting("apiKey");
-    const model = Settings.getSetting("openaiModel");
+    const provider = Settings.getSetting("aiProvider") || "openai";
+    let apiKey, model;
 
-    console.log("Dimensional Weather | Ensuring AI service - Model:", model, "Has Key:", !!apiKey);
+    if (provider === "anthropic") {
+      apiKey = Settings.getSetting("anthropicApiKey");
+      model = Settings.getSetting("anthropicModel");
+    } else {
+      apiKey = Settings.getSetting("apiKey");
+      model = Settings.getSetting("openaiModel");
+    }
+
+    console.log("Dimensional Weather | Ensuring AI service - Provider:", provider, "Model:", model, "Has Key:", !!apiKey);
 
     if (!apiKey) {
       this.descriptionService = null;
-      console.warn("Dimensional Weather | No API key configured, clearing service");
+      console.warn("Dimensional Weather | No API key configured for provider:", provider);
       return;
     }
 
     const needsNew =
       !this.descriptionService ||
+      this.descriptionService.provider !== provider ||
       this.descriptionService.apiKey !== apiKey ||
       this.descriptionService.model !== model;
 
     if (needsNew) {
-      console.log("Dimensional Weather | Creating new AI service with OpenAI");
-      this.descriptionService = new WeatherDescriptionService({ apiKey, provider: "openai", model });
+      console.log("Dimensional Weather | Creating new AI service with provider:", provider);
+      this.descriptionService = new WeatherDescriptionService({ apiKey, provider, model });
     }
   }
 
