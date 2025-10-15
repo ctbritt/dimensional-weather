@@ -18,12 +18,15 @@ export class UIController {
     this.settingsData = settingsData;
     this.descriptionService = null;
 
-    // Load OpenAI description service
+    // Load AI description service
     if (Settings.getSetting("useAI")) {
       const apiKey = Settings.getSetting("apiKey");
-      const model = Settings.getSetting("openaiModel");
+      const provider = Settings.getSetting("aiProvider") || "openai";
+      const model = provider === "anthropic"
+        ? Settings.getSetting("anthropicModel")
+        : Settings.getSetting("openaiModel");
       if (apiKey) {
-        this.descriptionService = new WeatherDescriptionService({ apiKey, model });
+        this.descriptionService = new WeatherDescriptionService({ apiKey, provider, model });
       }
     }
 
@@ -378,7 +381,11 @@ export class UIController {
     }
 
     const apiKey = Settings.getSetting("apiKey");
-    const model = Settings.getSetting("openaiModel");
+    const provider = Settings.getSetting("aiProvider") || "openai";
+    const model = provider === "anthropic"
+      ? Settings.getSetting("anthropicModel")
+      : Settings.getSetting("openaiModel");
+
     if (!apiKey) {
       this.descriptionService = null;
       return;
@@ -387,10 +394,11 @@ export class UIController {
     const needsNew =
       !this.descriptionService ||
       this.descriptionService.apiKey !== apiKey ||
+      this.descriptionService.provider !== provider ||
       this.descriptionService.model !== model;
 
     if (needsNew) {
-      this.descriptionService = new WeatherDescriptionService({ apiKey, model });
+      this.descriptionService = new WeatherDescriptionService({ apiKey, provider, model });
     }
   }
 
