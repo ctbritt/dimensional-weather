@@ -42,12 +42,16 @@ export class DimensionalWeatherAPI {
       this.engine = new WeatherEngine(this.settingsData);
       this.ui = new UIController(this.settingsData);
 
-      // Initialize OpenAI description service
+      // Initialize AI description service
       if (Settings.getSetting("useAI")) {
         const apiKey = Settings.getSetting("apiKey");
-        const model = Settings.getSetting("openaiModel");
+        const provider = Settings.getSetting("aiProvider") || "openai";
+        const model = provider === "anthropic"
+          ? Settings.getSetting("anthropicModel")
+          : Settings.getSetting("openaiModel");
+
         if (apiKey) {
-          this.descriptionService = new WeatherDescriptionService({ apiKey, model });
+          this.descriptionService = new WeatherDescriptionService({ apiKey, provider, model });
         }
       }
 

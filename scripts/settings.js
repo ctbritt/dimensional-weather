@@ -157,15 +157,27 @@ export class Settings {
     },
     useAI: {
       name: "Use AI for Descriptions",
-      hint: "Use OpenAI to generate more detailed weather descriptions",
+      hint: "Use AI to generate more detailed weather descriptions",
       scope: "world",
       config: true,
       type: Boolean,
       default: false,
     },
+    aiProvider: {
+      name: "AI Provider",
+      hint: "Choose which AI service to use for weather descriptions",
+      scope: "world",
+      config: true,
+      type: String,
+      default: "openai",
+      choices: {
+        openai: "OpenAI",
+        anthropic: "Anthropic (Claude)"
+      },
+    },
     apiKey: {
-      name: "OpenAI API Key",
-      hint: "Your OpenAI API key for generating weather descriptions",
+      name: "AI API Key",
+      hint: "Your API key for the selected AI provider (OpenAI or Anthropic)",
       scope: "world",
       config: true,
       type: String,
@@ -182,6 +194,27 @@ export class Settings {
       config: true,
       type: String,
       default: "gpt-4o-mini",
+      choices: {
+        "gpt-4o": "GPT-4o (Most Capable)",
+        "gpt-4o-mini": "GPT-4o Mini (Fast & Affordable)",
+        "gpt-4-turbo": "GPT-4 Turbo",
+        "gpt-3.5-turbo": "GPT-3.5 Turbo (Legacy)"
+      },
+    },
+    anthropicModel: {
+      name: "Anthropic Model",
+      hint: "Model used for Anthropic (Claude) descriptions",
+      scope: "world",
+      config: true,
+      type: String,
+      default: "claude-3-5-sonnet-20241022",
+      choices: {
+        "claude-3-5-sonnet-20241022": "Claude 3.5 Sonnet (Latest)",
+        "claude-3-5-haiku-20241022": "Claude 3.5 Haiku (Fast)",
+        "claude-3-opus-20240229": "Claude 3 Opus (Most Capable)",
+        "claude-3-sonnet-20240229": "Claude 3 Sonnet",
+        "claude-3-haiku-20240307": "Claude 3 Haiku"
+      },
     },
     useCustomStyles: {
       name: "Use Custom Campaign Styles",
