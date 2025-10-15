@@ -110,11 +110,10 @@ export class SceneConfiguration {
       // Create the form group HTML
       const formGroupHtml = `
         <div class="form-group">
-          <label>Weather Terrain</label>
+          <label data-tooltip="Select a terrain type for this scene's weather. Leave as 'None' to use the global terrain setting." data-tooltip-direction="UP">Scene Terrain</label>
           <select name="flags.${this.MODULE_ID}.terrain">
             ${optionsHtml}
           </select>
-          <p class="notes">Select a terrain type for this scene's weather. Leave as "None" to use the global terrain setting.</p>
         </div>
       `;
 
