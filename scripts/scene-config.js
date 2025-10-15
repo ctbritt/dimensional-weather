@@ -17,9 +17,8 @@ export class SceneConfiguration {
    * Register hooks for scene configuration
    */
   static register() {
-    console.log("Dimensional Weather | Registering SceneConfiguration hooks");
     Hooks.on("renderSceneConfig", this._onRenderSceneConfig.bind(this));
-    console.log("Dimensional Weather | SceneConfiguration hooks registered");
+    DebugLogger.log("weather", "SceneConfiguration hooks registered");
   }
 
   /**
@@ -60,39 +59,19 @@ export class SceneConfiguration {
    */
   static async _onRenderSceneConfig(app, html, data) {
     try {
-      console.log("Dimensional Weather | renderSceneConfig hook called", {
-        hasObject: !!app.object,
-        hasDocument: !!app.document,
-        appKeys: Object.keys(app),
-        dataKeys: Object.keys(data)
-      });
-
       // In Foundry v13, the document might be at app.document instead of app.object
       const scene = app.document || app.object;
 
       // Verify we have a valid scene
       if (!scene || !scene.id) {
-        console.warn("Dimensional Weather | No valid scene found in SceneConfig", {
-          scene,
-          hasScene: !!scene,
-          hasId: scene?.id
-        });
+        DebugLogger.log("weather", "No valid scene found in SceneConfig");
         return;
       }
 
-      console.log("Dimensional Weather | Processing scene config for:", scene.name);
+      DebugLogger.log("weather", `Processing scene config for: ${scene.name}`);
 
       // Ensure html is a jQuery object
       const $html = html instanceof jQuery ? html : $(html);
-      console.log("Dimensional Weather | HTML type:", typeof html, "jQuery:", $html.length);
-
-      // Debug: Let's see what tabs are available
-      const allTabs = $html.find('.tab');
-      console.log("Dimensional Weather | All tabs found:", allTabs.length, Array.from(allTabs).map(t => $(t).data('tab')));
-
-      // Check for subtabs within ambience
-      const ambienceSubtabs = $html.find('.tab[data-tab="ambience"] .tab');
-      console.log("Dimensional Weather | Ambience subtabs:", ambienceSubtabs.length, Array.from(ambienceSubtabs).map(t => $(t).data('tab')));
 
       // Get current terrain from scene flag
       const currentTerrain = scene.getFlag(this.MODULE_ID, "terrain") || "";
@@ -119,50 +98,34 @@ export class SceneConfiguration {
 
       // Try to find the basic subtab (within ambience) first - that's where scene playlist and weather are
       let targetTab = $html.find('.tab[data-tab="basic"]');
-      console.log("Dimensional Weather | Basic subtab found:", targetTab.length, "visible:", targetTab.is(':visible'));
 
       // Fall back to ambience tab if basic not found
       if (targetTab.length === 0) {
         targetTab = $html.find('.tab[data-tab="ambience"]');
-        console.log("Dimensional Weather | Using ambience tab instead");
       }
-
-      console.log("Dimensional Weather | Target tab found:", targetTab.length, "visible:", targetTab.is(':visible'), "display:", targetTab.css('display'));
 
       if (targetTab.length > 0) {
         // Insert after the last form group in target tab
         const lastFormGroup = targetTab.find(".form-group").last();
-        console.log("Dimensional Weather | Form groups in target tab:", targetTab.find(".form-group").length);
-        console.log("Dimensional Weather | Last form group:", lastFormGroup.find('label').text());
         if (lastFormGroup.length > 0) {
           lastFormGroup.after(formGroupHtml);
-          console.log("Dimensional Weather | Inserted after last form group");
         } else {
           targetTab.append(formGroupHtml);
-          console.log("Dimensional Weather | Appended to target tab");
         }
       } else {
         // Fallback: insert before submit buttons
-        console.log("Dimensional Weather | Ambience tab not found, using fallback");
         const footer = $html.find("footer.sheet-footer, button[type='submit']").first();
         if (footer.length > 0) {
           footer.before(formGroupHtml);
-          console.log("Dimensional Weather | Inserted before footer");
         } else {
           // Last resort: append to form
           $html.find("form").append(formGroupHtml);
-          console.log("Dimensional Weather | Appended to form");
         }
       }
-
-      // Verify the element was actually added
-      const addedSelect = $html.find(`select[name="flags.${this.MODULE_ID}.terrain"]`);
-      console.log("Dimensional Weather | Verification - dropdown in DOM:", addedSelect.length > 0, "parent visible:", addedSelect.parent().is(':visible'));
 
       // Adjust the app height to accommodate new field
       app.setPosition({ height: "auto" });
 
-      console.log("Dimensional Weather | Terrain dropdown added successfully");
       DebugLogger.log("weather", "Added terrain dropdown to Scene Config");
     } catch (error) {
       ErrorHandler.logAndNotify(
