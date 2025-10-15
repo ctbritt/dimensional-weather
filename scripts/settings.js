@@ -78,11 +78,12 @@ export class Settings {
         humidity: 0,
       },
     },
+    // Debug settings - hidden from UI, accessible via API (game.dimWeather.toggleDebug())
     debugTimePeriod: {
       name: "Debug Time Period",
       hint: "Enable debug logging for time period calculations",
       scope: "world",
-      config: true,
+      config: false, // Hidden from UI
       type: Boolean,
       default: false,
     },
@@ -90,7 +91,7 @@ export class Settings {
       name: "Debug Time Utils",
       hint: "Enable debug logging for time utility functions",
       scope: "world",
-      config: true,
+      config: false, // Hidden from UI
       type: Boolean,
       default: false,
     },
@@ -98,7 +99,7 @@ export class Settings {
       name: "Debug Settings",
       hint: "Enable debug logging for settings operations",
       scope: "world",
-      config: true,
+      config: false, // Hidden from UI
       type: Boolean,
       default: false,
     },
@@ -106,7 +107,7 @@ export class Settings {
       name: "Debug Weather",
       hint: "Enable debug logging for weather calculations",
       scope: "world",
-      config: true,
+      config: false, // Hidden from UI
       type: Boolean,
       default: false,
     },
@@ -157,15 +158,27 @@ export class Settings {
     },
     useAI: {
       name: "Use AI for Descriptions",
-      hint: "Use OpenAI to generate more detailed weather descriptions",
+      hint: "Use AI to generate more detailed weather descriptions",
       scope: "world",
       config: true,
       type: Boolean,
       default: false,
     },
+    aiProvider: {
+      name: "AI Provider",
+      hint: "Choose which AI provider to use for weather descriptions",
+      scope: "world",
+      config: true,
+      type: String,
+      default: "openai",
+      choices: {
+        "openai": "OpenAI (Recommended - Fast and cost-effective)",
+        "anthropic": "Anthropic Claude (High quality creative writing)"
+      },
+    },
     apiKey: {
       name: "OpenAI API Key",
-      hint: "Your OpenAI API key for generating weather descriptions",
+      hint: "Your OpenAI API key for generating weather descriptions (starts with 'sk-')",
       scope: "world",
       config: true,
       type: String,
@@ -177,11 +190,44 @@ export class Settings {
     },
     openaiModel: {
       name: "OpenAI Model",
-      hint: "Model used for OpenAI descriptions",
+      hint: "Model used for OpenAI descriptions. Recommended: GPT-4o-mini for best speed/cost balance",
       scope: "world",
       config: true,
       type: String,
       default: "gpt-4o-mini",
+      choices: {
+        "gpt-4o-mini": "GPT-4o-mini (Recommended - Fast, low-cost, great for creative content)",
+        "gpt-4o": "GPT-4o (Faster, excellent for real-time creative generation)",
+        "gpt-5-mini": "GPT-5-mini (Higher quality, slower, more expensive)",
+        "gpt-5": "GPT-5 (Highest quality, slowest, most expensive - overkill for this task)"
+      },
+    },
+    anthropicApiKey: {
+      name: "Anthropic API Key",
+      hint: "Your Anthropic API key for Claude descriptions (starts with 'sk-ant-')",
+      scope: "world",
+      config: true,
+      type: String,
+      default: "",
+      inputType: "password",
+      display: (value) => "••••••••" + (value ? value.slice(-4) : ""),
+      requiresReload: false,
+      restricted: true,
+    },
+    anthropicModel: {
+      name: "Anthropic Model",
+      hint: "Model used for Anthropic Claude descriptions",
+      scope: "world",
+      config: true,
+      type: String,
+      default: "claude-haiku-4-5",
+      choices: {
+        "claude-sonnet-4-5": "Claude 4.5 Sonnet (Latest, most capable)",
+        "claude-sonnet-4-0": "Claude 4 Sonnet (Fast and balanced)",
+        "claude-haiku-4-5": "Claude 4.5 Haiku (Fastest, most cost-effective)",
+        "claude-3-7-sonnet-latest": "Claude Sonnet 3.7",
+        "claude-3-5-haiku-latest": "Claude 3.5 Haiku"
+      },
     },
     useCustomStyles: {
       name: "Use Custom Campaign Styles",
@@ -225,12 +271,12 @@ export class Settings {
       }
       // Register all settings
       for (const [key, config] of Object.entries(this.SETTINGS)) {
-        if (key === "apiKey") {
+        if (key === "apiKey" || key === "anthropicApiKey") {
           const baseConfig = { ...config };
           baseConfig.type = String;
           baseConfig.onChange = (value) => {
             const input = document.querySelector(
-              'input[name="dimensional-weather.apiKey"]'
+              `input[name="dimensional-weather.${key}"]`
             );
             if (input) {
               input.type = "password";
@@ -243,10 +289,11 @@ export class Settings {
         }
       }
 
-      // Add custom styling for API key input
+      // Add custom styling for API key inputs
       const style = document.createElement("style");
       style.textContent = `
-        input[name="dimensional-weather.apiKey"] {
+        input[name="dimensional-weather.apiKey"],
+        input[name="dimensional-weather.anthropicApiKey"] {
           -webkit-text-security: disc;
           text-security: disc;
         }

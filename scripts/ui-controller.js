@@ -18,12 +18,12 @@ export class UIController {
     this.settingsData = settingsData;
     this.descriptionService = null;
 
-    // Load OpenAI description service
+    // Load AI description service (OpenAI only)
     if (Settings.getSetting("useAI")) {
       const apiKey = Settings.getSetting("apiKey");
       const model = Settings.getSetting("openaiModel");
       if (apiKey) {
-        this.descriptionService = new WeatherDescriptionService({ apiKey, model });
+        this.descriptionService = new WeatherDescriptionService({ apiKey, provider: "openai", model });
       }
     }
 
@@ -325,8 +325,13 @@ export class UIController {
     const timePeriod = this._getTimePeriod();
 
     // Try to use AI description service if enabled
-    if (Settings.getSetting("useAI") && this.descriptionService) {
+    const useAI = Settings.getSetting("useAI");
+    console.log("Dimensional Weather | AI enabled:", useAI, "Service exists:", !!this.descriptionService);
+
+    if (useAI && this.descriptionService) {
       try {
+        console.log("Dimensional Weather | Attempting AI description with OpenAI");
+
         const prompt = {
           campaign: this.settingsData.name,
           terrain: atmosphericDesc,
@@ -341,18 +346,27 @@ export class UIController {
           prompt
         );
 
-        // Get survival rules
-        const survivalRules = game.dimWeather?.engine?.getSurvivalRules?.() || this._getSurvivalRules(weatherState);
+        console.log("Dimensional Weather | AI description received:", aiDescription ? "YES" : "NO (empty)");
+        console.log("Dimensional Weather | AI description length:", aiDescription?.length || 0);
+        console.log("Dimensional Weather | AI description content:", aiDescription);
 
-        // Format the weather conditions with appropriate styling
-        const weatherDetails = `<p><strong>Heat:</strong> ${tempDesc}</p>
+        if (aiDescription && aiDescription.trim()) {
+          console.log("Dimensional Weather | Using AI description");
+          // Get survival rules
+          const survivalRules = game.dimWeather?.engine?.getSurvivalRules?.() || this._getSurvivalRules(weatherState);
+
+          // Format the weather conditions with appropriate styling
+          const weatherDetails = `<p><strong>Heat:</strong> ${tempDesc}</p>
 <p><strong>Wind:</strong> ${windDesc}</p>
 <p><strong>Humidity:</strong> ${humidDesc}</p>
 <p><strong>Precipitation:</strong> ${precipDesc}</p>`;
 
-        return `${aiDescription} ${weatherDetails} ${survivalRules}`;
+          return `${aiDescription} ${weatherDetails} ${survivalRules}`;
+        } else {
+          console.warn("Dimensional Weather | AI returned empty description, using fallback");
+        }
       } catch (error) {
-        // Fall back to basic description silently
+        console.error("Dimensional Weather | AI description failed:", error);
       }
     }
 
@@ -374,23 +388,38 @@ export class UIController {
   _ensureDescriptionService() {
     if (!Settings.getSetting("useAI")) {
       this.descriptionService = null;
+      console.log("Dimensional Weather | AI disabled, clearing service");
       return;
     }
 
-    const apiKey = Settings.getSetting("apiKey");
-    const model = Settings.getSetting("openaiModel");
+    const provider = Settings.getSetting("aiProvider") || "openai";
+    let apiKey, model;
+
+    if (provider === "anthropic") {
+      apiKey = Settings.getSetting("anthropicApiKey");
+      model = Settings.getSetting("anthropicModel");
+    } else {
+      apiKey = Settings.getSetting("apiKey");
+      model = Settings.getSetting("openaiModel");
+    }
+
+    console.log("Dimensional Weather | Ensuring AI service - Provider:", provider, "Model:", model, "Has Key:", !!apiKey);
+
     if (!apiKey) {
       this.descriptionService = null;
+      console.warn("Dimensional Weather | No API key configured for provider:", provider);
       return;
     }
 
     const needsNew =
       !this.descriptionService ||
+      this.descriptionService.provider !== provider ||
       this.descriptionService.apiKey !== apiKey ||
       this.descriptionService.model !== model;
 
     if (needsNew) {
-      this.descriptionService = new WeatherDescriptionService({ apiKey, model });
+      console.log("Dimensional Weather | Creating new AI service with provider:", provider);
+      this.descriptionService = new WeatherDescriptionService({ apiKey, provider, model });
     }
   }
 

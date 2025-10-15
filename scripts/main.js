@@ -8,6 +8,7 @@ import { DimensionalWeatherAPI } from "./api.js";
 import { ErrorHandler, DebugLogger } from "./utils.js";
 import { WeatherCommandSystem } from "./command-system.js";
 import { SceneManager } from "./scene-manager.js";
+import { SceneConfiguration } from "./scene-config.js";
 import { TimeUtils } from "./time-utils.js";
 
 // Module constants
@@ -36,6 +37,9 @@ async function initializeModule() {
     // Initialize unified command system
     commandSystem = new WeatherCommandSystem(game.dimWeather);
     commandSystem.register();
+
+    // Register scene configuration hooks
+    SceneConfiguration.register();
 
     initialized = true;
     DebugLogger.log("weather", "Module initialized successfully");

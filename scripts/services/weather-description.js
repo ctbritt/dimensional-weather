@@ -1,6 +1,6 @@
 /**
  * Weather Description Service
- * Handles generation of rich weather descriptions using OpenAI API
+ * Handles generation of rich weather descriptions using AI (OpenAI or Anthropic)
  */
 
 import { ErrorHandler } from "../utils.js";
@@ -8,13 +8,15 @@ import { Settings } from "../settings.js";
 
 export class WeatherDescriptionService {
   /**
-   * Create a new weather description service (OpenAI only)
+   * Create a new weather description service
    * @param {Object} options - configuration
-   * @param {string} options.apiKey - OpenAI API key
-   * @param {string} options.model - OpenAI model name
+   * @param {string} options.apiKey - API key for the provider
+   * @param {string} options.provider - AI provider ('openai' or 'anthropic')
+   * @param {string} options.model - Model name
    */
-  constructor({ apiKey, model }) {
+  constructor({ apiKey, provider = "openai", model }) {
     this.apiKey = apiKey;
+    this.provider = provider;
     this.model = model;
     this.lastCallTime = 0;
     this.RATE_LIMIT_MS = 5000; // 5 seconds between API calls
@@ -27,7 +29,7 @@ export class WeatherDescriptionService {
    */
   async generateWeatherDescription(conditions) {
     if (!this.apiKey) {
-      throw new Error("No OpenAI API key configured");
+      throw new Error(`No API key configured for ${this.provider}`);
     }
 
     // Rate limiting
@@ -41,7 +43,14 @@ export class WeatherDescriptionService {
 
     try {
       const prompt = this._buildPrompt(conditions);
-      const result = await this._callOpenAI(prompt);
+      let result;
+
+      if (this.provider === "anthropic") {
+        result = await this._callAnthropic(prompt);
+      } else {
+        result = await this._callOpenAI(prompt);
+      }
+
       this.lastCallTime = Date.now();
       if (!result || !String(result).trim()) {
         return this._getBasicDescription(conditions);
@@ -49,7 +58,7 @@ export class WeatherDescriptionService {
       return result;
     } catch (error) {
       // Provide a graceful fallback
-      console.error("Weather description generation failed:", error);
+      console.error(`Weather description generation failed (${this.provider}):`, error);
       return this._getBasicDescription(conditions);
     }
   }
@@ -83,17 +92,39 @@ export class WeatherDescriptionService {
    */
   async _callOpenAI(prompt) {
     const model = this.model || Settings.getSetting("openaiModel") || "gpt-4o-mini";
+    console.log("Dimensional Weather | Using OpenAI model:", model);
 
     const buildBody = (maxTokens) => {
-      return {
+      const body = {
         model,
         messages: [
           { role: "system", content: "You are a weather system for the Dark Sun D&D setting. Generate very concise, atmospheric descriptions (2-3 sentences max) focusing on the most critical environmental effects and immediate survival concerns. Give your responses in the style of the Wanderer from the Wanderer's Chronicle." },
           { role: "user", content: prompt },
         ],
-        // Use Chat Completions-compatible parameter
-        max_tokens: maxTokens,
       };
+
+      // Newer models (GPT-4.1+, GPT-5+, O-series) use max_completion_tokens instead of max_tokens
+      // Check if model starts with these prefixes or contains these strings
+      const useNewParam = model.startsWith("gpt-5") ||
+                          model.startsWith("gpt-4.1") ||
+                          model.startsWith("o3") ||
+                          model.startsWith("o4") ||
+                          model.includes("-5-") ||
+                          model.includes("-4.1-");
+
+      console.log("Dimensional Weather | Model:", model, "Use max_completion_tokens:", useNewParam);
+
+      if (!useNewParam) {
+        console.warn("Dimensional Weather | Using legacy max_tokens parameter for model:", model);
+      }
+
+      if (useNewParam) {
+        body.max_completion_tokens = maxTokens;
+      } else {
+        body.max_tokens = maxTokens;
+      }
+
+      return body;
     };
 
     const callOnce = async (body) => {
@@ -107,9 +138,17 @@ export class WeatherDescriptionService {
       });
       if (!resp.ok) {
         const errorData = await resp.json().catch(() => ({}));
-        throw new Error(`OpenAI API error: ${errorData.error?.message || resp.statusText}`);
+        const errorMsg = errorData.error?.message || resp.statusText;
+
+        // Check if this might be a key mismatch
+        if (errorMsg.includes("authentication") || errorMsg.includes("api_key") || errorMsg.includes("Incorrect API key")) {
+          throw new Error(`OpenAI API authentication failed. Make sure you're using an OpenAI API key (should start with 'sk-'). Error: ${errorMsg}`);
+        }
+
+        throw new Error(`OpenAI API error: ${errorMsg}`);
       }
       const data = await resp.json();
+      console.log("Dimensional Weather | OpenAI raw response:", JSON.stringify(data, null, 2));
       let contentText = null;
       let finishReason = null;
 
@@ -146,16 +185,25 @@ export class WeatherDescriptionService {
         contentText = data.output_text.trim();
       }
 
+      console.log("Dimensional Weather | Parsed content:", contentText, "Finish reason:", finishReason);
       return { contentText: contentText ? String(contentText).trim() : "", finishReason };
     };
 
-    // First attempt
-    const initialTokens = 300;
+    // First attempt - reasoning models (GPT-5, O-series) need much more tokens
+    // They use reasoning_tokens internally before generating output
+    const isReasoningModel = model.startsWith("gpt-5") ||
+                            model.startsWith("o3") ||
+                            model.startsWith("o4") ||
+                            model.includes("-5-");
+
+    const initialTokens = isReasoningModel ? 1500 : 300;
     let { contentText, finishReason } = await callOnce(buildBody(initialTokens));
+    console.log("Dimensional Weather | First attempt result - Content length:", contentText?.length || 0, "Finish:", finishReason);
 
     // Retry once if empty content or length-capped
     if (!contentText || finishReason === "length") {
-      const retryTokens = initialTokens + 200; // give more budget
+      const retryTokens = isReasoningModel ? 2000 : initialTokens + 200;
+      console.log("Dimensional Weather | Retrying with more tokens:", retryTokens);
       const retry = await callOnce(buildBody(retryTokens));
       contentText = retry.contentText || contentText;
       finishReason = retry.finishReason || finishReason;
@@ -167,16 +215,80 @@ export class WeatherDescriptionService {
   }
 
   /**
+   * Call Anthropic API
+   * @private
+   * @param {string} prompt - Prompt to send
+   * @returns {Promise<string>} API response
+   */
+  async _callAnthropic(prompt) {
+    const model = this.model || Settings.getSetting("anthropicModel") || "claude-sonnet-4-5-20250929";
+    console.log("Dimensional Weather | Using Anthropic model:", model);
+
+    const body = {
+      model,
+      max_tokens: 500,
+      messages: [
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      system: "You are a weather system for the Dark Sun D&D setting. Generate very concise, atmospheric descriptions (2-3 sentences max) focusing on the most critical environmental effects and immediate survival concerns. Give your responses in the style of the Wanderer from the Wanderer's Chronicle."
+    };
+
+    console.log("Dimensional Weather | Calling Anthropic API with dangerous-direct-browser-access header");
+    const resp = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": this.apiKey,
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true"
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!resp.ok) {
+      const errorData = await resp.json().catch(() => ({}));
+      const errorMsg = errorData.error?.message || resp.statusText;
+      console.error("Dimensional Weather | Anthropic API error:", errorMsg, errorData);
+
+      // Check if this might be a key mismatch
+      if (errorMsg.includes("authentication") || errorMsg.includes("api_key") || errorMsg.includes("invalid")) {
+        throw new Error(`Anthropic API authentication failed. Make sure you're using an Anthropic API key (should start with 'sk-ant-'). Error: ${errorMsg}`);
+      }
+
+      throw new Error(`Anthropic API error: ${errorMsg}`);
+    }
+
+    const data = await resp.json();
+    console.log("Dimensional Weather | Anthropic raw response:", JSON.stringify(data, null, 2));
+
+    // Anthropic returns content in a different format
+    if (data.content && Array.isArray(data.content) && data.content.length > 0) {
+      const textContent = data.content.find(c => c.type === "text");
+      if (textContent && textContent.text) {
+        const result = textContent.text.trim();
+        console.log("Dimensional Weather | Anthropic description:", result);
+        return result;
+      }
+    }
+
+    console.warn("Dimensional Weather | Anthropic returned no usable content");
+    return "";
+  }
+
+  /**
    * Generate a basic description as fallback
    * @private
    * @param {Object} conditions - Weather conditions
    * @returns {string} Basic description
    */
   _getBasicDescription(conditions) {
-    return `The ${conditions.terrain || "landscape"} unfolds before you. 
-    The temperature is ${conditions.tempDesc || "sweltering"}, with 
-    ${conditions.windDesc || "scratchy winds"} and 
-    ${conditions.precipDesc || "hazy skies"}. 
+    return `The ${conditions.terrain || "landscape"} unfolds before you.
+    The temperature is ${conditions.tempDesc || "sweltering"}, with
+    ${conditions.windDesc || "scratchy winds"} and
+    ${conditions.precipDesc || "hazy skies"}.
     The air feels ${conditions.humidDesc || "dry and dusty"}.`;
   }
 }
