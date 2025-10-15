@@ -60,17 +60,27 @@ export class SceneConfiguration {
    */
   static async _onRenderSceneConfig(app, html, data) {
     try {
-      DebugLogger.log("weather", "renderSceneConfig hook called", { app, hasObject: !!app.object });
+      console.log("Dimensional Weather | renderSceneConfig hook called", {
+        hasObject: !!app.object,
+        hasDocument: !!app.document,
+        appKeys: Object.keys(app),
+        dataKeys: Object.keys(data)
+      });
 
-      const scene = app.object;
+      // In Foundry v13, the document might be at app.document instead of app.object
+      const scene = app.document || app.object;
 
       // Verify we have a valid scene
       if (!scene || !scene.id) {
-        console.warn("Dimensional Weather | No valid scene found in SceneConfig");
+        console.warn("Dimensional Weather | No valid scene found in SceneConfig", {
+          scene,
+          hasScene: !!scene,
+          hasId: scene?.id
+        });
         return;
       }
 
-      DebugLogger.log("weather", `Processing scene config for: ${scene.name}`);
+      console.log("Dimensional Weather | Processing scene config for:", scene.name);
 
       // Get current terrain from scene flag
       const currentTerrain = scene.getFlag(this.MODULE_ID, "terrain") || "";
