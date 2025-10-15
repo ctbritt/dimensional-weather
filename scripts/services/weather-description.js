@@ -148,6 +148,7 @@ export class WeatherDescriptionService {
         throw new Error(`OpenAI API error: ${errorMsg}`);
       }
       const data = await resp.json();
+      console.log("Dimensional Weather | OpenAI raw response:", JSON.stringify(data, null, 2));
       let contentText = null;
       let finishReason = null;
 
@@ -184,12 +185,14 @@ export class WeatherDescriptionService {
         contentText = data.output_text.trim();
       }
 
+      console.log("Dimensional Weather | Parsed content:", contentText, "Finish reason:", finishReason);
       return { contentText: contentText ? String(contentText).trim() : "", finishReason };
     };
 
     // First attempt
     const initialTokens = 300;
     let { contentText, finishReason } = await callOnce(buildBody(initialTokens));
+    console.log("Dimensional Weather | First attempt result - Content length:", contentText?.length || 0, "Finish:", finishReason);
 
     // Retry once if empty content or length-capped
     if (!contentText || finishReason === "length") {
