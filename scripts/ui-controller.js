@@ -347,8 +347,11 @@ export class UIController {
         );
 
         console.log("Dimensional Weather | AI description received:", aiDescription ? "YES" : "NO (empty)");
+        console.log("Dimensional Weather | AI description length:", aiDescription?.length || 0);
+        console.log("Dimensional Weather | AI description content:", aiDescription);
 
         if (aiDescription && aiDescription.trim()) {
+          console.log("Dimensional Weather | Using AI description");
           // Get survival rules
           const survivalRules = game.dimWeather?.engine?.getSurvivalRules?.() || this._getSurvivalRules(weatherState);
 
