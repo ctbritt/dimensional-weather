@@ -82,6 +82,10 @@ export class SceneConfiguration {
 
       console.log("Dimensional Weather | Processing scene config for:", scene.name);
 
+      // Ensure html is a jQuery object
+      const $html = html instanceof jQuery ? html : $(html);
+      console.log("Dimensional Weather | HTML type:", typeof html, "jQuery:", $html.length);
+
       // Get current terrain from scene flag
       const currentTerrain = scene.getFlag(this.MODULE_ID, "terrain") || "";
 
@@ -107,7 +111,7 @@ export class SceneConfiguration {
       `;
 
       // Find the ambience tab or appropriate insertion point
-      const ambienceTab = html.find('.tab[data-tab="ambience"]');
+      const ambienceTab = $html.find('.tab[data-tab="ambience"]');
       console.log("Dimensional Weather | Ambience tab found:", ambienceTab.length);
 
       if (ambienceTab.length > 0) {
@@ -124,13 +128,13 @@ export class SceneConfiguration {
       } else {
         // Fallback: insert before submit buttons
         console.log("Dimensional Weather | Ambience tab not found, using fallback");
-        const footer = html.find("footer.sheet-footer, button[type='submit']").first();
+        const footer = $html.find("footer.sheet-footer, button[type='submit']").first();
         if (footer.length > 0) {
           footer.before(formGroupHtml);
           console.log("Dimensional Weather | Inserted before footer");
         } else {
           // Last resort: append to form
-          html.find("form").append(formGroupHtml);
+          $html.find("form").append(formGroupHtml);
           console.log("Dimensional Weather | Appended to form");
         }
       }
