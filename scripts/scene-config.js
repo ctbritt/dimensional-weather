@@ -90,6 +90,10 @@ export class SceneConfiguration {
       const allTabs = $html.find('.tab');
       console.log("Dimensional Weather | All tabs found:", allTabs.length, Array.from(allTabs).map(t => $(t).data('tab')));
 
+      // Check for subtabs within ambience
+      const ambienceSubtabs = $html.find('.tab[data-tab="ambience"] .tab');
+      console.log("Dimensional Weather | Ambience subtabs:", ambienceSubtabs.length, Array.from(ambienceSubtabs).map(t => $(t).data('tab')));
+
       // Get current terrain from scene flag
       const currentTerrain = scene.getFlag(this.MODULE_ID, "terrain") || "";
 
@@ -114,21 +118,29 @@ export class SceneConfiguration {
         </div>
       `;
 
-      // Find the ambience tab or appropriate insertion point
-      const ambienceTab = $html.find('.tab[data-tab="ambience"]');
-      console.log("Dimensional Weather | Ambience tab found:", ambienceTab.length, "visible:", ambienceTab.is(':visible'), "display:", ambienceTab.css('display'));
+      // Try to find the environment subtab (within ambience) first
+      let targetTab = $html.find('.tab[data-tab="environment"]');
+      console.log("Dimensional Weather | Environment subtab found:", targetTab.length, "visible:", targetTab.is(':visible'));
 
-      if (ambienceTab.length > 0) {
-        // Insert after the last form group in ambience tab
-        const lastFormGroup = ambienceTab.find(".form-group").last();
-        console.log("Dimensional Weather | Form groups in ambience:", ambienceTab.find(".form-group").length);
+      // Fall back to ambience tab if environment not found
+      if (targetTab.length === 0) {
+        targetTab = $html.find('.tab[data-tab="ambience"]');
+        console.log("Dimensional Weather | Using ambience tab instead");
+      }
+
+      console.log("Dimensional Weather | Target tab found:", targetTab.length, "visible:", targetTab.is(':visible'), "display:", targetTab.css('display'));
+
+      if (targetTab.length > 0) {
+        // Insert after the last form group in target tab
+        const lastFormGroup = targetTab.find(".form-group").last();
+        console.log("Dimensional Weather | Form groups in target tab:", targetTab.find(".form-group").length);
         console.log("Dimensional Weather | Last form group:", lastFormGroup.find('label').text());
         if (lastFormGroup.length > 0) {
           lastFormGroup.after(formGroupHtml);
           console.log("Dimensional Weather | Inserted after last form group");
         } else {
-          ambienceTab.append(formGroupHtml);
-          console.log("Dimensional Weather | Appended to ambience tab");
+          targetTab.append(formGroupHtml);
+          console.log("Dimensional Weather | Appended to target tab");
         }
       } else {
         // Fallback: insert before submit buttons
