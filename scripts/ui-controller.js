@@ -18,15 +18,12 @@ export class UIController {
     this.settingsData = settingsData;
     this.descriptionService = null;
 
-    // Load AI description service
+    // Load AI description service (OpenAI only)
     if (Settings.getSetting("useAI")) {
       const apiKey = Settings.getSetting("apiKey");
-      const provider = Settings.getSetting("aiProvider") || "openai";
-      const model = provider === "anthropic"
-        ? Settings.getSetting("anthropicModel")
-        : Settings.getSetting("openaiModel");
+      const model = Settings.getSetting("openaiModel");
       if (apiKey) {
-        this.descriptionService = new WeatherDescriptionService({ apiKey, provider, model });
+        this.descriptionService = new WeatherDescriptionService({ apiKey, provider: "openai", model });
       }
     }
 
@@ -333,8 +330,7 @@ export class UIController {
 
     if (useAI && this.descriptionService) {
       try {
-        const provider = Settings.getSetting("aiProvider") || "openai";
-        console.log("Dimensional Weather | Attempting AI description with provider:", provider);
+        console.log("Dimensional Weather | Attempting AI description with OpenAI");
 
         const prompt = {
           campaign: this.settingsData.name,
@@ -394,12 +390,9 @@ export class UIController {
     }
 
     const apiKey = Settings.getSetting("apiKey");
-    const provider = Settings.getSetting("aiProvider") || "openai";
-    const model = provider === "anthropic"
-      ? Settings.getSetting("anthropicModel")
-      : Settings.getSetting("openaiModel");
+    const model = Settings.getSetting("openaiModel");
 
-    console.log("Dimensional Weather | Ensuring AI service - Provider:", provider, "Model:", model, "Has Key:", !!apiKey);
+    console.log("Dimensional Weather | Ensuring AI service - Model:", model, "Has Key:", !!apiKey);
 
     if (!apiKey) {
       this.descriptionService = null;
@@ -410,12 +403,11 @@ export class UIController {
     const needsNew =
       !this.descriptionService ||
       this.descriptionService.apiKey !== apiKey ||
-      this.descriptionService.provider !== provider ||
       this.descriptionService.model !== model;
 
     if (needsNew) {
-      console.log("Dimensional Weather | Creating new AI service with provider:", provider);
-      this.descriptionService = new WeatherDescriptionService({ apiKey, provider, model });
+      console.log("Dimensional Weather | Creating new AI service with OpenAI");
+      this.descriptionService = new WeatherDescriptionService({ apiKey, provider: "openai", model });
     }
   }
 

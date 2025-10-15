@@ -94,15 +94,22 @@ export class WeatherDescriptionService {
     const model = this.model || Settings.getSetting("openaiModel") || "gpt-4o-mini";
 
     const buildBody = (maxTokens) => {
-      return {
+      const body = {
         model,
         messages: [
           { role: "system", content: "You are a weather system for the Dark Sun D&D setting. Generate very concise, atmospheric descriptions (2-3 sentences max) focusing on the most critical environmental effects and immediate survival concerns. Give your responses in the style of the Wanderer from the Wanderer's Chronicle." },
           { role: "user", content: prompt },
         ],
-        // Use Chat Completions-compatible parameter
-        max_tokens: maxTokens,
       };
+
+      // Newer models (GPT-4.1, O-series) use max_completion_tokens instead of max_tokens
+      if (model.includes("gpt-4.1") || model.includes("o3") || model.includes("o4")) {
+        body.max_completion_tokens = maxTokens;
+      } else {
+        body.max_tokens = maxTokens;
+      }
+
+      return body;
     };
 
     const callOnce = async (body) => {

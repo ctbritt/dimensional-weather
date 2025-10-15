@@ -163,21 +163,9 @@ export class Settings {
       type: Boolean,
       default: false,
     },
-    aiProvider: {
-      name: "AI Provider",
-      hint: "Choose which AI service to use for weather descriptions",
-      scope: "world",
-      config: true,
-      type: String,
-      default: "openai",
-      choices: {
-        openai: "OpenAI",
-        anthropic: "Anthropic (Claude)"
-      },
-    },
     apiKey: {
-      name: "AI API Key",
-      hint: "Your API key for the selected AI provider (OpenAI or Anthropic)",
+      name: "OpenAI API Key",
+      hint: "Your OpenAI API key for generating weather descriptions",
       scope: "world",
       config: true,
       type: String,
@@ -193,31 +181,11 @@ export class Settings {
       scope: "world",
       config: true,
       type: String,
-      default: "gpt-4o-mini",
+      default: "gpt-5-mini",
       choices: {
-        "gpt-4.1": "GPT-4.1 (Latest, Most Capable)",
-        "gpt-4.1-nano": "GPT-4.1 Nano (Fastest & Cheapest)",
-        "gpt-4.1-mini": "GPT-4.1 Mini (Balanced)",
-        "gpt-4o": "GPT-4o (Multimodal)",
-        "gpt-4o-mini": "GPT-4o Mini (Fast & Affordable)",
-        "o3-mini": "O3 Mini (Reasoning)",
-        "o4-mini": "O4 Mini (Advanced Reasoning)"
-      },
-    },
-    anthropicModel: {
-      name: "Anthropic Model",
-      hint: "Model used for Anthropic (Claude) descriptions",
-      scope: "world",
-      config: true,
-      type: String,
-      default: "claude-sonnet-4-5-20250929",
-      choices: {
-        "claude-sonnet-4-5-20250929": "Claude Sonnet 4.5 (Latest)",
-        "claude-haiku-4-5-20251001": "Claude Haiku 4.5 (Fastest)",
-        "claude-opus-4-1-20250805": "Claude Opus 4.1 (Most Capable)",
-        "claude-sonnet-4-20250514": "Claude Sonnet 4",
-        "claude-3-7-sonnet-20250219": "Claude 3.7 Sonnet",
-        "claude-3-5-haiku-20241022": "Claude 3.5 Haiku"
+        "gpt-5": "GPT-5 (Latest, Most Capable)",
+        "gpt-5-nano": "GPT-5-Nano (Fastest, most cost-efficient version of GPT-5)",
+        "gpt-5-mini": "GPT-5-Mini (A faster, cost-efficient version of GPT-5 for well-defined tasks)"
       },
     },
     useCustomStyles: {
