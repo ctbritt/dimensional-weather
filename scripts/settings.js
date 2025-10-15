@@ -195,10 +195,13 @@ export class Settings {
       type: String,
       default: "gpt-4o-mini",
       choices: {
-        "gpt-4o": "GPT-4o (Most Capable)",
+        "gpt-4.1": "GPT-4.1 (Latest, Most Capable)",
+        "gpt-4.1-nano": "GPT-4.1 Nano (Fastest & Cheapest)",
+        "gpt-4.1-mini": "GPT-4.1 Mini (Balanced)",
+        "gpt-4o": "GPT-4o (Multimodal)",
         "gpt-4o-mini": "GPT-4o Mini (Fast & Affordable)",
-        "gpt-4-turbo": "GPT-4 Turbo",
-        "gpt-3.5-turbo": "GPT-3.5 Turbo (Legacy)"
+        "o3-mini": "O3 Mini (Reasoning)",
+        "o4-mini": "O4 Mini (Advanced Reasoning)"
       },
     },
     anthropicModel: {
@@ -207,13 +210,14 @@ export class Settings {
       scope: "world",
       config: true,
       type: String,
-      default: "claude-3-5-sonnet-20241022",
+      default: "claude-sonnet-4-5-20250929",
       choices: {
-        "claude-3-5-sonnet-20241022": "Claude 3.5 Sonnet (Latest)",
-        "claude-3-5-haiku-20241022": "Claude 3.5 Haiku (Fast)",
-        "claude-3-opus-20240229": "Claude 3 Opus (Most Capable)",
-        "claude-3-sonnet-20240229": "Claude 3 Sonnet",
-        "claude-3-haiku-20240307": "Claude 3 Haiku"
+        "claude-sonnet-4-5-20250929": "Claude Sonnet 4.5 (Latest)",
+        "claude-haiku-4-5-20251001": "Claude Haiku 4.5 (Fastest)",
+        "claude-opus-4-1-20250805": "Claude Opus 4.1 (Most Capable)",
+        "claude-sonnet-4-20250514": "Claude Sonnet 4",
+        "claude-3-7-sonnet-20250219": "Claude 3.7 Sonnet",
+        "claude-3-5-haiku-20241022": "Claude 3.5 Haiku"
       },
     },
     useCustomStyles: {

@@ -189,7 +189,7 @@ export class WeatherDescriptionService {
    * @returns {Promise<string>} API response
    */
   async _callAnthropic(prompt) {
-    const model = this.model || Settings.getSetting("anthropicModel") || "claude-3-5-sonnet-20241022";
+    const model = this.model || Settings.getSetting("anthropicModel") || "claude-sonnet-4-5-20250929";
 
     const body = {
       model,
