@@ -60,6 +60,12 @@ export class SceneConfiguration {
     try {
       const scene = app.object;
 
+      // Verify we have a valid scene
+      if (!scene || !scene.id || scene.documentName !== "Scene") {
+        DebugLogger.log("weather", "Skipping terrain dropdown - not a Scene document");
+        return;
+      }
+
       // Get current terrain from scene flag
       const currentTerrain = scene.getFlag(this.MODULE_ID, "terrain") || "";
 
