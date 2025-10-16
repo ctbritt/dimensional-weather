@@ -97,6 +97,23 @@ export class UIController {
       customVars.push(`--dw-color-border: ${finalStyles.borderColor};`);
     }
 
+    // Handle new style properties for enhanced theming
+    if (finalStyles.backgroundGradient && useCustomStyles) {
+      customVars.push(`--dw-campaign-bg-gradient: ${finalStyles.backgroundGradient};`);
+    }
+    if (finalStyles.borderStyle && useCustomStyles) {
+      customVars.push(`--dw-campaign-border-style: ${finalStyles.borderStyle};`);
+    }
+    if (finalStyles.borderWidth && useCustomStyles) {
+      customVars.push(`--dw-campaign-border-width: ${finalStyles.borderWidth};`);
+    }
+    if (finalStyles.boxShadow && useCustomStyles) {
+      customVars.push(`--dw-campaign-box-shadow: ${finalStyles.boxShadow};`);
+    }
+    if (finalStyles.textShadow !== undefined && useCustomStyles) {
+      customVars.push(`--dw-campaign-text-shadow: ${finalStyles.textShadow};`);
+    }
+
     // Only create root styles if we have custom variables
     const rootStyles =
       customVars.length > 0
@@ -263,8 +280,12 @@ export class UIController {
       if (campaignStyles.borderColor)
         styleString += `--dw-campaign-border-color: ${campaignStyles.borderColor};`;
 
-      // Build chat card with inline style
-      const chatCardText = `<div class="weather-report" style="${styleString}">
+      // Get current campaign ID for CSS class
+      const currentCampaign = Settings.getSetting("campaign");
+      const campaignClass = currentCampaign ? `campaign-${currentCampaign}` : '';
+      
+      // Build chat card with inline style and campaign class
+      const chatCardText = `<div class="weather-report ${campaignClass}" style="${styleString}">
         <h3>Current Weather</h3>
         <p class="terrain-type">${terrainDisplay} - ${timeDisplay} - ${seasonDisplay}</p>
         <hr>

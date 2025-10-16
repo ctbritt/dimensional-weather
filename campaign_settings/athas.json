@@ -4,12 +4,19 @@
     "description": "A harsh desert world where survival is a daily struggle. The sun burns relentlessly, and water is the most precious resource.",
     "defaultTerrain": "scrubPlains",
     "styles": {
-        "headingFont": "Papyrus, Uncial Antiqua, Luminari, fantasy",
+        "headingFont": "Packard Antique Bold, MedievalSharp, Uncial Antiqua, fantasy",
         "textFont": "Signika",
         "headingColor": "#8B4513",
         "textColor": "#4A4A4A",
         "accentColor": "#D2691E",
-        "borderColor": "#8B4513"
+        "borderColor": "#8B4513",
+        "backgroundGradient": "linear-gradient(135deg, #F4A460 0%, #DEB887 50%, #D2691E 100%)",
+        "borderStyle": "solid",
+        "borderWidth": "2px",
+        "boxShadow": "0 8px 16px rgba(139, 69, 19, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
+        "textShadow": "2px 2px 4px rgba(0, 0, 0, 0.3)",
+        "backgroundPattern": "none",
+        "specialEffects": "sand"
     },
     "seasons": {
         "highSun": {

@@ -4,13 +4,20 @@
     "description": "A vast expanse of wildspace and the mysterious Flow, where ships sail between crystal spheres and through the phlogiston. The environment is harsh and unforgiving, with unique challenges for spacefaring adventurers.",
     "defaultTerrain": "wildspace",
     "styles": {
-        "headingFont": "Orbitron, Space Grotesk, fantasy",
+        "headingFont": "Orbitron, Audiowide, Expletus Sans, fantasy",
         "textFont": "Arial, Helvetica, sans-serif",
         "backgroundColor": "#1a1a1a",
         "headingColor": "#FFD700",
         "textColor": "#E0E0E0",
         "accentColor": "#40E0D0",
-        "borderColor": "#FFD700"
+        "borderColor": "#FFD700",
+        "backgroundGradient": "linear-gradient(135deg, #2a2a3e 0%, #1a1a2e 50%, #16213e 100%)",
+        "borderStyle": "solid",
+        "borderWidth": "1px",
+        "boxShadow": "0 0 20px rgba(255, 215, 0, 0.3), 0 0 40px rgba(64, 224, 208, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
+        "textShadow": "0 0 10px rgba(255, 215, 0, 0.5)",
+        "backgroundPattern": "none",
+        "specialEffects": "stars"
     },
     "seasons": {
         "flowCurrent": {

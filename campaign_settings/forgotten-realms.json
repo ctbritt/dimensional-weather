@@ -1,23 +1,23 @@
 {
-    "id": "earth",
-    "name": "Earth",
-    "description": "A balanced weather system correspondent to Earth.",
+    "id": "forgotten-realms",
+    "name": "Forgotten Realms",
+    "description": "The most detailed and developed campaign setting in D&D, featuring diverse climates from arctic Icewind Dale to tropical jungles of Chult.",
     "defaultTerrain": "temperate",
     "styles": {
-        "headingFont": "Lato, Roboto, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        "textFont": "Lato, Roboto, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        "backgroundColor": "#F8F9FA",
+        "headingFont": "Cinzel, Cinzel Decorative, IM Fell English SC, Uncial Antiqua, fantasy",
+        "textFont": "Crimson Text, 'Times New Roman', serif",
+        "backgroundColor": "#F8F6F0",
         "headingColor": "#1A3D1A",
         "textColor": "#2C1810",
-        "accentColor": "#87CEEB",
-        "borderColor": "#6C757D",
-        "backgroundGradient": "linear-gradient(135deg, #E8F5E8 0%, #F0F8FF 100%)",
+        "accentColor": "#8B4513",
+        "borderColor": "#6B4423",
+        "backgroundGradient": "linear-gradient(135deg, #F8F6F0 0%, #E8E0D0 50%, #D8C8A8 100%)",
         "borderStyle": "solid",
-        "borderWidth": "1px",
-        "boxShadow": "0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)",
-        "textShadow": "none",
+        "borderWidth": "2px",
+        "boxShadow": "0 6px 12px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.4)",
+        "textShadow": "1px 1px 2px rgba(0, 0, 0, 0.15)",
         "backgroundPattern": "none",
-        "specialEffects": "clouds"
+        "specialEffects": "tome"
     },
     "seasons": {
         "spring": {
@@ -42,7 +42,7 @@
                 "variability": 1
             }
         },
-        "fall": {
+        "autumn": {
             "name": "Autumn",
             "description": "Cooling temperatures and increased wind bring changing weather patterns.",
             "modifiers": {
@@ -81,12 +81,12 @@
                 {
                     "extremeHeat": 10,
                     "description": "Extreme Heat",
-                    "effect": "[[/save con 15 format=long]] each hour (increases by 1 per hour) or gain 1 Exhaustion level. Creatures wearing Medium/Heavy armor have Disadvantage. Creatures with Fire Resistance/Immunity automatically succeed."
+                    "effect": "[[/save con format=long]] each hour (DC starts at 5 and increases by 1 per hour) or gain 1 Exhaustion level. Creatures wearing Medium/Heavy armor have Disadvantage. Creatures with Fire Resistance/Immunity automatically succeed."
                 },
                 {
                     "extremeCold": -10,
                     "description": "Extreme Cold",
-                    "effect": "DC 10 Constitution save each hour or gain 1 Exhaustion level. Creatures with Cold Resistance/Immunity automatically succeed."
+                    "effect": "[[/save con 10 format=long]] each hour or gain 1 Exhaustion level. Creatures with Cold Resistance/Immunity automatically succeed."
                 }
             ]
         },

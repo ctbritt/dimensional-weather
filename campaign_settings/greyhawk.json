@@ -3,6 +3,22 @@
     "name": "Greyhawk",
     "description": "A balanced weather system correspondent to Earth.",
     "defaultTerrain": "temperate",
+    "styles": {
+        "headingFont": "MedievalSharp, IM Fell English SC, UnifrakturCook, fantasy",
+        "textFont": "Crimson Text, 'Times New Roman', serif",
+        "backgroundColor": "#F4E7D7",
+        "headingColor": "#1A1A1A",
+        "textColor": "#2C1810",
+        "accentColor": "#8B4513",
+        "borderColor": "#8B4513",
+        "backgroundGradient": "linear-gradient(135deg, #FFF8DC 0%, #F5E6D3 50%, #E6D3A3 100%)",
+        "borderStyle": "double",
+        "borderWidth": "2px",
+        "boxShadow": "0 8px 16px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.3)",
+        "textShadow": "1px 1px 2px rgba(0, 0, 0, 0.2)",
+        "backgroundPattern": "none",
+        "specialEffects": "parchment"
+    },
     "seasons": {
         "spring": {
             "name": "Spring",

@@ -11,6 +11,11 @@
             "path": "earth.json"
         },
         {
+            "id": "forgotten-realms",
+            "name": "Forgotten Realms",
+            "path": "forgotten-realms.json"
+        },
+        {
             "id": "greyhawk",
             "name": "Greyhawk",
             "path": "greyhawk.json"

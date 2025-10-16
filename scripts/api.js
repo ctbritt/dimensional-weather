@@ -352,7 +352,11 @@ export class DimensionalWeatherAPI {
       .map(([key, season]) => `<div class="list-item">${season.name}</div>`)
       .join("");
 
-    return `<div class="weather-report"><h3>WEATHER SYSTEM COMMANDS</h3><div class="command"><span class="command-name">/weather</span><span class="command-desc">: Display current weather</span></div><h4>GM Commands:</h4><div class="command"><span class="command-name">/weather calc</span><span class="command-desc">: Display weather calculation details (GM only)</span></div><div class="command"><span class="command-name">/weather random [0-10]</span><span class="command-desc">: Set randomness</span></div><div class="command"><span class="command-name">/weather season [name]</span><span class="command-desc">: Change season</span></div><div class="command"><span class="command-name">/weather settings</span><span class="command-desc">: Open settings</span></div><div class="command"><span class="command-name">/weather stats</span><span class="command-desc">: Display scene base stats</span></div><div class="command"><span class="command-name">/weather terrain [name]</span><span class="command-desc">: Change terrain</span></div><div class="command"><span class="command-name">/weather update</span><span class="command-desc">: Force update</span></div><h4>Available Terrains:</h4><div class="list-section">${terrainList}</div><h4>Available Seasons:</h4><div class="list-section">${seasonList}</div></div>`;
+    // Get current campaign ID for CSS class
+    const currentCampaign = Settings.getSetting("campaign");
+    const campaignClass = currentCampaign ? `campaign-${currentCampaign}` : '';
+    
+    return `<div class="weather-report ${campaignClass}"><h3>WEATHER SYSTEM COMMANDS</h3><div class="command"><span class="command-name">/weather</span><span class="command-desc">: Display current weather</span></div><h4>GM Commands:</h4><div class="command"><span class="command-name">/weather calc</span><span class="command-desc">: Display weather calculation details (GM only)</span></div><div class="command"><span class="command-name">/weather random [0-10]</span><span class="command-desc">: Set randomness</span></div><div class="command"><span class="command-name">/weather season [name]</span><span class="command-desc">: Change season</span></div><div class="command"><span class="command-name">/weather settings</span><span class="command-desc">: Open settings</span></div><div class="command"><span class="command-name">/weather stats</span><span class="command-desc">: Display scene base stats</span></div><div class="command"><span class="command-name">/weather terrain [name]</span><span class="command-desc">: Change terrain</span></div><div class="command"><span class="command-name">/weather update</span><span class="command-desc">: Force update</span></div><h4>Available Terrains:</h4><div class="list-section">${terrainList}</div><h4>Available Seasons:</h4><div class="list-section">${seasonList}</div></div>`;
   }
 
   /**
@@ -378,7 +382,11 @@ export class DimensionalWeatherAPI {
       const terrain = this.settingsData.terrains[weatherState.terrain];
       const season = this.settingsData.seasons[weatherState.season];
 
-      let forecast = `<div class="weather-report"><h3>WEATHER FORECAST</h3><h4>Current Conditions</h4><ul><li>Terrain: ${terrain.name}</li><li>Season: ${season.name}</li><li>Temperature: ${weatherState.temperature}</li><li>Wind: ${weatherState.wind}</li><li>Precipitation: ${weatherState.precipitation}</li><li>Humidity: ${weatherState.humidity}</li></ul>`;
+      // Get current campaign ID for CSS class
+      const currentCampaign = Settings.getSetting("campaign");
+      const campaignClass = currentCampaign ? `campaign-${currentCampaign}` : '';
+      
+      let forecast = `<div class="weather-report ${campaignClass}"><h3>WEATHER FORECAST</h3><h4>Current Conditions</h4><ul><li>Terrain: ${terrain.name}</li><li>Season: ${season.name}</li><li>Temperature: ${weatherState.temperature}</li><li>Wind: ${weatherState.wind}</li><li>Precipitation: ${weatherState.precipitation}</li><li>Humidity: ${weatherState.humidity}</li></ul>`;
 
       // Add survival rules if any apply
       const rules = [];
@@ -528,7 +536,11 @@ export class DimensionalWeatherAPI {
             return;
           }
 
-          const details = `<div class="weather-report">
+          // Get current campaign ID for CSS class
+          const currentCampaign = Settings.getSetting("campaign");
+          const campaignClass = currentCampaign ? `campaign-${currentCampaign}` : '';
+          
+          const details = `<div class="weather-report ${campaignClass}">
             <h3>Weather Calculation Details</h3>
             <hr>
             <h4>Base Values (${calc.terrain.name})</h4>
@@ -621,8 +633,12 @@ export class DimensionalWeatherAPI {
   }
 </ul>`;
 
+    // Get current campaign ID for CSS class
+    const currentCampaign = Settings.getSetting("campaign");
+    const campaignClass = currentCampaign ? `campaign-${currentCampaign}` : '';
+    
     await ChatMessage.create({
-      content: `<div class="weather-report">
+      content: `<div class="weather-report ${campaignClass}">
         <h2>Dimensional Weather Help</h2>
         ${commands}
       </div>`,

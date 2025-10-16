@@ -600,8 +600,12 @@ export class WeatherCommandSystem {
       );
     }
 
+    // Get current campaign ID for CSS class
+    const currentCampaign = Settings.getSetting("campaign");
+    const campaignClass = currentCampaign ? `campaign-${currentCampaign}` : '';
+    
     return this._createSuccessResponse(
-      `<div class="weather-report">
+      `<div class="weather-report ${campaignClass}">
         <h3>Weather System Info</h3>
         <ul>
           <li>Name: ${this.api.settingsData.name}</li>
@@ -764,8 +768,12 @@ export class WeatherCommandSystem {
     const terrain = this.api.settingsData.terrains[weatherState.terrain];
     const season = this.api.settingsData.seasons[weatherState.season];
 
+    // Get current campaign ID for CSS class
+    const currentCampaign = Settings.getSetting("campaign");
+    const campaignClass = currentCampaign ? `campaign-${currentCampaign}` : '';
+    
     return this._createSuccessResponse(
-      `<div class="weather-report">
+      `<div class="weather-report ${campaignClass}">
         <h3>SCENE WEATHER STATS</h3>
         <h4>Current State</h4>
         <ul>
@@ -811,7 +819,11 @@ export class WeatherCommandSystem {
       );
     }
 
-    const details = `<div class="weather-report">
+    // Get current campaign ID for CSS class
+    const currentCampaign = Settings.getSetting("campaign");
+    const campaignClass = currentCampaign ? `campaign-${currentCampaign}` : '';
+    
+    const details = `<div class="weather-report ${campaignClass}">
       <h3>WEATHER CALCULATION DETAILS</h3>
       <h4>Base Values (${calc.terrain.name})</h4>
       <ul>
